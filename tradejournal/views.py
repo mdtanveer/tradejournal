@@ -16,7 +16,7 @@ repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 @app.route('/')
 @app.route('/home')
 def home():
-    """Renders the home page, with a list of all polls."""
+    """Renders the home page, with a list of all journalentrys."""
     return render_template(
         'index.html',
         title='Journal Entries',
@@ -45,20 +45,20 @@ def about():
 
 @app.route('/seed', methods=['POST', 'GET'])
 def seed():
-    """Seeds the database with sample polls."""
+    """Seeds the database with sample journalentrys."""
     repository.add_sample_journalentries()
     return redirect('/')
 
 @app.route('/results/<key>')
 def results(key):
     """Renders the results page."""
-    poll = repository.get_poll(key)
-    poll.calculate_stats()
+    journalentry = repository.get_journalentry(key)
+    journalentry.calculate_stats()
     return render_template(
         'results.html',
         title='Results',
         year=datetime.now().year,
-        poll=poll,
+        journalentry=journalentry,
     )
 
 @app.route('/create', methods=['POST'])
@@ -67,9 +67,9 @@ def create():
     repository.create_journalentries(request.get_json())
     return redirect('/')
 
-@app.route('/poll/<key>', methods=['GET', 'POST'])
+@app.route('/journalentry/<key>', methods=['GET', 'POST'])
 def details(key):
-    """Renders the poll details page."""
+    """Renders the journalentry details page."""
     error_message = ''
     if request.method == 'POST':
         try:
@@ -81,9 +81,7 @@ def details(key):
 
     return render_template(
         'details.html',
-        title='JournalEntry',
-        year=datetime.now().year,
-        poll=repository.get_poll(key),
+        journalentry=repository.get_journalentry(key),
         error_message=error_message,
     )
 

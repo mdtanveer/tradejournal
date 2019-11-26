@@ -9,7 +9,7 @@ from datetime import datetime
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self):
-        self.id = ""
+        self.key = ""
         self.symbol = ""
         self.entry_time = None
         self.exit_time = None
@@ -20,8 +20,8 @@ class JournalEntry(object):
         self.entry_target = 0
         self.direction = "LONG"
 
-    def __init__(self, id, entity): 
-        self.id = id,
+    def __init__(self, key, entity): 
+        self.key = key
         self.symbol = entity.symbol
         self.entry_time = datetime.fromtimestamp(float(entity.entry_time))
         self.exit_time = datetime.fromtimestamp(float(entity.exit_time))

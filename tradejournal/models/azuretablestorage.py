@@ -58,15 +58,7 @@ class Repository(object):
         try:
             partition, row = _key_to_partition_and_row(journalentry_key)
             journalentry_entity = self.svc.get_entity(self.journalentry_table, partition, row)
-            choice_entities = self.svc.query_entities(
-                self.choice_table,
-                "JournalEntryPartitionKey eq '{0}' and JournalEntryRowKey eq '{1}'" \
-                    .format(partition, row)
-            )
-
             journalentry = _journalentry_from_entity(journalentry_entity)
-            journalentry.choices = [_choice_from_entity(choice_entity)
-                            for choice_entity in choice_entities]
             return journalentry
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()

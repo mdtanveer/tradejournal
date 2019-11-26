@@ -10,7 +10,7 @@
         {% for journalentry in journalentries %}
         <tr>
             <td>
-                <a href="/journalentry/{{journalentry.id}}">{{journalentry.symbol}}</a>
+                <a href="/journalentry/{{journalentry.key}}">{{journalentry.symbol}}</a>
             </td>
         </tr>
         {% endfor %}
