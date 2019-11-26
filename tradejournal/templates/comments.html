@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>Comments</h2>
+<br />
+{% if comments %}
+<table class="table table-hover">
+    {% for comment in comments %}
+    <tr>
+        <th> {{ comment.add_time.strftime("%d/%m/%y %H:%M") }} </th>
+        <td> {{ comment.title }} </td>
+        <td> {{ comment.text }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No comments available.</p>
+<br />
+{% endif %}
+
+{% if error_message %}
+<p class="text-danger">{{error_message}}</p>
+{% endif %}
+
+{% endblock %}

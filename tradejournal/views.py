@@ -84,6 +84,23 @@ def details(key):
         error_message=error_message,
     )
 
+@app.route('/journalentry/<key>/comments', methods=['GET', 'POST'])
+def comments(key):
+    """Renders the comments page."""
+    error_message = ''
+    if request.method == 'POST':
+        try:
+            repository.add_comment(key, request.get_json())
+            return redirect('/journalentry/{0}/comments'.format(key))
+        except KeyError:
+            error_message = 'Unable to update'
+
+    return render_template(
+        'comments.html',
+        comments=repository.get_comments(key),
+        error_message=error_message,
+    )
+
 @app.errorhandler(JournalEntryNotFound)
 def page_not_found(error):
     """Renders error page."""

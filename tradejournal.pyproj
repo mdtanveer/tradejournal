@@ -71,6 +71,7 @@
     <Content Include="tradejournal\static\scripts\_references.js" />
     <Content Include="tradejournal\templates\about.html" />
     <Content Include="tradejournal\templates\contact.html" />
+    <Content Include="tradejournal\templates\comments.html" />
     <Content Include="tradejournal\templates\details.html" />
     <Content Include="tradejournal\templates\index.html" />
     <Content Include="tradejournal\templates\layout.html" />
