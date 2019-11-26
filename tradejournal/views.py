@@ -73,11 +73,10 @@ def details(key):
     error_message = ''
     if request.method == 'POST':
         try:
-            choice_key = request.form['choice']
-            repository.increment_vote(key, choice_key)
-            return redirect('/results/{0}'.format(key))
+            repository.update_journalentry(key, request.get_json())
+            return redirect('/journalentry/{0}'.format(key))
         except KeyError:
-            error_message = 'Please make a selection.'
+            error_message = 'Unable to update'
 
     return render_template(
         'details.html',

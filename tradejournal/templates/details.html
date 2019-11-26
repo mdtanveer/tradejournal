@@ -5,6 +5,15 @@
 <h2>{{journalentry.symbol}}</h2>
 <br />
 
+<table>
+    {% for key, value in journalentry.__dict__.items() %}
+    <tr>
+        <th> {{ key }} </th>
+        <td> {{ value }} </td>
+    </tr>
+    {% endfor %}
+</table>
+
 {% if error_message %}
 <p class="text-danger">{{error_message}}</p>
 {% endif %}

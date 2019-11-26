@@ -42,7 +42,7 @@ class Repository(object):
         self.name = 'Azure Table Storage'
         self.storage_name = settings['STORAGE_NAME']
         self.storage_key = settings['STORAGE_KEY']
-        self.journalentry_table = settings['STORAGE_TABLE_TRADEENTRY']
+        self.journalentry_table = 'TradeEntryTable'
 
         self.svc = TableService(self.storage_name, self.storage_key)
         self.svc.create_table(self.journalentry_table)
@@ -63,13 +63,13 @@ class Repository(object):
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
-    def increment_vote(self, journalentry_key, choice_key):
-        """Increment the choice vote count for the specified journalentry."""
+    def update_journalentry(self, key, updated_entity):
+        """Update the specified journalentry."""
         try:
-            partition, row = _key_to_partition_and_row(choice_key)
-            entity = self.svc.get_entity(self.choice_table, partition, row)
-            entity.Votes += 1
-            self.svc.update_entity(self.choice_table, entity)
+            partition, row = _key_to_partition_and_row(key)
+            entity = self.svc.get_entity(self.journalentry_table, partition, row)
+            entity.update(updated_entity)
+            self.svc.update_entity(self.journalentry_table, entity)
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
