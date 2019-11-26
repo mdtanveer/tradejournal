@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>{{title}}.</h2>
+
+{% if journalentries %}
+<table class="table table-hover">
+    <tbody>
+        {% for journalentry in journalentries %}
+        <tr>
+            <td>
+                <a href="/journalentry/{{journalentry.id}}">{{journalentry.symbol}}</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No journalentries available.</p>
+<br />
+{% endif %}
+
+{% endblock %}
