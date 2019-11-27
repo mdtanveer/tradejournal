@@ -32,6 +32,13 @@ class Comment(object):
         self.title = entity.title if 'title' in entity.keys() else ''
         self.text = entity.text if 'text' in entity.keys() else ''
 
+class Chart(object):
+    def __init__(self, key, entity): 
+        self.key = key
+        self.add_time = datetime.fromtimestamp(float(entity.add_time))                                               
+        self.title = entity.title if 'title' in entity.keys() else ''
+        self.data = entity.data if 'data' in entity.keys() else ''
+
 def _load_samples_json():
     """Loads polls from samples.json file."""
     samples_path = path.join(path.dirname(__file__), 'samples.json')

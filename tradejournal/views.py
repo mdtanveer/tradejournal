@@ -101,6 +101,23 @@ def comments(key):
         error_message=error_message,
     )
 
+@app.route('/journalentry/<key>/charts', methods=['GET', 'POST'])
+def charts(key):
+    """Renders the charts page."""
+    error_message = ''
+    if request.method == 'POST':
+        try:
+            repository.add_chart(key, request.get_json())
+            return redirect('/journalentry/{0}/charts'.format(key))
+        except KeyError:
+            error_message = 'Unable to update'
+
+    return render_template(
+        'charts.html',
+        charts=repository.get_charts(key),
+        error_message=error_message,
+    )
+
 @app.errorhandler(JournalEntryNotFound)
 def page_not_found(error):
     """Renders error page."""

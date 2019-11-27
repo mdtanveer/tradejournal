@@ -13,6 +13,7 @@ if REPOSITORY_NAME == 'azuretablestorage':
     REPOSITORY_SETTINGS = {
         'STORAGE_NAME': environ.get('STORAGE_NAME', 'tradejournalstorage'),
         'STORAGE_KEY': environ.get('STORAGE_KEY', '0YGfSMwBb4xJaMDQ6fr2jjNRRd3aqYCvlqDdwvhul4uCihGufJzHXXq0M5Db5tB/veW1cW3/TthwqMcpPreMwg=='),
+        'CONNECTION_STRING' : environ.get('CONNECTION_STRING', 'DefaultEndpointsProtocol=https;AccountName=tradejournalstorage;AccountKey=0YGfSMwBb4xJaMDQ6fr2jjNRRd3aqYCvlqDdwvhul4uCihGufJzHXXq0M5Db5tB/veW1cW3/TthwqMcpPreMwg==;EndpointSuffix=core.windows.net')
     }
 elif REPOSITORY_NAME == 'memory':
     REPOSITORY_SETTINGS = {}
