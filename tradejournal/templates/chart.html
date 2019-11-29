@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>TradeGym</title>
+    <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
+</head>
+<body>
+    <div id="main">
+        <div id="chart"></div>
+    </div>
+
+<script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
+<script type="text/javascript" src="/static/scripts/techan.min.js"></script>
+<script>
+    var dataWindowSize = 200;
+    var randomOffset = 0;
+    var windowW = Math.round(window.innerWidth*0.8);
+    var windowH = Math.round(window.innerHeight*0.95);
+    var currentScrip = "";
+
+    var dim = {
+        width: windowW, height: windowH,
+        margin: { top: 20, right: 10, bottom: 30, left: 30 },
+        ohlc: { height: 305 },
+        indicator: { height: 65, padding: 5 }
+    };
+
+
+    dim.plot = {
+        width: dim.width - dim.margin.left - dim.margin.right,
+        height: dim.height - dim.margin.top - dim.margin.bottom
+    };
+    dim.ohlc.height = Math.floor(dim.plot.height*0.80)
+    dim.indicator.height = Math.floor(dim.plot.height*0.20)
+    
+    dim.indicator.top = dim.ohlc.height+dim.indicator.padding;
+    dim.indicator.bottom = dim.indicator.top+dim.indicator.height+dim.indicator.padding;
+
+    var indicatorTop = d3.scaleLinear()
+            .range([dim.indicator.top, dim.indicator.bottom]);
+
+    var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+
+    var x = techan.scale.financetime()
+            .range([0, dim.plot.width]);
+
+    var y = d3.scaleLinear()
+            .range([dim.ohlc.height, 0]);
+
+    var yVolume = d3.scaleLinear()
+            .range([y(0), y(0.2)]);
+
+    var plotHeikenAshi = false;
+
+    if (!plotHeikenAshi)
+    {
+        var candlestick = techan.plot.candlestick()
+                .xScale(x)
+                .yScale(y);
+    }
+    else
+    {
+        var candlestick = techan.plot.heikinashi()
+                .xScale(x)
+                .yScale(y);
+
+        var heikinashiIndicator = techan.indicator.heikinashi();
+    }
+
+
+    var ichimoku = techan.plot.ichimoku()
+            .xScale(x)
+            .yScale(y);
+
+    var xAxis = d3.axisBottom(x);
+
+    var yAxis = d3.axisLeft(y)
+            .tickFormat(d3.format(",.3s"));
+
+    var volumeAxis = d3.axisRight(yVolume)
+            .ticks(3)
+            .tickFormat(d3.format(",.3s"));
+
+    var svg = d3.select("#chart").append("svg")
+            .attr("width", windowW)
+            .attr("height", windowH)
+        .append("g")
+            .attr("transform", "translate(" + dim.margin.left + "," + dim.margin.top + ")");
+
+    var defs = svg.append("defs");
+
+    defs.append("clipPath")
+            .attr("id", "ohlcClip")
+            .append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", dim.plot.width)
+            .attr("height", dim.ohlc.height);
+
+    defs.selectAll("indicatorClip").data([0])
+        .enter()
+            .append("clipPath")
+            .attr("id", function(d, i) { return "indicatorClip-" + i; })
+        .append("rect")
+            .attr("x", 0)
+            .attr("y", function(d, i) { return indicatorTop(i); })
+            .attr("width", dim.plot.width)
+            .attr("height", dim.indicator.height);
+
+ 
+    var stochasticScale = d3.scaleLinear()
+            .range([indicatorTop(0)+dim.indicator.height, indicatorTop(0)]);
+
+    var stochastic = techan.plot.stochastic()
+            .xScale(x)
+            .yScale(stochasticScale);
+
+    var stochasticIndicator = techan.indicator.stochastic()
+
+    var stochasticAxisLeft = d3.axisLeft(stochasticScale)
+            .ticks(3);
+
+    var stochasticAnnotationLeft = techan.plot.axisannotation()
+            .axis(stochasticAxisLeft)
+            .orient("left")
+            .format(d3.format(',.2f'));
+   
+    var indicatorSelection = svg.selectAll("svg > g.indicator").data(["stochastic"]).enter()
+             .append("g")
+                .attr("class", function(d) { return d + " indicator"; });
+
+    indicatorSelection.append("g")
+            .attr("class", "axis right")
+            .attr("transform", "translate(" + x(1) + ",0)");
+
+    indicatorSelection.append("g")
+            .attr("class", "axis left")
+            .attr("transform", "translate(" + x(0) + ",0)");
+
+    indicatorSelection.append("g")
+            .attr("class", "indicator-plot")
+            .attr("clip-path", function(d, i) { return "url(#indicatorClip-" + i + ")"; });
+
+    var ichimokuIndicator = techan.indicator.ichimoku();
+    // Don't show where indicators don't have data
+    var indicatorPreRoll = ichimokuIndicator.kijunSen()+ichimokuIndicator.senkouSpanB();
+    var volume = techan.plot.volume()
+            .accessor(candlestick.accessor())   // Set the accessor to a ohlc accessor so we get highlighted bars
+            .xScale(x)
+            .yScale(yVolume);
+
+    svg.append("g")
+            .attr("class", "ichimoku")
+            .attr("clip-path", "url(#ohlcClip)");
+
+    svg.append("g")
+            .attr("class", "candlestick")
+            .attr("clip-path", "url(#ohlcClip)");
+
+    svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + dim.indicator.bottom + ")");
+
+    svg.append("g")
+            .attr("class", "y axis")
+        .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Ichimoku");
+
+    svg.append("g")
+            .attr("class", "volume")
+            .attr("clip-path", "url(#ohlcClip)");
+
+    function draw(data) {
+        if (plotHeikenAshi)
+        {
+            candlestickData = heikinashiIndicator(data);
+        }
+        else
+        {
+            candlestickData = data;
+        }
+        var ichimokuData = ichimokuIndicator(data);
+        
+        var stochasticData = stochasticIndicator(data);
+        stochasticScale.domain(techan.scale.plot.stochastic(stochasticData).domain());
+
+        x.domain(data.map(ichimokuIndicator.accessor().d));
+        // Calculate the y domain for visible data points (ensure to include Kijun Sen additional data offset)
+        y.domain(techan.scale.plot.ichimoku(ichimokuData.slice(indicatorPreRoll-ichimokuIndicator.kijunSen())).domain());
+        yVolume.domain(techan.scale.plot.volume(data.slice(indicatorPreRoll-ichimokuIndicator.kijunSen())).domain());
+
+        // Logic to ensure that at least +KijunSen displacement is applied to display cloud plotted ahead of ohlc
+        x.zoomable().clamp(false).domain([indicatorPreRoll, data.length+ichimokuIndicator.kijunSen()]);
+
+       svg
+          //.transition() // Disable transition for now, each is only for transitions
+          .each(function() {
+                var selection = d3.select(this);
+                selection.select("g.candlestick").datum(candlestickData).call(candlestick);
+                selection.select("g.ichimoku").datum(ichimokuData).call(ichimoku);
+                selection.select("g.x.axis").call(xAxis);
+                selection.select("g.y.axis").call(yAxis);
+                selection.select("g.volume").datum(data).call(volume);
+                selection.select("g.stochastic .indicator-plot").datum(stochasticData).call(stochastic);
+                selection.select("g.stochastic .axis.left").call(stochasticAxisLeft);
+            });
+    }
+
+    data1 = d3.csv("{{ base_url + '/' + charts[0].data }}", function(error, data) {
+        data = data.map(function(d) {
+            // Open, high, low, close generally not required, is being used here to demonstrate colored volume
+            // bars
+            return {
+                date: parseDate(d.date+' '+d.time),
+                volume: +d.volume,
+                open: +d.open,
+                high: +d.high,
+                low: +d.low,
+                close: +d.close
+            };
+        })
+        draw(data);
+    })
+</script>
+</body>

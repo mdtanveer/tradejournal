@@ -148,7 +148,7 @@ class Repository(object):
             add_time = str(datetime.now().timestamp())
             local_file_name = "chart_" + str(uuid.uuid4()) + ".csv"
             entity['data'] = local_file_name
-            yahooquote.get_yahoo_quote(partition).to_csv(local_file_name)
+            yahooquote.get_yahoo_quote(partition).to_csv(local_file_name, index=False)
             # Create a blob client using the local file name as the name for the blob
             blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=local_file_name)
             
@@ -171,8 +171,9 @@ class Repository(object):
         partition, row = _key_to_partition_and_row(key)
         chart_entities = self.svc.query_entities(self.charts_table, "PartitionKey eq '%s'"%key)
         charts = [_chart_from_entity(entity) for entity in chart_entities]
-        for chart in charts:
-            blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=chart.data)
-            data = blob_client.download_blob().readall()
-            chart.data = data
         return charts
+
+    def get_chart_data(self, chartid):
+        blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=chartid)
+        data = blob_client.download_blob().readall()
+        return data

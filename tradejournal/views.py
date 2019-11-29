@@ -4,7 +4,7 @@ Routes and views for the flask application.
 
 from datetime import datetime
 
-from flask import render_template, redirect, request
+from flask import render_template, redirect, request, Response
 
 from tradejournal import app
 from tradejournal.models import JournalEntryNotFound
@@ -23,6 +23,10 @@ def home():
         year=datetime.now().year,
         journalentries=repository.get_journalentries()
     )
+
+@app.route('/js/<path:path>')
+def send_js(path):
+    return send_from_directory('js', path)
 
 @app.route('/contact')
 def contact():
@@ -113,10 +117,20 @@ def charts(key):
             error_message = 'Unable to update'
 
     return render_template(
-        'charts.html',
+        'chart.html',
         charts=repository.get_charts(key),
+        base_url = request.url,
         error_message=error_message,
     )
+
+@app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
+def chart_data(key, chartid):
+    csv_data = repository.get_chart_data(chartid)
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=%s"%chartid})
 
 @app.errorhandler(JournalEntryNotFound)
 def page_not_found(error):

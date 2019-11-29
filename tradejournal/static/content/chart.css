@@ -1,0 +1,108 @@
+body {
+    font: 10px sans-serif;
+}
+
+text {
+    fill: #000;
+}
+
+path.candle.body {
+    stroke-width: 0;
+}
+
+path.candle.up {
+    fill: #00AA00;
+    stroke: #00AA00;
+}
+
+path.candle.down {
+    fill: #FF0000;
+    stroke: #FF0000;
+}
+
+path.volume {
+    fill: #AAAAAA;
+    opacity: 0.5;
+}
+
+.ichimoku path {
+    fill: none;
+    stroke-width: 0.8;
+}
+
+.ichimoku path {
+    stroke: #000000;
+}
+
+.ichimoku path.chikouspan {
+    stroke: #003F00;
+}
+
+.ichimoku path.tenkansen {
+    stroke: #0000FF;
+}
+
+.ichimoku path.kijunsen {
+    stroke: #FF0000;
+}
+
+.ichimoku path.kumo {
+    opacity: 0.1;
+}
+
+.ichimoku path.kumo.up {
+    fill: #00AA00;
+}
+
+.ichimoku path.kumo.down {
+    fill: #FF0000;
+}
+
+.ichimoku path.senkouspana {
+    stroke: #006600;
+}
+
+.ichimoku path.senkouspanb {
+    stroke: #FF0000;
+}
+
+path.signal {
+    stroke: #FF9999;
+}
+
+path.zero {
+    stroke: #BBBBBB;
+    stroke-dasharray: 0;
+    stroke-opacity: 0.5;
+}
+
+path.difference {
+    fill: #BBBBBB;
+    opacity: 0.5;
+}
+
+.stochastic.up {
+    stroke: #00AA00;
+}
+
+.stochastic.down {
+    stroke: #FF0000;
+}
+
+path.overbought, path.oversold {
+    stroke: #FF9999;
+    stroke-dasharray: 5, 5;
+}
+
+path.middle, path.zero {
+    stroke: #BBBBBB;
+    stroke-dasharray: 5, 5;
+}
+.indicator-plot path.line {
+    fill: none;
+    stroke-width: 1;
+}
+path {
+    fill: none;
+    stroke-width: 1;
+}

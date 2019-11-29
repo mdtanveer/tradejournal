@@ -13,7 +13,8 @@ def get_yahoo_quote(symbol='SBIN', data_range='60d', data_interval='1h'):
     df = pd.DataFrame(body['indicators']['quote'][0], index=dt)
     dg = pd.DataFrame(body['timestamp'])    
     df.dropna(inplace=True)     #removing NaN rows
-    df=df.reset_index()
+    df = df[(df.open != 0) & (df.high != 0) & (df.low != 0) & (df.close != 0)]
+    df = df.reset_index()
     df[['date', 'time']]=df['Datetime'].astype(str).str.split(' ', expand=True)
     df = df.loc[:, ('date', 'time', 'open', 'high', 'low', 'close', 'volume')]
      

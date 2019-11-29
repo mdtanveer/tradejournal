@@ -9,8 +9,12 @@
     {% for comment in comments %}
     <tr>
         <th> {{ comment.add_time.strftime("%d/%m/%y %H:%M") }} </th>
-        <td> {{ comment.title }} </td>
-        <td> {{ comment.text }} </td>
+        <td> 
+            {%if comment.title %}
+            <b>{{ comment.title }}</b><br/>
+            {% endif %}
+            {{ comment.text }}
+        </td>
     </tr>
     {% endfor %}
 </table>
