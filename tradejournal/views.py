@@ -183,7 +183,7 @@ def charts(key):
         return render_template(
             'chart.html',
             charts=repository.get_charts(key),
-            base_url = request.url,
+            base_url = request.url.replace('http://', 'https://'),
             error_message=error_message,
             form = form
         )

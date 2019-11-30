@@ -3,4 +3,4 @@ azure-storage
 pandas
 arrow
 azure-storage-blob
-wtform
+wtforms
