@@ -1,5 +1,6 @@
-Flask<1
-azure-storage<1
-pandas<1
-arrow<1
-azure-storage-blob<1
+Flask
+azure-storage
+pandas
+arrow
+azure-storage-blob
+wtform

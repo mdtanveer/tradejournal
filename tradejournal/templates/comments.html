@@ -9,9 +9,9 @@
     {% for comment in comments %}
     <tr>
         <th> {{ comment.add_time.strftime("%d/%m/%y %H:%M") }} </th>
-        <td> 
+        <td>
             {%if comment.title %}
-            <b>{{ comment.title }}</b><br/>
+            <b>{{ comment.title }}</b><br />
             {% endif %}
             {{ comment.text }}
         </td>
@@ -22,6 +22,17 @@
 <p>No comments available.</p>
 <br />
 {% endif %}
+<form action="" method="post" role="form" class="NewCommentForm">
+    <div class="form-group">
+        <div class="input text">
+            {{ form.title.label }} {{ form.title }}
+        </div>
+        <div class="input text">
+            {{ form.text.label }} {{ form.text }}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success">Post Comment</button>
+</form>
 
 {% if error_message %}
 <p class="text-danger">{{error_message}}</p>

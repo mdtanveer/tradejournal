@@ -1,10 +1,11 @@
 """
 Routes and views for the flask application.
 """
-
+import json
 from datetime import datetime
 
 from flask import render_template, redirect, request, Response
+from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField
 
 from tradejournal import app
 from tradejournal.models import JournalEntryNotFound
@@ -12,6 +13,26 @@ from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
+
+class EditJournalEntryForm(Form):
+    exit_time = DateTimeField('Exit Time:')
+    entry_price = FloatField('Entry Price:')
+    exit_price = FloatField('Exit Price:')
+    quantity = IntegerField('Quantity:')
+    entry_sl = FloatField('Entry SL:')
+    entry_target = FloatField('Entry Target:')
+    direction = StringField('Direction:')
+
+class NewJournalEntryForm(EditJournalEntryForm):
+    symbol = StringField('Symbol:', validators=[validators.required()])
+    entry_time = DateTimeField('Entry Time:', validators=[validators.required()])
+
+class CommentForm(Form):
+    title = StringField('Title:')
+    text = TextAreaField('Text', validators=[validators.required()])
+
+class ChartForm(Form):
+    title = StringField('Title:')
 
 @app.route('/')
 @app.route('/home')
@@ -65,23 +86,55 @@ def results(key):
         journalentry=journalentry,
     )
 
-@app.route('/create', methods=['POST'])
+@app.route('/create', methods=['GET', 'POST'])
 def create():
     """New journal entry"""
-    repository.create_journalentries(request.get_json())
-    return redirect('/')
+    form = NewJournalEntryForm()
+    if request.method == 'POST':
+        if request.get_json():
+            data = request.get_json()
+        else:
+            data = request.form
+        repository.create_journalentries(data)
+        return redirect('/')
+    else:
+        return render_template(
+        'create.html',
+        form=form
+    )
+
+
+@app.route('/journalentry/<key>/edit', methods=['GET', 'POST'])
+def edit(key):
+    """New journal entry"""
+    if request.method == 'POST':
+        if request.get_json():
+            data = request.get_json()
+        else:
+            data = request.form
+        repository.update_journalentry(key, data)
+        return redirect('/journalentry/{0}'.format(key))
+    else:
+        form = EditJournalEntryForm()
+        journalentry=repository.get_journalentry(key)
+
+        form.exit_time.data = journalentry.exit_time
+        form.entry_target.data = journalentry.entry_target
+        form.entry_sl.data = journalentry.entry_sl
+        form.entry_price.data = journalentry.entry_price
+        form.exit_price.data = journalentry.exit_price
+        form.quantity.data = journalentry.quantity
+        form.direction.data = journalentry.direction
+
+        return render_template(
+            'edit.html',
+            form = form
+        )
 
 @app.route('/journalentry/<key>', methods=['GET', 'POST'])
 def details(key):
     """Renders the journalentry details page."""
     error_message = ''
-    if request.method == 'POST':
-        try:
-            repository.update_journalentry(key, request.get_json())
-            return redirect('/journalentry/{0}'.format(key))
-        except KeyError:
-            error_message = 'Unable to update'
-
     return render_template(
         'details.html',
         journalentry=repository.get_journalentry(key),
@@ -94,16 +147,22 @@ def comments(key):
     error_message = ''
     if request.method == 'POST':
         try:
-            repository.add_comment(key, request.get_json())
+            if request.get_json():
+                data = request.get_json()
+            else:
+                data = request.form
+            repository.add_comment(key, data)
             return redirect('/journalentry/{0}/comments'.format(key))
         except KeyError:
             error_message = 'Unable to update'
-
-    return render_template(
-        'comments.html',
-        comments=repository.get_comments(key),
-        error_message=error_message,
-    )
+    else:
+        form = CommentForm()
+        return render_template(
+            'comments.html',
+            comments=repository.get_comments(key),
+            error_message=error_message,
+            form = form
+        )
 
 @app.route('/journalentry/<key>/charts', methods=['GET', 'POST'])
 def charts(key):
@@ -111,17 +170,23 @@ def charts(key):
     error_message = ''
     if request.method == 'POST':
         try:
-            repository.add_chart(key, request.get_json())
+            if request.get_json():
+                data = request.get_json()
+            else:
+                data = request.form
+            repository.add_chart(key, data)
             return redirect('/journalentry/{0}/charts'.format(key))
         except KeyError:
             error_message = 'Unable to update'
-
-    return render_template(
-        'chart.html',
-        charts=repository.get_charts(key),
-        base_url = request.url,
-        error_message=error_message,
-    )
+    else:
+        form = ChartForm()
+        return render_template(
+            'chart.html',
+            charts=repository.get_charts(key),
+            base_url = request.url,
+            error_message=error_message,
+            form = form
+        )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
 def chart_data(key, chartid):

@@ -1,0 +1,51 @@
+<title>Edit Entry</title>
+<link rel="stylesheet" media="screen" href="static/bootstrap.min.css">
+<link rel="stylesheet" href="static/bootstrap-theme.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="container">
+    <h2>Edit Journal Entry</h2>
+    <form action="" method="post" role="form">
+        <div class="form-group">
+            <div class="input text">
+                {{ form.exit_time.label }} {{ form.exit_time }}
+            </div>
+            <div class="input text">
+                {{ form.entry_price.label }} {{ form.entry_price }}
+            </div>
+            <div class="input text">
+                {{ form.exit_price.label }} {{ form.exit_price }}
+            </div>
+            <div class="input text">
+                {{ form.entry_sl.label }} {{ form.entry_sl }}
+            </div>
+            <div class="input text">
+                {{ form.entry_target.label }} {{ form.entry_target }}
+            </div>
+            <div class="input text">
+                {{ form.direction.label }} {{ form.direction }}
+            </div>
+            <div class="input text">
+                {{ form.quantity.label }} {{ form.quantity }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+
+    {% for message in messages %}
+    {% if "Error" not in message[1]: %}
+    <div class="alert alert-info">
+        <strong>Success! </strong> { { message[1] }}
+    </div>
+    {% endif %}
+
+    {% if "Error" in message[1]: %}
+    <div class="alert alert-warning">
+        { { message[1] }}
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>

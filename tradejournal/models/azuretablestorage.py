@@ -38,7 +38,7 @@ def strtime_to_timestamp(input):
     if not input:
         return '0'
     else:
-        return str(datetime.strptime(input, '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())
+        return str(datetime.strptime(input, '%Y-%m-%d %H:%M:%S').timestamp())
 
 class Repository(object):
     """Azure Twable Storage repository."""
@@ -96,6 +96,9 @@ class Repository(object):
             partition, row = _key_to_partition_and_row(key)
             entity = self.svc.get_entity(self.journalentry_table, partition, row)
             entity.update(updated_entity)
+            key = 'exit_time'
+            if key in entity.keys():
+                entity[key] = strtime_to_timestamp(entity[key])
             self.svc.update_entity(self.journalentry_table, entity)
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
@@ -108,7 +111,8 @@ class Repository(object):
 
     def create_journalentries(self, entity):
         """Adds a new journalentry"""
-        entry_time = strtime_to_timestamp(entity['entry_time'])    
+        entry_time = strtime_to_timestamp(entity['entry_time'])
+        entity = dict(entity)
         entity.update(
         {
             'PartitionKey': entity['symbol'],
@@ -123,6 +127,7 @@ class Repository(object):
         try:
             partition, row = _key_to_partition_and_row(key)
             add_time = str(datetime.now().timestamp())
+            comment_entity = dict(comment_entity)
             comment_entity.update(
             {
                 'PartitionKey': key,
@@ -147,6 +152,7 @@ class Repository(object):
             partition, row = _key_to_partition_and_row(key)
             add_time = str(datetime.now().timestamp())
             local_file_name = "chart_" + str(uuid.uuid4()) + ".csv"
+            entity = dict(entity)
             entity['data'] = local_file_name
             yahooquote.get_yahoo_quote(partition).to_csv(local_file_name, index=False)
             # Create a blob client using the local file name as the name for the blob
@@ -155,7 +161,8 @@ class Repository(object):
             # Upload the created file
             with open(local_file_name, "rb") as data:
                 blob_client.upload_blob(data)
-
+            
+            os.remove(local_file_name)
             entity.update(
             {
                 'PartitionKey': key,

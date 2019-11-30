@@ -35,9 +35,9 @@ class Comment(object):
 class Chart(object):
     def __init__(self, key, entity): 
         self.key = key
-        self.add_time = datetime.fromtimestamp(float(entity.add_time))                                               
+        #self.add_time = datetime.fromtimestamp(float(entity.add_time))                                               
         self.title = entity.title if 'title' in entity.keys() else ''
-        self.data = entity.data if 'data' in entity.keys() else ''
+        self.data = entity.data
 
 def _load_samples_json():
     """Loads polls from samples.json file."""

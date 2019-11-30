@@ -14,7 +14,9 @@
     {% endfor %}
 </table>
 
+<a href="/journalentry/{{journalentry.key}}/edit">Edit</a>
 <a href="/journalentry/{{journalentry.key}}/comments">Comments</a>
+<a href="/journalentry/{{journalentry.key}}/charts">Charts</a>
 
 {% if error_message %}
 <p class="text-danger">{{error_message}}</p>

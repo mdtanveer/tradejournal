@@ -5,13 +5,22 @@
     <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
 </head>
 <body>
+    <h2 id="title"></h2>
     <div id="main">
         <div id="chart"></div>
     </div>
+    <form action="" method="post" role="form" class="NewCommentForm">
+        <div class="form-group">
+            <div class="input text">
+                {{ form.title.label }} {{ form.title }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">Capture New Chart</button>
+    </form>
 
-<script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
-<script type="text/javascript" src="/static/scripts/techan.min.js"></script>
-<script>
+    <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
+    <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
+    <script>
     var dataWindowSize = 200;
     var randomOffset = 0;
     var windowW = Math.round(window.innerWidth*0.8);
@@ -32,7 +41,7 @@
     };
     dim.ohlc.height = Math.floor(dim.plot.height*0.80)
     dim.indicator.height = Math.floor(dim.plot.height*0.20)
-    
+
     dim.indicator.top = dim.ohlc.height+dim.indicator.padding;
     dim.indicator.bottom = dim.indicator.top+dim.indicator.height+dim.indicator.padding;
 
@@ -107,7 +116,7 @@
             .attr("width", dim.plot.width)
             .attr("height", dim.indicator.height);
 
- 
+
     var stochasticScale = d3.scaleLinear()
             .range([indicatorTop(0)+dim.indicator.height, indicatorTop(0)]);
 
@@ -124,7 +133,7 @@
             .axis(stochasticAxisLeft)
             .orient("left")
             .format(d3.format(',.2f'));
-   
+
     var indicatorSelection = svg.selectAll("svg > g.indicator").data(["stochastic"]).enter()
              .append("g")
                 .attr("class", function(d) { return d + " indicator"; });
@@ -184,7 +193,7 @@
             candlestickData = data;
         }
         var ichimokuData = ichimokuIndicator(data);
-        
+
         var stochasticData = stochasticIndicator(data);
         stochasticScale.domain(techan.scale.plot.stochastic(stochasticData).domain());
 
@@ -210,20 +219,57 @@
             });
     }
 
-    data1 = d3.csv("{{ base_url + '/' + charts[0].data }}", function(error, data) {
-        data = data.map(function(d) {
-            // Open, high, low, close generally not required, is being used here to demonstrate colored volume
-            // bars
-            return {
-                date: parseDate(d.date+' '+d.time),
-                volume: +d.volume,
-                open: +d.open,
-                high: +d.high,
-                low: +d.low,
-                close: +d.close
-            };
-        })
-        draw(data);
-    })
-</script>
+        var charts = [];
+        var titles = []
+        {% for chart in charts %}
+        charts.push("{{chart.data}}");
+        titles.push("{{chart.title}}")
+        {% endfor %}
+
+        function RenderChart(i) {
+            if (i >= charts.length)
+                return;
+            document.getElementById('title').innerText = titles[i];
+            d3.csv("{{ base_url }}" + '/' + charts[i], function (error, data) {
+                data = data.map(function (d) {
+                    // Open, high, low, close generally not required, is being used here to demonstrate colored volume
+                    // bars
+                    return {
+                        date: parseDate(d.date + ' ' + d.time),
+                        volume: +d.volume,
+                        open: +d.open,
+                        high: +d.high,
+                        low: +d.low,
+                        close: +d.close
+                    };
+                })
+                draw(data);
+            })
+        }
+
+        var currentChartIndex = 0;
+        if (charts.length > 0)
+            RenderChart(currentChartIndex);
+
+        function RenderNextChart() {
+            currentChartIndex++;
+            if (currentChartIndex >= charts.length)
+                currentChartIndex = 0;
+            if (charts.length > 0)
+                RenderChart(currentChartIndex);
+        }
+
+        function RenderPreviousChart() {
+            currentChartIndex--;
+            if (currentChartIndex < 0)
+                currentChartIndex = charts.length-1;
+            if (charts.length > 0)
+                RenderChart(currentChartIndex);
+       }
+
+    </script>
+    <button onclick="RenderPreviousChart();">
+        Previous</a>
+        <button onclick="RenderNextChart();">Next</button>
+
 </body>
