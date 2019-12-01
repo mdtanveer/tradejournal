@@ -7,37 +7,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="container">
     <h2>Create New Journal Entry</h2>
-    <form action="" method="post" role="form" class="NewJournalEntryForm">
+    <form class="form-horizontal" action="" method="post" role="form" class="NewJournalEntryForm">
         <div class="form-group">
-            <div class="input text">
-                {{ form.symbol.label }} {{ form.symbol }}
-            </div>
-            <div class="input text">
-                {{ form.entry_time.label }} {{ form.entry_time }}
-            </div>
-            <div class="input text">
-                {{ form.exit_time.label }} {{ form.exit_time }}
-            </div>
-            <div class="input text">
-                {{ form.entry_price.label }} {{ form.entry_price }}
-            </div>
-            <div class="input text">
-                {{ form.exit_price.label }} {{ form.exit_price }}
-            </div>
-            <div class="input text">
-                {{ form.entry_sl.label }} {{ form.entry_sl }}
-            </div>
-            <div class="input text">
-                {{ form.entry_target.label }} {{ form.entry_target }}
-            </div>
-            <div class="input text">
-                {{ form.direction.label }} {{ form.direction }}
-            </div>
-            <div class="input text">
-                {{ form.quantity.label }} {{ form.quantity }}
+            <label class="control-label col-sm-2" for="symbol">Symbol:</label>
+            <input class="form-control col-sm-10" id="symbol" name="symbol" required type="text" value="">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="entry_time">Entry Time:</label>
+            <input class="form-control col-sm-10" id="entry_time" name="entry_time" required type="text" value="">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="exit_time">Exit Time:</label>
+            <input class="form-control col-sm-10" id="exit_time" name="exit_time" type="text" value="">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="entry_price">Entry Price:</label>
+            <input class="form-control col-sm-10" id="entry_price" name="entry_price" type="text" value="">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="exit_price">Exit Price:</label>
+            <input class="form-control col-sm-10" id="exit_price" name="exit_price" type="text" value="">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="entry_sl">Entry SL:</label>
+            <input class="form-control col-sm-10" id="entry_sl" name="entry_sl" type="text" value="">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="entry_target">Entry Target:</label>
+            <input class="form-control col-sm-10" id="entry_target" name="entry_target" type="text" value="">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="direction">Direction:</label>
+            <input class="form-control col-sm-10" id="direction" name="direction" required type="text" value="">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="quantity">Quantity:</label>
+            <input class="form-control col-sm-10" id="quantity" name="quantity" required type="text" value="">
+        </div>
+        <div class="form-group">
+            <div class=" col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-success">Save</button>
             </div>
         </div>
-        <button type="submit" class="btn btn-success">Save</button>
     </form>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

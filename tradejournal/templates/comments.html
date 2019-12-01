@@ -25,10 +25,12 @@
 <form action="" method="post" role="form" class="NewCommentForm">
     <div class="form-group">
         <div class="input text">
-            {{ form.title.label }} {{ form.title }}
+            <label for="title">Title:</label> 
+            <input class="form-control" id="title" name="title" type="text" value="">
         </div>
         <div class="input text">
-            {{ form.text.label }} {{ form.text }}
+            <label for="text">Text:</label> 
+            <textarea  class="form-control" id="text" name="text" required></textarea>
         </div>
     </div>
     <button type="submit" class="btn btn-success">Post Comment</button>
