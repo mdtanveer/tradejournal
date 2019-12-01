@@ -78,6 +78,7 @@ class Repository(object):
         """Returns all the journalentries from the repository."""
         journalentry_entities = self.svc.query_entities(self.journalentry_table)
         journalentries = [_journalentry_from_entity(entity) for entity in journalentry_entities]
+        journalentries.sort(key = lambda x: x.entry_time, reverse=True)
         return journalentries
 
     def get_journalentry(self, journalentry_key):
@@ -97,7 +98,7 @@ class Repository(object):
             entity = self.svc.get_entity(self.journalentry_table, partition, row)
             entity.update(updated_entity)
             key = 'exit_time'
-            if key in entity.keys():
+            if key in entity.keys() and entity[key]:
                 entity[key] = strtime_to_timestamp(entity[key])
             self.svc.update_entity(self.journalentry_table, entity)
         except AzureMissingResourceHttpError:

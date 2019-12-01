@@ -18,10 +18,10 @@ class EditJournalEntryForm(Form):
     exit_time = DateTimeField('Exit Time:')
     entry_price = FloatField('Entry Price:')
     exit_price = FloatField('Exit Price:')
-    quantity = IntegerField('Quantity:')
+    quantity = IntegerField('Quantity:', validators=[validators.required()])
     entry_sl = FloatField('Entry SL:')
     entry_target = FloatField('Entry Target:')
-    direction = StringField('Direction:')
+    direction = StringField('Direction:', validators=[validators.required()])
 
 class NewJournalEntryForm(EditJournalEntryForm):
     symbol = StringField('Symbol:', validators=[validators.required()])
@@ -118,7 +118,7 @@ def edit(key):
         form = EditJournalEntryForm()
         journalentry=repository.get_journalentry(key)
 
-        form.exit_time.data = journalentry.exit_time
+        form.exit_time.data = journalentry.exit_time if journalentry.exit_time != datetime.fromtimestamp(0) else None
         form.entry_target.data = journalentry.entry_target
         form.entry_sl.data = journalentry.entry_sl
         form.entry_price.data = journalentry.entry_price

@@ -6,12 +6,42 @@
 <br />
 
 <table class="table table-hover">
-    {% for key, value in journalentry.__dict__.items() %}
     <tr>
-        <th> {{ key }} </th>
-        <td> {{ value }} </td>
+        <th> Symbol </th>
+        <td> {{ journalentry.symbol }} </td>
     </tr>
-    {% endfor %}
+    <tr>
+        <th> Quantity </th>
+        <td> {{ journalentry.quantity }} </td>
+    </tr>
+    <tr>
+        <th> Entry time </th>
+        <td> {{ journalentry.entry_time }} </td>
+    </tr>
+    <tr>
+        <th> Entry price </th>
+        <td> {{ journalentry.entry_price }} </td>
+    </tr>
+    <tr>
+        <th> Exit time </th>
+        <td> {{ journalentry.exit_time if journalentry.exit_time.year != 1970 else "" }} </td>
+    </tr>
+    <tr>
+        <th> Exit price </th>
+        <td> {{ journalentry.exit_price }} </td>
+    </tr>
+    <tr>
+        <th> Entry SL </th>
+        <td> {{ journalentry.entry_sl }} </td>
+    </tr>
+    <tr>
+        <th> Entry Target </th>
+        <td> {{ journalentry.entry_target }} </td>
+    </tr>
+    <tr>
+        <th> Direction </th>
+        <td> {{ journalentry.direction }} </td>
+    </tr>
 </table>
 
 <a href="/journalentry/{{journalentry.key}}/edit">Edit</a>

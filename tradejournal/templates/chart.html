@@ -1,26 +1,23 @@
-﻿<!DOCTYPE html>
-<head>
-    <meta charset="utf-8">
-    <title>TradeGym</title>
-    <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
-</head>
-<body>
-    <h2 id="title"></h2>
-    <div id="main">
-        <div id="chart"></div>
-    </div>
-    <form action="" method="post" role="form" class="NewCommentForm">
-        <div class="form-group">
-            <div class="input text">
-                {{ form.title.label }} {{ form.title }}
-            </div>
-        </div>
-        <button type="submit" class="btn btn-success">Capture New Chart</button>
-    </form>
+﻿{% extends "layout.html" %}
 
-    <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
-    <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
-    <script>
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/content/chart.css">
+<h2 id="title"></h2>
+<div id="main">
+    <div id="chart"></div>
+</div>
+<form action="" method="post" role="form" class="NewCommentForm">
+    <div class="form-group">
+        <div class="input text">
+            {{ form.title.label }} {{ form.title }}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success">Capture New Chart</button>
+</form>
+
+<script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
+<script type="text/javascript" src="/static/scripts/techan.min.js"></script>
+<script>
     var dataWindowSize = 200;
     var randomOffset = 0;
     var windowW = Math.round(window.innerWidth*0.8);
@@ -267,9 +264,9 @@
                 RenderChart(currentChartIndex);
        }
 
-    </script>
-    <button onclick="RenderPreviousChart();">
-        Previous</button>
-        <button onclick="RenderNextChart();">Next</button>
-
-</body>
+</script>
+<button onclick="RenderPreviousChart();"  class="btn btn-success">
+    Previous
+</button>
+<button onclick="RenderNextChart();"  class="btn btn-success">Next</button>
+{% endblock %}

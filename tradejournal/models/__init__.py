@@ -6,13 +6,17 @@ from os import path
 import json
 from datetime import datetime
 
+
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self, key, entity): 
         self.key = key
         self.symbol = entity.symbol
         self.entry_time = datetime.fromtimestamp(float(entity.entry_time))
-        self.exit_time = datetime.fromtimestamp(float(entity.exit_time if 'exit_time' in entity.keys() else '0'))
+        try:
+            self.exit_time = datetime.fromtimestamp(float(entity.exit_time))
+        except:
+            self.exit_time = datetime.fromtimestamp(0)
         self.entry_price = entity.entry_price if 'entry_price' in entity.keys() else ''
         self.exit_price = entity.exit_price if 'exit_price' in entity.keys() else '' 
         self.quantity = entity.quantity if 'quantity' in entity.keys() else ''
