@@ -161,7 +161,8 @@ def comments(key):
             'comments.html',
             comments=repository.get_comments(key),
             error_message=error_message,
-            form = form
+            form = form,
+            journalentry=repository.get_journalentry(key),
         )
 
 @app.route('/journalentry/<key>/charts', methods=['GET', 'POST'])

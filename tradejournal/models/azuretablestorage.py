@@ -8,6 +8,7 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from . import yahooquote
 from datetime import datetime
 import os, uuid
+import arrow
 
 from . import Chart, Comment, JournalEntry, JournalEntryNotFound
 from . import _load_samples_json
@@ -127,7 +128,7 @@ class Repository(object):
         """Add comments"""
         try:
             partition, row = _key_to_partition_and_row(key)
-            add_time = str(datetime.now().timestamp())
+            add_time = str(arrow.utcnow().to('Asia/Calcutta').datetime.timestamp())
             comment_entity = dict(comment_entity)
             comment_entity.update(
             {
