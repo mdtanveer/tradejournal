@@ -118,17 +118,11 @@ def edit(key):
         form = EditJournalEntryForm()
         journalentry=repository.get_journalentry(key)
 
-        form.exit_time.data = journalentry.exit_time if journalentry.exit_time != datetime.fromtimestamp(0) else None
-        form.entry_target.data = journalentry.entry_target
-        form.entry_sl.data = journalentry.entry_sl
-        form.entry_price.data = journalentry.entry_price
-        form.exit_price.data = journalentry.exit_price
-        form.quantity.data = journalentry.quantity
-        form.direction.data = journalentry.direction
-
         return render_template(
             'edit.html',
-            form = form
+            form = form,
+            journalentry = journalentry,
+            zero_time = datetime.fromtimestamp(0)
         )
 
 @app.route('/journalentry/<key>', methods=['GET', 'POST'])
@@ -184,7 +178,7 @@ def charts(key):
         return render_template(
             'chart.html',
             charts=repository.get_charts(key),
-            base_url = request.url.replace('http://', 'https://'),
+            base_url = request.url,
             error_message=error_message,
             form = form
         )

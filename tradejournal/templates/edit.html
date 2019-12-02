@@ -6,31 +6,36 @@
 <link rel="stylesheet" href="static/bootstrap-theme.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="container">
-    <h2>Edit Journal Entry</h2>
+    <h4>Edit Journal Entry</h4>
     <form action="" method="post" role="form">
-        <div class="form-group">
-            <div class="input text">
-                {{ form.exit_time.label }} {{ form.exit_time }}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="exit_time">Exit Time:</label> 
+                <input class="form-control col-sm-10" id="exit_time" name="exit_time" type="text" value="{{journalentry.exit_time if journalentry.exit_time != zero_time else ''}}">
             </div>
-            <div class="input text">
-                {{ form.entry_price.label }} {{ form.entry_price }}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="entry_price">Entry Price:</label> 
+                <input class="form-control col-sm-10" id="entry_price" name="entry_price" type="text" value="{{journalentry.entry_price}}">
             </div>
-            <div class="input text">
-                {{ form.exit_price.label }} {{ form.exit_price }}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="exit_price">Exit Price:</label> 
+                <input class="form-control col-sm-10" id="exit_price" name="exit_price" type="text" value="{{journalentry.exit_price}}">
             </div>
-            <div class="input text">
-                {{ form.entry_sl.label }} {{ form.entry_sl }}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="entry_sl">Entry SL:</label> 
+                <input class="form-control col-sm-10" id="entry_sl" name="entry_sl" type="text" value="{{journalentry.entry_sl}}">
             </div>
-            <div class="input text">
-                {{ form.entry_target.label }} {{ form.entry_target }}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="entry_target">Entry Target:</label> 
+                <input class="form-control col-sm-10" id="entry_target" name="entry_target" type="text" value="{{journalentry.entry_target}}">
             </div>
-            <div class="input text">
-                {{ form.direction.label }} {{ form.direction }}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="direction">Direction:</label> 
+                <input class="form-control col-sm-10" id="direction" name="direction" required type="text" value="{{journalentry.direction}}">
             </div>
-            <div class="input text">
-                {{ form.quantity.label }} {{ form.quantity }}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="quantity">Quantity:</label> 
+                <input class="form-control col-sm-10" id="quantity" name="quantity" required type="text" value="{{journalentry.quantity}}">
             </div>
-        </div>
         <button type="submit" class="btn btn-success">Save</button>
     </form>
     {% with messages = get_flashed_messages(with_categories=true) %}

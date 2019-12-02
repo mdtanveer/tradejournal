@@ -1,32 +1,35 @@
 ﻿{% extends "layout.html" %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="/static/content/chart.css">
-<h2 id="title"></h2>
-<div id="main">
-    <div id="chart"></div>
-</div>
-<form action="" method="post" role="form" class="NewCommentForm">
-    <div class="form-group">
-        <div class="input text">
-            {{ form.title.label }} {{ form.title }}
+    <div class="container">
+        <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
+        <h4 id="title"></h4>
+        <div id="main">
+            <div id="chart"></div>
         </div>
+        <form class="form-horizontal" action="" method="post" role="form">
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="title">Title:</label>
+                <input class="form-control col-sm-10" id="title" name="title" type="text" value="">
+            </div>
+            <button type="submit" class="btn btn-success">Capture New Chart</button>
+        </form>
+        <button onclick="RenderPreviousChart();" class="btn btn-success">
+            Previous
+        </button>
+        <button onclick="RenderNextChart();" class="btn btn-success">Next</button>
     </div>
-    <button type="submit" class="btn btn-success">Capture New Chart</button>
-</form>
-
-<script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
-<script type="text/javascript" src="/static/scripts/techan.min.js"></script>
-<script>
+        <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
+        <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
+        <script>
     var dataWindowSize = 200;
-    var randomOffset = 0;
-    var windowW = Math.round(window.innerWidth*0.8);
+    var windowW = Math.round(window.innerWidth*0.95);
     var windowH = Math.round(window.innerHeight*0.95);
     var currentScrip = "";
 
     var dim = {
         width: windowW, height: windowH,
-        margin: { top: 20, right: 10, bottom: 30, left: 30 },
+        margin: { top: 0, right: 0, bottom: 60, left: 0 },
         ohlc: { height: 305 },
         indicator: { height: 65, padding: 5 }
     };
@@ -240,7 +243,7 @@
                         close: +d.close
                     };
                 })
-                draw(data);
+                draw(data.slice(data.length - dataWindowSize, data.length));
             })
         }
 
@@ -264,9 +267,5 @@
                 RenderChart(currentChartIndex);
        }
 
-</script>
-<button onclick="RenderPreviousChart();"  class="btn btn-success">
-    Previous
-</button>
-<button onclick="RenderNextChart();"  class="btn btn-success">Next</button>
-{% endblock %}
+        </script>
+        {% endblock %}
