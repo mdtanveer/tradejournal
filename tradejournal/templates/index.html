@@ -10,9 +10,14 @@
         {% for journalentry in journalentries %}
         <tr>
             <td>
+                {%if journalentry.direction == "LONG"%}
+                <span class="glyphicon glyphicon-chevron-up"></span>
+                {%else%}
+                <span class="glyphicon glyphicon-chevron-down"></span>
+                {%endif%}
                 <a href="/journalentry/{{journalentry.key}}">{{journalentry.symbol}}</a><br />
                 Entry: {{journalentry.entry_time}}<br />
-                Quantity: {{journalentry.quantity}} ({{journalentry.direction}})
+                Quantity: {{journalentry.quantity}}
             </td>
         </tr>
         {% endfor %}
