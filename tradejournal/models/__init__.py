@@ -6,18 +6,18 @@ from os import path
 import json
 from datetime import datetime
 import arrow
-
+import pytz
 
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self, key, entity): 
         self.key = key
         self.symbol = entity.symbol
-        self.entry_time = datetime.fromtimestamp(float(entity.entry_time))
+        self.entry_time = pytz.timezone('Asia/Calcutta').localize(datetime.utcfromtimestamp(float(entity.entry_time)))
         try:
-            self.exit_time = datetime.fromtimestamp(float(entity.exit_time))
+            self.exit_time = pytz.timezone('Asia/Calcutta').localize(datetime.utcfromtimestamp(float(entity.exit_time)))
         except:
-            self.exit_time = datetime.fromtimestamp(0)
+            self.exit_time = pytz.timezone('Asia/Calcutta').localize(datetime.utcfromtimestamp(0))
         self.entry_price = entity.entry_price if 'entry_price' in entity.keys() else ''
         self.exit_price = entity.exit_price if 'exit_price' in entity.keys() else '' 
         self.quantity = entity.quantity if 'quantity' in entity.keys() else ''
@@ -26,7 +26,7 @@ class JournalEntry(object):
         self.direction = entity.direction if 'direction' in entity.keys() else ''
     
     def is_open(self):
-        return self.exit_time == datetime.fromtimestamp(0)
+        return self.exit_time == pytz.timezone('Asia/Calcutta').localize(datetime.fromtimestamp(0))
 
     def is_profitable(self):
         try:

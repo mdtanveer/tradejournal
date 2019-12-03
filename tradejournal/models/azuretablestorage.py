@@ -9,6 +9,7 @@ from . import yahooquote
 from datetime import datetime
 import os, uuid
 import arrow
+import pytz
 
 from . import Chart, Comment, JournalEntry, JournalEntryNotFound
 from . import _load_samples_json
@@ -39,7 +40,7 @@ def strtime_to_timestamp(input):
     if not input:
         return '0'
     else:
-        return str(datetime.strptime(input, '%Y-%m-%d %H:%M:%S').timestamp())
+        return str(pytz.timezone('Asia/Calcutta').localize(datetime.strptime(input, '%Y-%m-%d %H:%M:%S')).timestamp())
 
 class Repository(object):
     """Azure Twable Storage repository."""
