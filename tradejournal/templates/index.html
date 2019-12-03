@@ -10,15 +10,6 @@
         {% for journalentry in journalentries %}
         <tr>
             <td>
-                <a href="/journalentry/{{journalentry.key}}">{{journalentry.symbol}}</a>
-                {%if journalentry.direction == "LONG"%}
-                <span class="glyphicon glyphicon-plus text-success"></span>
-                {%else%}
-                <span class="glyphicon glyphicon-minus text-danger"></span>
-                {%endif%}
-                <br />
-                Entry: {{journalentry.get_entry_time()}}<br />
-                Quantity: {{journalentry.quantity}}
                 {%if journalentry.is_open()%}
                 <span class="glyphicon glyphicon-play-circle text-primary"></span>
                 {%else%}
@@ -28,7 +19,15 @@
                 <span class="glyphicon glyphicon-circle-arrow-down text-danger"></span>
                 {%endif%}
                 {%endif%}
-
+                <a href="/journalentry/{{journalentry.key}}">{{journalentry.symbol}}</a><br />
+                Entry: {{journalentry.get_entry_time()}}<br />
+                Quantity:
+                {%if journalentry.direction == "LONG"%}
+                <span class="glyphicon glyphicon-plus text-success"></span>
+                {%else%}
+                <span class="glyphicon glyphicon-minus text-danger"></span>
+                {%endif%}
+                {{journalentry.quantity}}
             </td>
         </tr>
         {% endfor %}
