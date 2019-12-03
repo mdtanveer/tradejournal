@@ -129,7 +129,7 @@ class Repository(object):
         """Add comments"""
         try:
             partition, row = _key_to_partition_and_row(key)
-            add_time = str(arrow.utcnow().to('Asia/Calcutta').datetime.timestamp())
+            add_time = str(pytz.UTC.localize(datetime.utcnow()).timestamp())
             comment_entity = dict(comment_entity)
             comment_entity.update(
             {
