@@ -5,6 +5,7 @@ Package for the models.
 from os import path
 import json
 from datetime import datetime
+import arrow
 
 
 class JournalEntry(object):
@@ -23,6 +24,24 @@ class JournalEntry(object):
         self.entry_sl = entity.entry_sl if 'entry_sl' in entity.keys() else ''
         self.entry_target = entity.entry_target if 'entry_target' in entity.keys() else ''
         self.direction = entity.direction if 'direction' in entity.keys() else ''
+    
+    def is_open(self):
+        return self.exit_time == datetime.fromtimestamp(0)
+
+    def is_profitable(self):
+        try:
+            if not self.is_open():
+                longprofitable = float(self.exit_price) >= float(self.entry_price)
+                if self.direction == 'LONG':
+                    return longprofitable
+                else:
+                    return not longprofitable
+        except:
+            return False
+
+    def get_entry_time(self):
+        return arrow.get(self.entry_time).humanize()
+
 
 class JournalEntryNotFound(Exception):
     """Exception raised when a trade entry object couldn't be retrieved from
