@@ -3,33 +3,44 @@
 {% block content %}
     <div class="container">
         <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
-        <h4 id="title"></h4>
+        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-secondary btn-success" onclick="RenderPreviousChart();">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="RenderNextChart();">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                </button>
+            </div>
+            <div>
+            <center>
+                <h5 id="title"></h5>
+            </center>
+            </div>
+        </div>
         <div id="main">
             <div id="chart"></div>
         </div>
-        <form class="form-horizontal" action="" method="post" role="form">
-            <div class="form-group">
-                <label class="control-label col-sm-2" for="title">Title:</label>
-                <input class="form-control col-sm-10" id="title" name="title" type="text" value="">
-            </div>
-            <button type="submit" class="btn btn-success">Capture New Chart</button>
-        </form>
-        <button onclick="RenderPreviousChart();" class="btn btn-success">
-            Previous
-        </button>
-        <button onclick="RenderNextChart();" class="btn btn-success">Next</button>
+        <form class="input-group"  action="" method="post" role="form">
+            <input type="text" class="form-control" id="title" name="title" >
+            <span class="input-group-btn">
+                <button type="submit" class="btn btn-secondary btn-success">
+                    <span class="glyphicon glyphicon-camera"></span>
+                </button>
+            </span>
+        </form>        
     </div>
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
         <script>
     var dataWindowSize = 200;
-    var windowW = Math.round(window.innerWidth*0.95);
-    var windowH = Math.round(window.innerHeight*0.95);
+    var windowW = Math.round(window.innerWidth*0.8);
+    var windowH = Math.round(window.innerHeight*0.8);
     var currentScrip = "";
 
     var dim = {
         width: windowW, height: windowH,
-        margin: { top: 0, right: 0, bottom: 60, left: 0 },
+        margin: { top: 10, right: 0, bottom: 30, left: 0 },
         ohlc: { height: 305 },
         indicator: { height: 65, padding: 5 }
     };
@@ -268,4 +279,4 @@
        }
 
         </script>
-        {% endblock %}
+{% endblock %}
