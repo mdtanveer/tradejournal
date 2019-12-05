@@ -237,11 +237,42 @@
         titles.push("{{chart.title}}")
         {% endfor %}
 
+            function combine1hto2h(row1, row2) {
+                if (row1['date'] != row2['date']) {
+                    return [row1, row2];
+                }
+                else {
+                    return [{
+                        'date': row1['date'],
+                        'time': row1['time'],
+                        'open': row1['open'],
+                        'high': Math.max(parseFloat(row1['high']), parseFloat(row2['high'])),
+                        'low': Math.min(parseFloat(row1['low']), parseFloat(row2['low'])),
+                        'close': row2['close'],
+                        'volume' : parseFloat(row1['volume'])+parseFloat(row2['volume'])
+                    }]
+                }
+            }
+
+            function To2HChart(data) {
+                var newData = new Array();
+                var i = 0;
+                for (i = 0; i < data.length - 1; i+=2) {
+                    newData = newData.concat(combine1hto2h(data[i], data[i+1]))
+                }
+                if (i < data.length - 1) {
+                    i = data.length - 1;
+                    newData = newData.concat(data[i]);
+                }
+                return newData;
+            }
+
         function RenderChart(i) {
             if (i >= charts.length)
                 return;
             document.getElementById('title').innerText = titles[i];
             d3.csv("{{ base_url }}" + '/' + charts[i], function (error, data) {
+                data = To2HChart(data);
                 data = data.map(function (d) {
                     // Open, high, low, close generally not required, is being used here to demonstrate colored volume
                     // bars
