@@ -8,7 +8,7 @@ from flask import render_template, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField
 
 from tradejournal import app
-from tradejournal.models import JournalEntryNotFound
+from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 
@@ -100,7 +100,8 @@ def create():
     else:
         return render_template(
         'create.html',
-        form=form
+        form=form,
+        nowTime = datetime.now()
     )
 
 
@@ -122,7 +123,7 @@ def edit(key):
             'edit.html',
             form = form,
             journalentry = journalentry,
-            zero_time = datetime.fromtimestamp(0)
+            zero_exit = (journalentry.exit_time == toIST_fromtimestamp(0))
         )
 
 @app.route('/journalentry/<key>', methods=['GET', 'POST'])
@@ -196,3 +197,16 @@ def chart_data(key, chartid):
 def page_not_found(error):
     """Renders error page."""
     return 'JournalEntry does not exist.', 404
+
+@app.template_filter('formatdatetimeinput')
+def format_datetime(value, format="%Y-%m-%dT%H:%M"):
+    if value is None:
+        return ""
+    return value.strftime(format)
+
+
+@app.template_filter('formatdatetimedisplay')
+def format_datetime(value, format="%d-%m-%Y %I:%M %p"):
+    if value is None:
+        return ""
+    return value.strftime(format)

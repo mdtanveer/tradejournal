@@ -40,7 +40,7 @@ def strtime_to_timestamp(input):
     if not input:
         return '0'
     else:
-        return str(pytz.timezone('Asia/Calcutta').localize(datetime.strptime(input, '%Y-%m-%d %H:%M:%S')).timestamp())
+        return str(pytz.timezone('Asia/Calcutta').localize(datetime.strptime(input, '%Y-%m-%dT%H:%M')).timestamp())
 
 class Repository(object):
     """Azure Twable Storage repository."""

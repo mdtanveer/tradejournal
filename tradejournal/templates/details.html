@@ -12,7 +12,7 @@
     </tr>
     <tr>
         <th> Entry time </th>
-        <td> {{ journalentry.entry_time }} </td>
+        <td> {{ journalentry.entry_time | formatdatetimedisplay }} </td>
     </tr>
     <tr>
         <th> Entry price </th>
@@ -20,7 +20,7 @@
     </tr>
     <tr>
         <th> Exit time </th>
-        <td> {{ journalentry.exit_time if journalentry.exit_time.year != 1970 else "" }} </td>
+        <td> {{ journalentry.exit_time | formatdatetimedisplay if journalentry.exit_time.year != 1970 else "" }} </td>
     </tr>
     <tr>
         <th> Exit price </th>

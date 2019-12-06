@@ -14,11 +14,11 @@
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="entry_time">Entry Time:</label>
-            <input class="form-control col-sm-10" id="entry_time" name="entry_time" required type="text" value="">
+            <input class="form-control col-sm-10" id="entry_time" name="entry_time" required type="datetime-local" value="{{nowTime|formatdatetimeinput}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="exit_time">Exit Time:</label>
-            <input class="form-control col-sm-10" id="exit_time" name="exit_time" type="text" value="">
+            <input class="form-control col-sm-10" id="exit_time" name="exit_time" type="datetime-local" value="">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="entry_price">Entry Price:</label>
