@@ -8,7 +8,7 @@ from flask import render_template, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField
 
 from tradejournal import app
-from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp
+from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp, IST_now
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 
@@ -101,7 +101,7 @@ def create():
         return render_template(
         'create.html',
         form=form,
-        nowTime = datetime.now()
+        nowTime = IST_now()
     )
 
 
@@ -158,6 +158,31 @@ def comments(key):
             error_message=error_message,
             form = form,
             journalentry=repository.get_journalentry(key),
+            allcomments = False
+        )
+
+@app.route('/journalentry/comments', methods=['GET', 'POST'])
+def allcomments():
+    """Renders the all comments page."""
+    error_message = ''
+    if request.method == 'POST':
+        try:
+            if request.get_json():
+                data = request.get_json()
+            else:
+                data = request.form
+            repository.add_comment(key, data)
+            return redirect('/journalentry/comments')
+        except KeyError:
+            error_message = 'Unable to update'
+    else:
+        form = CommentForm()
+        return render_template(
+            'comments.html',
+            comments=repository.get_all_comments(),
+            error_message=error_message,
+            form = form,
+            allcomments=True
         )
 
 @app.route('/journalentry/<key>/charts', methods=['GET', 'POST'])
@@ -209,4 +234,8 @@ def format_datetime(value, format="%Y-%m-%dT%H:%M"):
 def format_datetime(value, format="%d-%m-%Y %I:%M %p"):
     if value is None:
         return ""
-    return value.strftime(format)
+    now = IST_now()
+    if now.year == value.year:
+        return value.strftime("%h %d, %I:%M %p")
+    else:
+        return value.strftime(format)

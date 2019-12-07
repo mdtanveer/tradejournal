@@ -149,6 +149,11 @@ class Repository(object):
         comments = [_comment_from_entity(entity) for entity in comment_entities]
         return comments
 
+    def get_all_comments(self):
+        """Returns all the comments from the repository."""
+        comment_entities = self.svc.query_entities(self.comments_table)
+        comments = [_comment_from_entity(entity) for entity in comment_entities]
+        return comments
 
     def add_chart(self, key, entity):
         """Add chart"""

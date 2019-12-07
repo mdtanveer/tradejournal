@@ -2,7 +2,12 @@
 
 {% block content %}
 
-<h3>Comments ({{journalentry.symbol}})</h3>
+<h3>
+    Comments 
+    {% if not allcomments %}
+    ({{journalentry.symbol}})
+    {% endif %}
+</h3>
 <br />
 {% if comments %}
 <table class="table table-hover">
@@ -10,8 +15,13 @@
     <tr>
         <th> {{ comment.add_time | formatdatetimedisplay }} </th>
         <td>
+            {% if allcomments %}
+            <span class="text-white bg-secondary">({{comment.symbol}})</span>
+            {% endif %}
             {%if comment.title %}
-            <b>{{ comment.title }}</b><br />
+            <b>
+                {{ comment.title }}
+            </b><br />
             {% endif %}
             {{ comment.text }}
         </td>

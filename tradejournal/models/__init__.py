@@ -8,6 +8,9 @@ from datetime import datetime
 import arrow
 import pytz
 
+def IST_now():
+    return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
+
 def toIST_fromtimestamp(ts):
     return pytz.UTC.localize(datetime.utcfromtimestamp(ts)).astimezone(pytz.timezone('Asia/Calcutta'))
 
@@ -57,6 +60,7 @@ class Comment(object):
         self.add_time = toIST_fromtimestamp(float(entity.add_time))
         self.title = entity.title if 'title' in entity.keys() else ''
         self.text = entity.text if 'text' in entity.keys() else ''
+        self.symbol = key.split('_')[0]
 
 class Chart(object):
     def __init__(self, key, entity): 
