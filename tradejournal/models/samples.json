@@ -1,8 +1,8 @@
 [
   {
     "symbol": "RELIANCE",
-    "entry_time": "2019-11-19T09:27:53.0000Z",
-    "exit_time": "2019-11-24T09:27:53.0000Z",
+    "entry_time": "2019-11-19T09:27",
+    "exit_time": "2019-11-24T09:27",
     "entry_price": "1000",
     "exit_price": "1100",
     "quantity": "500",
@@ -12,8 +12,8 @@
   },
   {
     "symbol": "BAJAJFIN",
-    "entry_time": "2019-11-19T09:27:53.0000Z",
-    "exit_time": "2019-11-24T09:27:53.0000Z",
+    "entry_time": "2019-11-19T09:27",
+    "exit_time": "2019-11-24T09:27",
     "entry_price": "1000",
     "exit_price": "1100",
     "quantity": "500",
@@ -23,8 +23,8 @@
   },
   {
     "symbol": "SBIN",
-    "entry_time": "2019-11-19T09:27:53.0000Z",
-    "exit_time": "2019-11-24T09:27:53.0000Z",
+    "entry_time": "2019-11-19T09:27",
+    "exit_time": "2019-11-24T09:27",
     "entry_price": "1000",
     "exit_price": "1100",
     "quantity": "500",

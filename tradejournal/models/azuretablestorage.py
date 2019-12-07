@@ -54,18 +54,18 @@ class Repository(object):
         """
         self.name = 'Azure Table Storage'
         self.storage_name = settings['STORAGE_NAME']
-        self.storage_key = settings['STORAGE_KEY']
+        self.connection_string = settings['CONNECTION_STRING']
         self.journalentry_table = 'TradeEntryTable'
         self.comments_table = 'CommentsTable'
         self.charts_table = 'ChartsTable'
 
-        self.svc = TableService(self.storage_name, self.storage_key)
+        self.svc = TableService(self.storage_name, connection_string=self.connection_string)
         self.svc.create_table(self.journalentry_table)
         self.svc.create_table(self.comments_table)
         self.svc.create_table(self.charts_table)
 
         # Create the BlobServiceClient object which will be used to create a container client
-        self.blob_service_client = BlobServiceClient.from_connection_string(settings['CONNECTION_STRING'])
+        self.blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
 
         # Create a unique name for the container
         self.container_name = "charts"

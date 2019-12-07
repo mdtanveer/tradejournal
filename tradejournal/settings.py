@@ -7,13 +7,12 @@ environment variables, or set the default values in code here.
 
 from os import environ
 
-REPOSITORY_NAME = environ.get('REPOSITORY_NAME', 'azuretablestorage')
+REPOSITORY_NAME = environ.get('REPOSITORY_NAME', 'azurestorage')
 
-if REPOSITORY_NAME == 'azuretablestorage':
+if REPOSITORY_NAME == 'azurestorage':
     REPOSITORY_SETTINGS = {
-        'STORAGE_NAME': environ.get('STORAGE_NAME', 'tradejournalstorage'),
-        'STORAGE_KEY': environ.get('STORAGE_KEY', '0YGfSMwBb4xJaMDQ6fr2jjNRRd3aqYCvlqDdwvhul4uCihGufJzHXXq0M5Db5tB/veW1cW3/TthwqMcpPreMwg=='),
-        'CONNECTION_STRING' : environ.get('CONNECTION_STRING', 'DefaultEndpointsProtocol=https;AccountName=tradejournalstorage;AccountKey=0YGfSMwBb4xJaMDQ6fr2jjNRRd3aqYCvlqDdwvhul4uCihGufJzHXXq0M5Db5tB/veW1cW3/TthwqMcpPreMwg==;EndpointSuffix=core.windows.net')
+        'STORAGE_NAME': environ.get('STORAGE_NAME', 'devstoreaccount1'),
+        'CONNECTION_STRING' : environ.get('CONNECTION_STRING', 'AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;')
     }
 elif REPOSITORY_NAME == 'memory':
     REPOSITORY_SETTINGS = {}
