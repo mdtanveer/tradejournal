@@ -82,7 +82,7 @@ path.difference {
 }
 
 .stochastic.up {
-    stroke: #BBBBBB;
+    stroke: none;
 }
 
 .stochastic.down {

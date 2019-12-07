@@ -206,7 +206,8 @@ def charts(key):
             charts=repository.get_charts(key),
             base_url = request.url,
             error_message=error_message,
-            form = form
+            form = form,
+            symbol = key.split('_')[0]
         )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
