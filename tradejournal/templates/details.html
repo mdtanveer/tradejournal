@@ -40,9 +40,19 @@
     </tr>
 </table>
 
-<a href="/journalentry/{{journalentry.key}}/edit">Edit</a>
-<a href="/journalentry/{{journalentry.key}}/comments">Comments</a>
-<a href="/journalentry/{{journalentry.key}}/charts">Charts</a>
+<div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="btn-group mr-2" role="group" aria-label="First group">
+        <form method="GET">
+            <button type="submit" class="btn btn-secondary btn-success" formaction="/journalentry/{{journalentry.key}}/edit">
+                Edit
+            </button>
+            <button type="submit" class="btn btn-secondary btn-success" formaction="/journalentry/{{journalentry.key}}/comments">
+                Comments
+            </button>
+            <button type="submit" class="btn btn-secondary btn-success" formaction="/journalentry/{{journalentry.key}}/charts">Charts</button>
+        </form>
+    </div>
+</div>
 
 {% if error_message %}
 <p class="text-danger">{{error_message}}</p>

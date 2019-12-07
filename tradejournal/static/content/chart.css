@@ -11,13 +11,13 @@ path.candle.body {
 }
 
 path.candle.up {
-    fill: #00AA00;
-    stroke: #00AA00;
+    fill: #5f9e0c;
+    stroke: #5f9e0c;
 }
 
 path.candle.down {
-    fill: #FF0000;
-    stroke: #FF0000;
+    fill: #8b1d1d;
+    stroke: #8b1d1d;
 }
 
 path.volume {
@@ -35,7 +35,7 @@ path.volume {
 }
 
 .ichimoku path.chikouspan {
-    stroke: #003F00;
+    stroke: #BBBBBB;
 }
 
 .ichimoku path.tenkansen {
@@ -59,11 +59,11 @@ path.volume {
 }
 
 .ichimoku path.senkouspana {
-    stroke: #006600;
+    stroke: #ffffff;
 }
 
 .ichimoku path.senkouspanb {
-    stroke: #FF0000;
+    stroke: #ffffff;
 }
 
 path.signal {
@@ -82,11 +82,11 @@ path.difference {
 }
 
 .stochastic.up {
-    stroke: #00AA00;
+    stroke: #BBBBBB;
 }
 
 .stochastic.down {
-    stroke: #FF0000;
+    stroke: #000;
 }
 
 path.overbought, path.oversold {

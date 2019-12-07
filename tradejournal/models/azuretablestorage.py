@@ -122,7 +122,8 @@ class Repository(object):
             'RowKey': entry_time,
         })
         for key in ['entry_time', 'exit_time']:
-            entity[key] = strtime_to_timestamp(entity[key])
+            if key in entity.keys():
+                entity[key] = strtime_to_timestamp(entity[key])
         self.svc.insert_entity(self.journalentry_table, entity)
 
     def add_comment(self, key, comment_entity):

@@ -33,7 +33,7 @@
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
         <script>
-    var dataWindowSize = 200;
+    var dataWindowSize = 250;
     var windowW = Math.round(window.innerWidth*0.8);
     var windowH = Math.round(window.innerHeight*0.8);
     var currentScrip = "";
@@ -268,9 +268,13 @@
             }
 
         function RenderChart(i) {
-            if (i >= charts.length)
-                return;
-            document.getElementById('title').innerText = titles[i];
+            if (i >= charts.length) 
+            {
+                    return;
+            }
+
+            document.getElementById('title').innerText = titles[i] + " (" + (i+1) + " of " + charts.length + ")";
+            document.getElementById('main').hidden = false;
             d3.csv("{{ base_url }}" + '/' + charts[i], function (error, data) {
                 data = To2HChart(data);
                 data = data.map(function (d) {
@@ -285,13 +289,22 @@
                         close: +d.close
                     };
                 })
-                draw(data.slice(data.length - dataWindowSize, data.length));
+                if (dataWindowSize < data.length) {
+                    data = data.slice(data.length - dataWindowSize, data.length)
+                }
+                draw(data);
             })
         }
 
         var currentChartIndex = 0;
-        if (charts.length > 0)
+        if (charts.length > 0) {
+                currentChartIndex = charts.length - 1;
             RenderChart(currentChartIndex);
+        }
+        else {
+            document.getElementById('title').innerText = "No charts available";
+            document.getElementById('main').hidden = true;
+        }
 
         function RenderNextChart() {
             currentChartIndex++;
