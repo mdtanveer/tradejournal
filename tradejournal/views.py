@@ -14,7 +14,7 @@ from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 
-class EditJournalEntryForm(Form):
+class CommonJournalEntryForm(Form):
     exit_time = DateTimeField('Exit Time:')
     entry_price = FloatField('Entry Price:')
     exit_price = FloatField('Exit Price:')
@@ -23,7 +23,10 @@ class EditJournalEntryForm(Form):
     entry_target = FloatField('Entry Target:')
     direction = StringField('Direction:', validators=[validators.required()])
 
-class NewJournalEntryForm(EditJournalEntryForm):
+class EditJournalEntryForm(Form):
+    rating = StringField('Rating:')
+
+class NewJournalEntryForm(CommonJournalEntryForm):
     symbol = StringField('Symbol:', validators=[validators.required()])
     entry_time = DateTimeField('Entry Time:', validators=[validators.required()])
 

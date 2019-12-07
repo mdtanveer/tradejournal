@@ -30,6 +30,7 @@ class JournalEntry(object):
         self.entry_sl = entity.entry_sl if 'entry_sl' in entity.keys() else ''
         self.entry_target = entity.entry_target if 'entry_target' in entity.keys() else ''
         self.direction = entity.direction if 'direction' in entity.keys() else ''
+        self.rating = entity.rating if 'rating' in entity.keys() else ''
     
     def is_open(self):
         return self.exit_time == toIST_fromtimestamp(0)
