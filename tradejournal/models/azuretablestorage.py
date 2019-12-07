@@ -153,6 +153,7 @@ class Repository(object):
         """Returns all the comments from the repository."""
         comment_entities = self.svc.query_entities(self.comments_table)
         comments = [_comment_from_entity(entity) for entity in comment_entities]
+        comments.sort(key = lambda x: x.add_time, reverse=True)
         return comments
 
     def add_chart(self, key, entity):

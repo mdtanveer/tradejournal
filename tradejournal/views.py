@@ -171,7 +171,7 @@ def allcomments():
                 data = request.get_json()
             else:
                 data = request.form
-            repository.add_comment(key, data)
+            repository.add_comment("GLOBAL_1", data)
             return redirect('/journalentry/comments')
         except KeyError:
             error_message = 'Unable to update'
