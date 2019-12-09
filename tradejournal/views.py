@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 from flask import render_template, redirect, request, Response
-from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField
+from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
 from tradejournal import app
 from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp, IST_now
@@ -33,6 +33,7 @@ class NewJournalEntryForm(CommonJournalEntryForm):
 class CommentForm(Form):
     title = StringField('Title:')
     text = TextAreaField('Text', validators=[validators.required()])
+    linkchart = BooleanField()
 
 class ChartForm(Form):
     title = StringField('Title:')
@@ -149,7 +150,10 @@ def comments(key):
                 data = request.get_json()
             else:
                 data = request.form
+            linkchart = dict(data).pop('linkchart', False)
             repository.add_comment(key, data)
+            if linkchart:
+                repository.add_chart(key, {'title':data['title']})
             return redirect('/journalentry/{0}/comments'.format(key))
         except KeyError:
             error_message = 'Unable to update'
