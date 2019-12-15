@@ -16,6 +16,9 @@
     <Name>tradejournal</Name>
     <RootNamespace>tradejournal</RootNamespace>
     <InterpreterId>Global|PythonCore|3.8</InterpreterId>
+    <WebBrowserPort>5555</WebBrowserPort>
+    <Environment>
+    </Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

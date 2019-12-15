@@ -11,6 +11,7 @@ from tradejournal import app
 from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp, IST_now
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
+from flask_login import login_required
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 
@@ -40,6 +41,7 @@ class ChartForm(Form):
 
 @app.route('/')
 @app.route('/home')
+@login_required
 def home():
     """Renders the home page, with a list of all journalentrys."""
     return render_template(
@@ -50,10 +52,12 @@ def home():
     )
 
 @app.route('/js/<path:path>')
+@login_required
 def send_js(path):
     return send_from_directory('js', path)
 
 @app.route('/contact')
+@login_required
 def contact():
     """Renders the contact page."""
     return render_template(
@@ -62,6 +66,7 @@ def contact():
         year=datetime.now().year,
     )
 
+@login_required
 @app.route('/about')
 def about():
     """Renders the about page."""
@@ -73,12 +78,14 @@ def about():
     )
 
 @app.route('/seed', methods=['POST', 'GET'])
+@login_required
 def seed():
     """Seeds the database with sample journalentrys."""
     repository.add_sample_journalentries()
     return redirect('/')
 
 @app.route('/results/<key>')
+@login_required
 def results(key):
     """Renders the results page."""
     journalentry = repository.get_journalentry(key)
@@ -91,6 +98,7 @@ def results(key):
     )
 
 @app.route('/create', methods=['GET', 'POST'])
+@login_required
 def create():
     """New journal entry"""
     form = NewJournalEntryForm()
@@ -110,6 +118,7 @@ def create():
 
 
 @app.route('/journalentry/<key>/edit', methods=['GET', 'POST'])
+@login_required
 def edit(key):
     """New journal entry"""
     if request.method == 'POST':
@@ -131,6 +140,7 @@ def edit(key):
         )
 
 @app.route('/journalentry/<key>', methods=['GET', 'POST'])
+@login_required
 def details(key):
     """Renders the journalentry details page."""
     error_message = ''
@@ -141,6 +151,7 @@ def details(key):
     )
 
 @app.route('/journalentry/<key>/comments', methods=['GET', 'POST'])
+@login_required
 def comments(key):
     """Renders the comments page."""
     error_message = ''
@@ -169,6 +180,7 @@ def comments(key):
         )
 
 @app.route('/journalentry/comments', methods=['GET', 'POST'])
+@login_required
 def allcomments():
     """Renders the all comments page."""
     error_message = ''
@@ -193,6 +205,7 @@ def allcomments():
         )
 
 @app.route('/journalentry/<key>/charts', methods=['GET', 'POST'])
+@login_required
 def charts(key):
     """Renders the charts page."""
     error_message = ''
@@ -218,6 +231,7 @@ def charts(key):
         )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
+@login_required
 def chart_data(key, chartid):
     csv_data = repository.get_chart_data(chartid)
     return Response(
