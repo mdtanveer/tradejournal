@@ -275,7 +275,7 @@
 
             document.getElementById('title').innerText = titles[i] + " (" + (i+1) + " of " + charts.length + ")";
             document.getElementById('main').hidden = false;
-            d3.csv("{{ base_url }}" + '/' + charts[i], function (error, data) {
+            d3.csv("charts/"+charts[i], function (error, data) {
                 data = To2HChart(data);
                 data = data.map(function (d) {
                     // Open, high, low, close generally not required, is being used here to demonstrate colored volume

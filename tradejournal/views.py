@@ -224,7 +224,6 @@ def charts(key):
         return render_template(
             'chart.html',
             charts=repository.get_charts(key),
-            base_url = request.url,
             error_message=error_message,
             form = form,
             symbol = key.split('_')[0]
