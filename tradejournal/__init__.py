@@ -33,7 +33,7 @@ oauth.register(
     name='microsoft',
     client_id=settings.CLIENT_ID,
     client_secret=settings.CLIENT_SECRET,
-    server_metadata_url='https://login.microsoftonline.com/%(tenantid)s/v2.0/.well-known/openid-configuration'%settings.TENANT_ID,
+    server_metadata_url='https://login.microsoftonline.com/%s/v2.0/.well-known/openid-configuration'%settings.TENANT_ID,
     client_kwargs={'scope': 'openid profile email'}
 )
 
