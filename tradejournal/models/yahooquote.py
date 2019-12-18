@@ -5,7 +5,7 @@ import datetime
 import os
  
 def get_yahoo_quote(symbol='SBIN', data_range='90d', data_interval='1h'):
-    res = requests.get('https://query1.finance.yahoo.com/v8/finance/chart/{symbol}.NS?range={data_range}&interval={data_interval}'.format(**locals()))
+    res = requests.get('https://query1.finance.yahoo.com/v8/finance/chart/{symbol}.BO?range={data_range}&interval={data_interval}'.format(**locals()))
     data = res.json()
     body = data['chart']['result'][0]    
     dt = datetime.datetime
