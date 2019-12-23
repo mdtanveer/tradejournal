@@ -226,7 +226,7 @@ def charts(key):
             charts=repository.get_charts(key),
             error_message=error_message,
             form = form,
-            symbol = key.split('_')[0]
+            journalentry=repository.get_journalentry(key)
         )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
@@ -260,3 +260,9 @@ def format_datetime(value, format="%d-%m-%Y %I:%M %p"):
         return value.strftime("%h %d, %I:%M %p")
     else:
         return value.strftime(format)
+
+@app.template_filter('formatdatetimed3')
+def format_datetime(value, format="%Y-%m-%d %H:%M:%S"):
+    if value is None:
+        return ""
+    return value.strftime(format)
