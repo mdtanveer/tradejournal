@@ -202,11 +202,23 @@
     svg.append("g")
               .attr("class", "tradearrow")
               .attr("clip-path", "url(#ohlcClip)");
+    const tradearrowoffsetentry = {{ 0.95 if journalentry.direction == 'LONG' else 1.05}};
+    const tradearrowoffsetexit = {{ 1.05 if journalentry.direction == 'LONG' else 0.95}};
 
-    var trades = [
-                { date: parseDate("{{ journalentry.entry_time|formatdatetimed3 }}"), type: "{{ 'buy' if journalentry.direction == 'LONG' else 'sell'}}", price: {{ journalentry.entry_price }}, quantity: {{ journalentry.quantity }} }
+    const trades = [
+                {
+                    date: parseDate("{{ journalentry.entry_time|formatdatetimed3 }}"),
+                    type: "{{ 'buy' if journalentry.direction == 'LONG' else 'sell'}}",
+                    price: {{ journalentry.entry_price }}* tradearrowoffsetentry,
+                    quantity: {{ journalentry.quantity }} 
+            }
             {% if not journalentry.is_open() %}
-            , { date: parseDate("{{ journalentry.exit_time|formatdatetimed3 }}"), type: "{{ 'sell' if journalentry.direction == 'LONG' else 'buy'}}", price: {{ journalentry.exit_price }}, quantity: {{ journalentry.quantity }} }
+            , {
+                date: parseDate("{{ journalentry.exit_time|formatdatetimed3 }}"),
+                    type: "{{ 'sell' if journalentry.direction == 'LONG' else 'buy'}}",
+                    price: {{ journalentry.exit_price }}* tradearrowoffsetexit,
+                quantity: {{ journalentry.quantity }}
+            }
             {%endif%}
         ];
 
@@ -240,7 +252,14 @@
         svg.selectAll("g.volume").datum(data).call(volume);
         svg.selectAll("g.stochastic .indicator-plot").datum(stochasticData).call(stochastic);
         svg.selectAll("g.stochastic .axis.left").call(stochasticAxisLeft);
-        svg.selectAll("g.tradearrow").datum(trades).call(tradearrow);
+        if (trades.length == 2 && trades[1].date > data[data.length - 1].date) {
+            chartTrades = [...trades].splice(0, 1);
+        }
+        else {
+            chartTrades = trades;
+        }
+        svg.selectAll("g.tradearrow").selectAll("*").remove();
+        svg.selectAll("g.tradearrow").datum(chartTrades).call(tradearrow);
     }
 
         var charts = [];
