@@ -12,7 +12,7 @@ from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp, IST_n
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
-from flask_paginate import Pagination, get_page_parameter
+from flask_paginate import Pagination, get_page_parameter, get_page_args
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 
@@ -46,13 +46,13 @@ class ChartForm(Form):
 def home():
     """Renders the home page, with a list of all journalentrys."""
     journalentries=repository.get_journalentries()
-    page = request.args.get(get_page_parameter(), type=int, default=1)
+    page, per_page, offset = get_page_args()
     pagination = Pagination(page=page, total=len(journalentries), search=False, record_name='journalentries',css_framework='bootstrap4')
     return render_template(
         'index.html',
         title='Journal Entries',
         year=datetime.now().year,
-        journalentries=journalentries,
+        journalentries=journalentries[offset:offset+per_page],
         pagination=pagination
     )
 
@@ -176,13 +176,13 @@ def comments(key):
     else:
         form = CommentForm()
         comments=repository.get_comments(key)
-        page = request.args.get(get_page_parameter(), type=int, default=1)
+        page, per_page, offset = get_page_args()
         pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
         return render_template(
             'comments.html',
             error_message=error_message,
             form = form,
-            comments=comments,
+            comments=comments[offset:offset+per_page],
             journalentry=repository.get_journalentry(key),
             allcomments = False,
             pagination = pagination
@@ -205,13 +205,12 @@ def allcomments():
             error_message = 'Unable to update'
     else:
         form = CommentForm()
-        page = request.args.get(get_page_parameter(), type=int, default=1)
-
+        page, per_page, offset = get_page_args()
         comments=repository.get_all_comments()
         pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
         return render_template(
             'comments.html',
-            comments=comments,
+            comments=comments[offset:offset+per_page],
             error_message=error_message,
             form = form,
             allcomments=True,
