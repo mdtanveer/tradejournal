@@ -12,6 +12,7 @@ from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp, IST_n
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
+from flask_paginate import Pagination, get_page_parameter
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 
@@ -44,11 +45,15 @@ class ChartForm(Form):
 @login_required
 def home():
     """Renders the home page, with a list of all journalentrys."""
+    journalentries=repository.get_journalentries()
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    pagination = Pagination(page=page, total=len(journalentries), search=False, record_name='journalentries',css_framework='bootstrap4')
     return render_template(
         'index.html',
         title='Journal Entries',
         year=datetime.now().year,
-        journalentries=repository.get_journalentries()
+        journalentries=journalentries,
+        pagination=pagination
     )
 
 @app.route('/js/<path:path>')
@@ -170,13 +175,17 @@ def comments(key):
             error_message = 'Unable to update'
     else:
         form = CommentForm()
+        comments=repository.get_comments(key)
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
         return render_template(
             'comments.html',
-            comments=repository.get_comments(key),
             error_message=error_message,
             form = form,
+            comments=comments,
             journalentry=repository.get_journalentry(key),
-            allcomments = False
+            allcomments = False,
+            pagination = pagination
         )
 
 @app.route('/journalentry/comments', methods=['GET', 'POST'])
@@ -196,12 +205,17 @@ def allcomments():
             error_message = 'Unable to update'
     else:
         form = CommentForm()
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+
+        comments=repository.get_all_comments()
+        pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
         return render_template(
             'comments.html',
-            comments=repository.get_all_comments(),
+            comments=comments,
             error_message=error_message,
             form = form,
-            allcomments=True
+            allcomments=True,
+            pagination = pagination
         )
 
 @app.route('/journalentry/<key>/charts', methods=['GET', 'POST'])
