@@ -21,17 +21,25 @@
         <div id="main">
             <div id="chart"></div>
         </div>
-        <form class="input-group" action="" method="post" role="form">
+        <form class="input-group"  method="post" role="form">
             <input type="text" class="form-control" id="title" name="title">
-            <span class="input-group-btn">
-                <button type="submit" class="btn btn-secondary btn-success">
-                    <span class="glyphicon glyphicon-camera"></span>
+            <div class="input-group-btn">
+                <button type="submit" class="btn btn-success">
+                    &zwnj;<span class="glyphicon glyphicon-camera"></span>
                 </button>
-            </span>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    &zwnj;<span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li>
+                        <a href="javascript:DeleteCurrentChart();">
+                            Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </form>
-        <button type="submit" class="btn btn-secondary btn-danger" onclick="DeleteCurrentChart();">
-            <span class="glyphicon glyphicon-trash"></span>
-        </button>
     </div>
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
