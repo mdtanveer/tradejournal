@@ -252,6 +252,12 @@ def chart_data(key, chartid):
         headers={"Content-disposition":
                  "attachment; filename=%s"%chartid})
 
+@app.route('/journalentry/<key>/charts/<chartkey>/delete', methods=['DELETE'])
+@login_required
+def chart_delete(key, chartkey):
+    repository.delete_chart(chartkey)
+    return Response("{}", status=200, mimetype='application/json')
+
 @app.errorhandler(JournalEntryNotFound)
 def page_not_found(error):
     """Renders error page."""

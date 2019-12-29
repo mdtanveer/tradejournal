@@ -21,7 +21,7 @@ def _partition_and_row_to_key(partition, row):
 def _key_to_partition_and_row(key):
     """Parses the azure table partition and row keys from the journalentry/choice
     key."""
-    partition, _, row = key.partition('_')
+    partition, _, row = key.rpartition('_')
     return partition, row
 
 def _journalentry_from_entity(entity):
@@ -180,6 +180,17 @@ class Repository(object):
                 'add_time' : add_time
             })
             self.svc.insert_entity(self.charts_table, entity)
+        except AzureMissingResourceHttpError:
+            raise JournalEntryNotFound()
+
+    def delete_chart(self, key):
+        try:
+            partition, row = _key_to_partition_and_row(key)
+            entity = self.svc.get_entity(self.charts_table, partition, row)
+            file_name = entity['data']
+            blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=file_name)
+            blob_client.delete_blob()
+            self.svc.delete_entity(self.charts_table, partition, row)
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
