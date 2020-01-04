@@ -257,7 +257,6 @@ def chart_data(key, chartid):
 def quick_charts():
     """Renders the charts page."""
     error_message = ''
-    form = ChartForm()
     if 'symbols' in request.args.keys():
         symbols = request.args['symbols'].split(',')
         charts = [{'key':'', 'title': symbol, 'data': symbol} for symbol in symbols]
@@ -265,9 +264,10 @@ def quick_charts():
             'chart.html',
             charts=jsonpickle.encode(charts, unpicklable=False),
             error_message=error_message,
-            form = form,
             journalentry=None
         )
+    else:
+        return ('', 204)
 
 @app.route('/charts/<symbol>', methods=['GET'])
 def fetch_chart(symbol):

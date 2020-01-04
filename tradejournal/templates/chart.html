@@ -21,6 +21,7 @@
         <div id="main">
             <div id="chart"></div>
         </div>
+        {%if journalentry%}
         <form class="input-group"  method="post" role="form">
             <input type="text" class="form-control" id="title" name="title">
             <div class="input-group-btn">
@@ -40,6 +41,7 @@
                 </ul>
             </div>
         </form>
+        {%endif%}
     </div>
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
@@ -375,7 +377,8 @@
                 currentChartIndex = charts.length-1;
             if (charts.length > 0)
                 RenderChart(currentChartIndex);
-       }
+            }
+        {%if journalentry%}
             function DeleteCurrentChart() {
                 $.ajax({
                     url: 'charts/' + charts[currentChartIndex].key + '/delete',
@@ -385,5 +388,6 @@
                     }
                 });
             }
+        {%endif%}
         </script>
 {% endblock %}
