@@ -19,6 +19,6 @@ elif REPOSITORY_NAME == 'memory':
 else:
     raise ValueError('Unknown repository.')
 
-CLIENT_ID = environ.get('CLIENT_ID', '0c1a5774-f145-4566-b3ed-f9b7698fe818')
-CLIENT_SECRET =  environ.get('CLIENT_SECRET', '=qjBXh4-iR:2HTSk2=8n1PjsMxk4AIo.')
-TENANT_ID = environ.get('TENANT_ID', 'e290c7cd-29c5-4763-a016-cc1bf155224c')
+CLIENT_ID = environ.get('CLIENT_ID', '')
+CLIENT_SECRET =  environ.get('CLIENT_SECRET', '')
+TENANT_ID = environ.get('TENANT_ID', '')
