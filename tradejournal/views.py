@@ -13,6 +13,7 @@ from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
 from flask_paginate import Pagination, get_page_parameter, get_page_args
+import jsonpickle
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 
@@ -236,7 +237,7 @@ def charts(key):
         form = ChartForm()
         return render_template(
             'chart.html',
-            charts=repository.get_charts(key),
+            charts=jsonpickle.encode(repository.get_charts(key), unpicklable=False),
             error_message=error_message,
             form = form,
             journalentry=repository.get_journalentry(key)

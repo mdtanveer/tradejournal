@@ -277,14 +277,7 @@
         svg.selectAll("g.tradearrow").datum(chartTrades).call(tradearrow);
     }
 
-        var charts = [];
-            var titles = [];
-            var chartkeys = [];
-        {% for chart in charts %}
-            charts.push("{{chart.data}}");
-            titles.push("{{chart.title}}");
-            chartkeys.push("{{chart.key}}")
-        {% endfor %}
+            var charts = JSON.parse('{{ charts | safe}}');
 
             function combine1hto2h(array, row1, row2) {
                 if (row1['date'] != row2['date']) {
@@ -326,9 +319,9 @@
                     return;
             }
 
-            document.getElementById('title').innerText = titles[i] + " (" + (i+1) + " of " + charts.length + ")";
+            document.getElementById('title').innerText = charts[i].title + " (" + (i+1) + " of " + charts.length + ")";
             document.getElementById('main').hidden = false;
-            d3.csv("charts/"+charts[i], function (error, data) {
+            d3.csv("charts/"+charts[i].data, function (error, data) {
                 data = To2HChart(data);
                 data = data.map(function (d) {
                     // Open, high, low, close generally not required, is being used here to demonstrate colored volume
@@ -376,7 +369,7 @@
        }
             function DeleteCurrentChart() {
                 $.ajax({
-                    url: 'charts/' + chartkeys[currentChartIndex] + '/delete',
+                    url: 'charts/' + charts[currentChartIndex].key + '/delete',
                     type: 'DELETE',
                     success: function(result) {
                         window.location.reload();

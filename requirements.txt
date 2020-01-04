@@ -7,3 +7,4 @@ wtforms
 flask_login
 authlib
 flask-paginate
+jsonpickle
