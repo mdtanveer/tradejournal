@@ -8,7 +8,7 @@ from flask import render_template, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
 from tradejournal import app
-from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp, IST_now
+from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquote
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
@@ -252,6 +252,31 @@ def chart_data(key, chartid):
         mimetype="text/csv",
         headers={"Content-disposition":
                  "attachment; filename=%s"%chartid})
+
+@app.route('/charts', methods=['GET'])
+def quick_charts():
+    """Renders the charts page."""
+    error_message = ''
+    form = ChartForm()
+    if 'symbols' in request.args.keys():
+        symbols = request.args['symbols'].split(',')
+        charts = [{'key':'', 'title': symbol, 'data': symbol} for symbol in symbols]
+        return render_template(
+            'chart.html',
+            charts=jsonpickle.encode(charts, unpicklable=False),
+            error_message=error_message,
+            form = form,
+            journalentry=None
+        )
+
+@app.route('/charts/<symbol>', methods=['GET'])
+def fetch_chart(symbol):
+    csv_data=yahooquote.get_yahoo_quote(symbol).to_csv(index=False)
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=%s.csv"%symbol})
 
 @app.route('/journalentry/<key>/charts/<chartkey>/delete', methods=['DELETE'])
 @login_required
