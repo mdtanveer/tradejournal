@@ -259,19 +259,30 @@ def quick_charts():
     error_message = ''
     if 'symbols' in request.args.keys():
         symbols = request.args['symbols'].split(',')
-        charts = [{'key':'', 'title': symbol, 'data': symbol} for symbol in symbols]
+        tf = request.args.get('tf', '2h')
+        charts = [{'key':'', 'title': symbol, 'data': symbol, 'relativeUrl':'charts/%s?tf=%s'%(symbol, tf)} for symbol in symbols]
         return render_template(
             'chart.html',
             charts=jsonpickle.encode(charts, unpicklable=False),
             error_message=error_message,
-            journalentry=None
+            journalentry=None,
+            timeframe=tf
         )
     else:
         return ('', 204)
 
 @app.route('/charts/<symbol>', methods=['GET'])
 def fetch_chart(symbol):
-    csv_data=yahooquote.get_yahoo_quote(symbol).to_csv(index=False)
+    tf = request.args.get('tf', '2h')
+    if tf == '2h':
+        yahoo_params = (symbol, '90d', '1h')
+    elif tf == '1d':
+        yahoo_params = (symbol, '1y', '1d')
+    elif tf == '1wk':
+        yahoo_params = (symbol, '5y', '1wk')
+    else:
+        raise Exception('Unrecognized timeframe')
+    csv_data=yahooquote.get_yahoo_quote(*yahoo_params).to_csv(index=False)
     return Response(
         csv_data,
         mimetype="text/csv",

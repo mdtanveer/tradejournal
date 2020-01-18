@@ -69,6 +69,7 @@ class Chart(object):
         self.add_time = toIST_fromtimestamp(float(entity.add_time))
         self.title = entity.title if 'title' in entity.keys() else ''
         self.data = entity.data
+        self.relativeUrl = 'charts/' + entity.data
 
 def _load_samples_json():
     """Loads polls from samples.json file."""

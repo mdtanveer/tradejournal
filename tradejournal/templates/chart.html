@@ -22,7 +22,7 @@
             <div id="chart"></div>
         </div>
         {%if journalentry%}
-        <form class="input-group"  method="post" role="form">
+        <form class="input-group" method="post" role="form">
             <input type="text" class="form-control" id="title" name="title">
             <div class="input-group-btn">
                 <button type="submit" class="btn btn-success">
@@ -41,6 +41,14 @@
                 </ul>
             </div>
         </form>
+        {%else%}
+        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart('2h');">I</button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart('1d');">D</button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart('1wk');">W</button>
+            </div>
+        </div>
         {%endif%}
     </div>
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
@@ -202,6 +210,7 @@
     svg.append("g")
             .attr("class", "y axis")
         .append("text")
+            .attr('id', 'charttitle')
             .attr("transform", "rotate(-90)")
             .attr("y", 6)
             .attr("dy", ".71em")
@@ -283,6 +292,7 @@
     }
 
             var charts = JSON.parse('{{ charts | safe}}');
+            var g_timeFrame = '{{ timeframe }}';
 
             function combine1hto2h(array, row1, row2) {
                 if (row1['date'] != row2['date']) {
@@ -318,17 +328,20 @@
                 return newData;
             }
 
-        function RenderChart(i) {
+        function RenderChart(i, timeFrame) {
             if (i >= charts.length) 
             {
                     return;
             }
 
             document.getElementById('title').innerText = charts[i].title + " (" + (i+1) + " of " + charts.length + ")";
+            document.getElementById('charttitle').innerHTML = charts[currentChartIndex].data + ' (' + timeFrame[1].toUpperCase() + ')';
             document.getElementById('main').hidden = false;
             function D3_DataCallback(error, data) {
                 charts[i].raw_data = data;
-                data = To2HChart(data);
+                if (timeFrame == '2h') {
+                    data = To2HChart(data);
+                }
                 data = data.map(function (d) {
                     // Open, high, low, close generally not required, is being used here to demonstrate colored volume
                     // bars
@@ -347,7 +360,11 @@
                 draw(data);
             }
             if (charts[i].raw_data == null) {
-                d3.csv("charts/" + charts[i].data, D3_DataCallback)
+                var temp = charts[i].relativeUrl.split('?');
+                params = new URLSearchParams(temp[1]);
+                params.set('tf', timeFrame);
+                relativeUrl = temp[0] + '?' + params;
+                d3.csv(relativeUrl, D3_DataCallback)
             } else {
                 D3_DataCallback(null, charts[i].raw_data);
             }
@@ -356,11 +373,16 @@
         var currentChartIndex = 0;
         if (charts.length > 0) {
                 currentChartIndex = charts.length - 1;
-            RenderChart(currentChartIndex);
+            RenderChart(currentChartIndex, g_timeFrame);
         }
         else {
             document.getElementById('title').innerText = "No charts available";
             document.getElementById('main').hidden = true;
+            }
+
+        function RenderCurrentChart(timeFrame) {
+            charts[currentChartIndex].raw_data = null;
+            RenderChart(currentChartIndex, timeFrame);
         }
 
         function RenderNextChart() {
@@ -368,7 +390,7 @@
             if (currentChartIndex >= charts.length)
                 currentChartIndex = 0;
             if (charts.length > 0)
-                RenderChart(currentChartIndex);
+                RenderChart(currentChartIndex, g_timeFrame);
         }
 
         function RenderPreviousChart() {
@@ -376,7 +398,7 @@
             if (currentChartIndex < 0)
                 currentChartIndex = charts.length-1;
             if (charts.length > 0)
-                RenderChart(currentChartIndex);
+                RenderChart(currentChartIndex, g_timeFrame);
             }
         {%if journalentry%}
             function DeleteCurrentChart() {
