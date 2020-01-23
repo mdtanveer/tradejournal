@@ -240,7 +240,8 @@ def charts(key):
             charts=jsonpickle.encode(repository.get_charts(key), unpicklable=False),
             error_message=error_message,
             form = form,
-            journalentry=repository.get_journalentry(key)
+            journalentry=repository.get_journalentry(key),
+            timeframe='2h'
         )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])

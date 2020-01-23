@@ -335,7 +335,9 @@
             }
 
             document.getElementById('title').innerText = charts[i].title + " (" + (i+1) + " of " + charts.length + ")";
+            {%if not journalentry%}
             document.getElementById('charttitle').innerHTML = charts[currentChartIndex].data + ' (' + timeFrame[1].toUpperCase() + ')';
+            {%endif%}
             document.getElementById('main').hidden = false;
             function D3_DataCallback(error, data) {
                 charts[i].raw_data = data;
