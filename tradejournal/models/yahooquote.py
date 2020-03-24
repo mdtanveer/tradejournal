@@ -7,7 +7,7 @@ import os
 def get_yahoo_quote(symbol='SBIN', data_range='90d', data_interval='1h'):
     args = dict(locals())
     if not symbol.startswith('^'):
-        args['symbol'] = args['symbol']+'.BO'
+        args['symbol'] = args['symbol']+'.NS'
 
     res = requests.get('https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?range={data_range}&interval={data_interval}'.format(**args))
     data = res.json()
