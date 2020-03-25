@@ -275,7 +275,7 @@ def quick_charts():
 @app.route('/charts/<symbol>', methods=['GET'])
 def fetch_chart(symbol):
     tf = request.args.get('tf', '2h')
-    if tf == '2h':
+    if tf == '2h' or tf == '1h':
         yahoo_params = (symbol, '90d', '1h')
     elif tf == '1d':
         yahoo_params = (symbol, '1y', '1d')
