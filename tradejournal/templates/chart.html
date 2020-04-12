@@ -341,7 +341,7 @@
             document.getElementById('main').hidden = false;
             function D3_DataCallback(error, data) {
                 charts[i].raw_data = data;
-                if (timeFrame == '2h') {
+                if (timeFrame == '2h' || timeFrame == '1h') {
                     data = To2HChart(data);
                 }
                 data = data.map(function (d) {
