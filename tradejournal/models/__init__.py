@@ -4,7 +4,7 @@ Package for the models.
 
 from os import path
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import arrow
 import pytz
 
@@ -48,6 +48,9 @@ class JournalEntry(object):
 
     def get_entry_time(self):
         return arrow.get(self.entry_time).humanize()
+
+    def is_aged(self, days):
+        return (IST_now() - self.entry_time) >= timedelta(days=days)
 
 
 class JournalEntryNotFound(Exception):

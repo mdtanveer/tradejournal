@@ -81,6 +81,7 @@ class Repository(object):
         journalentry_entities = self.svc.query_entities(self.journalentry_table)
         journalentries = [_journalentry_from_entity(entity) for entity in journalentry_entities]
         journalentries.sort(key = lambda x: x.entry_time, reverse=True)
+        journalentries = list(filter(lambda x: not x.is_aged(30), journalentries))
         return journalentries
 
     def get_journalentry(self, journalentry_key):
@@ -96,13 +97,23 @@ class Repository(object):
     def update_journalentry(self, key, updated_entity):
         """Update the specified journalentry."""
         try:
+            KEY_EXIT_TIME = 'exit_time'
             partition, row = _key_to_partition_and_row(key)
             entity = self.svc.get_entity(self.journalentry_table, partition, row)
+
+            trade_closure = ((KEY_EXIT_TIME not in entity.keys() 
+                              or entity[KEY_EXIT_TIME] == '0'
+                              or entity[KEY_EXIT_TIME]  == '') 
+                             and (KEY_EXIT_TIME in updated_entity.keys() 
+                                  and updated_entity[KEY_EXIT_TIME] != '0' 
+                                  and updated_entity[KEY_EXIT_TIME] != ''))
+            if trade_closure:
+                self.add_chart(key, {'title':'Auto exit chart'})
             entity.update(updated_entity)
-            key = 'exit_time'
-            if key in entity.keys() and entity[key]:
-                entity[key] = strtime_to_timestamp(entity[key])
+            if KEY_EXIT_TIME in entity.keys() and entity[KEY_EXIT_TIME]:
+                entity[KEY_EXIT_TIME] = strtime_to_timestamp(entity[KEY_EXIT_TIME])
             self.svc.update_entity(self.journalentry_table, entity)
+
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
