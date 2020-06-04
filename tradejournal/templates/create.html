@@ -13,6 +13,10 @@
             <input class="form-control col-sm-10" id="symbol" name="symbol" required type="text" value="">
         </div>
         <div class="form-group">
+            <label class="control-label col-sm-2" for="direction">Direction:</label>
+            <input class="form-control col-sm-10" id="direction" name="direction" required type="text" value="">
+        </div>
+        <div class="form-group">
             <label class="control-label col-sm-2" for="entry_time">Entry Time:</label>
             <input class="form-control col-sm-10" id="entry_time" name="entry_time" required type="datetime-local" value="{{nowTime|formatdatetimeinput}}">
         </div>
@@ -37,12 +41,8 @@
             <input class="form-control col-sm-10" id="entry_target" name="entry_target" type="text" value="">
         </div>
         <div class="form-group">
-            <label class="control-label col-sm-2" for="direction">Direction:</label>
-            <input class="form-control col-sm-10" id="direction" name="direction" required type="text" value="">
-        </div>
-        <div class="form-group">
             <label class="control-label col-sm-2" for="quantity">Quantity:</label>
-            <input class="form-control col-sm-10" id="quantity" name="quantity" required type="text" value="">
+            <input class="form-control col-sm-10" id="quantity" name="quantity" type="text" value="">
         </div>
         <div class="form-group">
             <div class=" col-sm-offset-2 col-sm-10">
