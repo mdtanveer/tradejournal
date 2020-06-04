@@ -108,6 +108,7 @@
         var heikinashiIndicator = techan.indicator.heikinashi();
     }
 
+    var g_indicator = "{{ indicator }}";
 
     var ichimoku = techan.plot.ichimoku()
             .xScale(x)
@@ -149,26 +150,34 @@
             .attr("height", dim.indicator.height);
 
 
-    var stochasticScale = d3.scaleLinear()
+    var indicatorScale = d3.scaleLinear()
             .range([indicatorTop(0)+dim.indicator.height, indicatorTop(0)]);
 
-    var stochastic = techan.plot.stochastic()
-            .xScale(x)
-            .yScale(stochasticScale);
+            if (g_indicator == "stochastic") {
+                var stochastic = techan.plot.stochastic()
+                    .xScale(x)
+                    .yScale(indicatorScale);
 
-    var stochasticIndicator = techan.indicator.stochastic()
+                var stochasticIndicator = techan.indicator.stochastic()
+            }
+            else {
+                var macd = techan.plot.macd()
+                    .xScale(x)
+                    .yScale(indicatorScale);
 
-    var stochasticAxisLeft = d3.axisLeft(stochasticScale)
+                var macdIndicator = techan.indicator.macd()
+            }
+    var indicatorAxisLeft = d3.axisLeft(indicatorScale)
             .ticks(3);
 
-    var stochasticAnnotationLeft = techan.plot.axisannotation()
-            .axis(stochasticAxisLeft)
+    var indicatorAnnotationLeft = techan.plot.axisannotation()
+            .axis(indicatorAxisLeft)
             .orient("left")
             .format(d3.format(',.2f'));
 
-    var indicatorSelection = svg.selectAll("svg > g.indicator").data(["stochastic"]).enter()
+    var indicatorSelection = svg.selectAll("svg > g.indicator").data(["indicator"]).enter()
              .append("g")
-                .attr("class", function(d) { return d + " indicator"; });
+             .attr("class", function (d) { return d; });
 
     indicatorSelection.append("g")
             .attr("class", "axis right")
@@ -261,9 +270,6 @@
         }
         var ichimokuData = ichimokuIndicator(data);
 
-        var stochasticData = stochasticIndicator(data);
-        stochasticScale.domain(techan.scale.plot.stochastic(stochasticData).domain());
-
         x.domain(data.map(ichimokuIndicator.accessor().d));
         // Calculate the y domain for visible data points (ensure to include Kijun Sen additional data offset)
         var y_domain = techan.scale.plot.ichimoku(ichimokuData.slice(indicatorPreRoll - ichimokuIndicator.kijunSen())).domain();
@@ -279,8 +285,19 @@
         svg.selectAll("g.x.axis").call(xAxis);
         svg.selectAll("g.y.axis").call(yAxis);
         svg.selectAll("g.volume").datum(data).call(volume);
-        svg.selectAll("g.stochastic .indicator-plot").datum(stochasticData).call(stochastic);
-        svg.selectAll("g.stochastic .axis.left").call(stochasticAxisLeft);
+
+        if (g_indicator == "stochastic") {
+            var stochasticData = stochasticIndicator(data);
+            indicatorScale.domain(techan.scale.plot.stochastic(stochasticData).domain());
+            svg.selectAll("g.indicator .indicator-plot").datum(stochasticData).call(stochastic);
+        }
+        else {
+            var macdData = macdIndicator(data);
+            indicatorScale.domain(techan.scale.plot.macd(macdData).domain());
+            svg.selectAll("g.indicator .indicator-plot").datum(macdData).call(macd);
+        }
+        svg.selectAll("g.indicator .axis.left").call(indicatorAxisLeft);
+
         if (trades.length == 2 && trades[1].date > data[data.length - 1].date) {
             chartTrades = [...trades].splice(0, 1);
         }

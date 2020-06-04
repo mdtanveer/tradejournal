@@ -21,7 +21,7 @@ class CommonJournalEntryForm(Form):
     exit_time = DateTimeField('Exit Time:')
     entry_price = FloatField('Entry Price:')
     exit_price = FloatField('Exit Price:')
-    quantity = IntegerField('Quantity:', validators=[validators.required()])
+    quantity = IntegerField('Quantity:')
     entry_sl = FloatField('Entry SL:')
     entry_target = FloatField('Entry Target:')
     direction = StringField('Direction:', validators=[validators.required()])
@@ -241,7 +241,8 @@ def charts(key):
             error_message=error_message,
             form = form,
             journalentry=repository.get_journalentry(key),
-            timeframe='2h'
+            timeframe='2h',
+            indicator='stochastic'
         )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
@@ -261,13 +262,15 @@ def quick_charts():
     if 'symbols' in request.args.keys():
         symbols = request.args['symbols'].split(',')
         tf = request.args.get('tf', '2h')
+        indicator = request.args.get('ind', 'stochastic')
         charts = [{'key':'', 'title': symbol, 'data': symbol, 'relativeUrl':'charts/%s?tf=%s'%(symbol, tf)} for symbol in symbols]
         return render_template(
             'chart.html',
             charts=jsonpickle.encode(charts, unpicklable=False),
             error_message=error_message,
             journalentry=None,
-            timeframe=tf
+            timeframe=tf,
+            indicator=indicator,
         )
     else:
         return ('', 204)

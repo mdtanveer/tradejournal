@@ -114,3 +114,22 @@ path.tradearrow.buy {
 path.tradearrow.sell {
     fill: #9900FF;
 }
+
+path.macd {
+    stroke: #0000AA;
+}
+
+path.signal {
+    stroke: #FF9999;
+}
+
+path.zero {
+    stroke: #BBBBBB;
+    stroke-dasharray: 0;
+    stroke-opacity: 0.5;
+}
+
+path.difference {
+    fill: #BBBBBB;
+    opacity: 0.5;
+}
