@@ -234,7 +234,7 @@
     svg.append("g")
               .attr("class", "tradearrow")
                 .attr("clip-path", "url(#ohlcClip)");
-    {%if journalentry %}
+            {%if journalentry and not not journalentry.entry_price %}
     const tradearrowoffsetperc = 0.01;
     const tradearrowoffsetentry = 1 + {{ -1 if journalentry.direction == 'LONG' else 1}}* tradearrowoffsetperc;
     const tradearrowoffsetexit = 1 + {{ 1 if journalentry.direction == 'LONG' else -1}}* tradearrowoffsetperc;
@@ -246,7 +246,7 @@
                     price: {{ journalentry.entry_price }}* tradearrowoffsetentry,
                     quantity: {{ journalentry.quantity }} 
             }
-            {% if not journalentry.is_open() %}
+            {% if not not journalentry.exit_price %}
             , {
                 date: parseDate("{{ journalentry.exit_time|formatdatetimed3 }}"),
                     type: "{{ 'sell' if journalentry.direction == 'LONG' else 'buy'}}",
