@@ -36,6 +36,7 @@ class JournalEntry(object):
         self.rating = entity.rating if 'rating' in entity.keys() else ''
         self.strategy = entity.strategy if 'strategy' in entity.keys() else ''
         self.timeframe = entity.timeframe if 'timeframe' in entity.keys() else ''
+        self.is_idea = entity.is_idea if 'is_idea' in entity.keys() else ''
         self.position_changes = []
     
     def is_open(self):
@@ -62,6 +63,12 @@ class JournalEntry(object):
         if not self.timeframe:
             return '2h'
         return self.timeframe
+
+    def get_indicator(self):
+        if not self.strategy or self.strategy == 'tkcross':
+            return 'stochastic'
+        else:
+            return 'macd'
 
 
 class JournalEntryNotFound(Exception):

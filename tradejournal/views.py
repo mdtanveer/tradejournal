@@ -227,7 +227,7 @@ def charts(key):
             form = form,
             journalentry=repository.get_journalentry(key),
             timeframe=journalentry.get_timeframe(),
-            indicator='stochastic'
+            indicator=journalentry.get_indicator()
         )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])

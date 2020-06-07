@@ -9,6 +9,9 @@
         <tr>
             <td>
                 <h4>
+                    {%if not not journalentry.is_idea%}
+                    <span class="glyphicon glyphicon-fire text-warning"></span>
+                    {%else%}
                     {%if journalentry.is_open()%}
                     <span class="glyphicon glyphicon-play-circle text-primary"></span>
                     {%else%}
@@ -16,6 +19,7 @@
                     <span class="glyphicon glyphicon-circle-arrow-up text-success"></span>
                     {%else%}
                     <span class="glyphicon glyphicon-circle-arrow-down text-danger"></span>
+                    {%endif%}
                     {%endif%}
                     {%endif%}
                     <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.symbol}}</a><br />
