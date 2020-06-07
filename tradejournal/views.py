@@ -120,7 +120,7 @@ def edit(key):
         else:
             data = request.form
         repository.update_journalentry(key, data)
-        return redirect('/journalentry/{0}'.format(key))
+        return redirect('/journalentry/{0}/edit'.format(key))
     else:
         journalentry=repository.get_journalentry(key)
 

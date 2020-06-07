@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="container">
     <h4>{{subtitle}}</h4>
-    <form class="form-horizontal" action="" method="post" role="form">
+    <form class="form-horizontal" id="details-form" action="" method="post" role="form">
         <div class="form-group">
             <label class="control-label col-sm-2" for="symbol">Symbol:</label>
             <input class="form-control col-sm-10" id="symbol" name="symbol" required type="text" value="{{journalentry.symbol}}">
@@ -56,23 +56,19 @@
             <label class="control-label col-sm-2" for="quantity">Rating:</label>
             <input class="form-control col-sm-10" id="quantity" name="rating" type="text" value="{{journalentry.rating}}">
         </div>
-        <div class="form-group">
-            <div class=" col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-success">Save</button>
-            </div>
-        </div>
     </form>
 
+    {% if journalentry.key %}
     <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
         <div class="btn-group mr-2" role="group" aria-label="First group">
-            <form method="GET">
-                <button type="submit" class="btn btn-secondary btn-success" formaction="/journalentry/{{journalentry.key}}/comments">
-                    Comments
-                </button>
-                <button type="submit" class="btn btn-secondary btn-success" formaction="/journalentry/{{journalentry.key}}/charts">Charts</button>
-            </form>
+            <button type="submit" form="details-form" class="btn btn-success">Save</button>
+            <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/comments">Comments</a>
+            <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/charts">Charts</a>
         </div>
     </div>
+    {% else %}
+        <button type="submit" form="details-form" class="btn btn-success">Save</button>
+    {% endif %}
 
 
     {% with messages = get_flashed_messages(with_categories=true) %}
