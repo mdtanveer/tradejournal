@@ -8,7 +8,7 @@ from flask import render_template, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
 from tradejournal import app
-from tradejournal.models import JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquote
+from tradejournal.models import JournalEntry, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquote
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
@@ -16,22 +16,6 @@ from flask_paginate import Pagination, get_page_parameter, get_page_args
 import jsonpickle
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
-
-class CommonJournalEntryForm(Form):
-    exit_time = DateTimeField('Exit Time:')
-    entry_price = FloatField('Entry Price:')
-    exit_price = FloatField('Exit Price:')
-    quantity = IntegerField('Quantity:')
-    entry_sl = FloatField('Entry SL:')
-    entry_target = FloatField('Entry Target:')
-    direction = StringField('Direction:', validators=[validators.required()])
-
-class EditJournalEntryForm(Form):
-    rating = StringField('Rating:')
-
-class NewJournalEntryForm(CommonJournalEntryForm):
-    symbol = StringField('Symbol:', validators=[validators.required()])
-    entry_time = DateTimeField('Entry Time:', validators=[validators.required()])
 
 class CommentForm(Form):
     title = StringField('Title:')
@@ -107,7 +91,6 @@ def results(key):
 @login_required
 def create():
     """New journal entry"""
-    form = NewJournalEntryForm()
     if request.method == 'POST':
         if request.get_json():
             data = request.get_json()
@@ -116,10 +99,14 @@ def create():
         repository.create_journalentries(data)
         return redirect('/')
     else:
+        journalentry = JournalEntry(None, {})
+        journalentry.entry_time = IST_now()
         return render_template(
         'create.html',
-        form=form,
-        nowTime = IST_now()
+        journalentry = journalentry,
+        zero_exit = True,
+        pagetitle = "Create New",
+        subtitle = "Create New Journal Entry"
     )
 
 
@@ -135,14 +122,14 @@ def edit(key):
         repository.update_journalentry(key, data)
         return redirect('/journalentry/{0}'.format(key))
     else:
-        form = EditJournalEntryForm()
         journalentry=repository.get_journalentry(key)
 
         return render_template(
-            'edit.html',
-            form = form,
+            'create.html',
             journalentry = journalentry,
-            zero_exit = (journalentry.exit_time == toIST_fromtimestamp(0))
+            zero_exit = (journalentry.exit_time == toIST_fromtimestamp(0)),
+            pagetitle = "Edit Entry",
+            subtitle = "Edit Journal Entry"
         )
 
 @app.route('/journalentry/<key>', methods=['GET', 'POST'])

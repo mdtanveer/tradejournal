@@ -1,48 +1,60 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<title>Create New</title>
+<title>{{page_title}}</title>
 <link rel="stylesheet" media="screen" href="static/bootstrap.min.css">
 <link rel="stylesheet" href="static/bootstrap-theme.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="container">
-    <h4>Create New Journal Entry</h4>
-    <form class="form-horizontal" action="" method="post" role="form" class="NewJournalEntryForm">
+    <h4>{{subtitle}}</h4>
+    <form class="form-horizontal" action="" method="post" role="form">
         <div class="form-group">
             <label class="control-label col-sm-2" for="symbol">Symbol:</label>
-            <input class="form-control col-sm-10" id="symbol" name="symbol" required type="text" value="">
+            <input class="form-control col-sm-10" id="symbol" name="symbol" required type="text" value="{{journalentry.symbol}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="direction">Direction:</label>
-            <input class="form-control col-sm-10" id="direction" name="direction" required type="text" value="">
+            <input class="form-control col-sm-10" id="direction" name="direction" required type="text" value="{{journalentry.direction}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="entry_time">Entry Time:</label>
-            <input class="form-control col-sm-10" id="entry_time" name="entry_time" required type="datetime-local" value="{{nowTime|formatdatetimeinput}}">
+            <input class="form-control col-sm-10" id="entry_time" name="entry_time" required type="datetime-local" value="{{journalentry.entry_time|formatdatetimeinput}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="strategy">Strategy:</label>
+            <input class="form-control col-sm-10" id="strategy" name="strategy" type="text" value="{{journalentry.strategy}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="timeframe">Timeframe:</label>
+            <input class="form-control col-sm-10" id="timeframe" name="timeframe" type="text" value="{{journalentry.timeframe}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="exit_time">Exit Time:</label>
-            <input class="form-control col-sm-10" id="exit_time" name="exit_time" type="datetime-local" value="">
+            <input class="form-control col-sm-10" id="exit_time" name="exit_time" type="datetime-local" value="{{journalentry.exit_time | formatdatetimeinput if not zero_exit else ''}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="entry_price">Entry Price:</label>
-            <input class="form-control col-sm-10" id="entry_price" name="entry_price" type="text" value="">
+            <input class="form-control col-sm-10" id="entry_price" name="entry_price" type="text" value="{{journalentry.entry_price}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="exit_price">Exit Price:</label>
-            <input class="form-control col-sm-10" id="exit_price" name="exit_price" type="text" value="">
+            <input class="form-control col-sm-10" id="exit_price" name="exit_price" type="text" value="{{journalentry.exit_price}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="entry_sl">Entry SL:</label>
-            <input class="form-control col-sm-10" id="entry_sl" name="entry_sl" type="text" value="">
+            <input class="form-control col-sm-10" id="entry_sl" name="entry_sl" type="text" value="{{journalentry.entry_sl}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="entry_target">Entry Target:</label>
-            <input class="form-control col-sm-10" id="entry_target" name="entry_target" type="text" value="">
+            <input class="form-control col-sm-10" id="entry_target" name="entry_target" type="text" value="{{journalentry.entry_target}}">
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2" for="quantity">Quantity:</label>
-            <input class="form-control col-sm-10" id="quantity" name="quantity" type="text" value="">
+            <input class="form-control col-sm-10" id="quantity" name="quantity" type="text" value="{{journalentry.quantity}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="quantity">Rating:</label>
+            <input class="form-control col-sm-10" id="quantity" name="rating" type="text" value="{{journalentry.rating}}">
         </div>
         <div class="form-group">
             <div class=" col-sm-offset-2 col-sm-10">
@@ -50,6 +62,19 @@
             </div>
         </div>
     </form>
+
+    <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <form method="GET">
+                <button type="submit" class="btn btn-secondary btn-success" formaction="/journalentry/{{journalentry.key}}/comments">
+                    Comments
+                </button>
+                <button type="submit" class="btn btn-secondary btn-success" formaction="/journalentry/{{journalentry.key}}/charts">Charts</button>
+            </form>
+        </div>
+    </div>
+
+
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
 

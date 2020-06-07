@@ -18,8 +18,11 @@ class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self, key, entity): 
         self.key = key
-        self.symbol = entity.symbol
-        self.entry_time = toIST_fromtimestamp(float(entity.entry_time))
+        self.symbol = entity.symbol if 'symbol' in entity.keys() else ''
+        try:
+            self.entry_time = toIST_fromtimestamp(float(entity.entry_time))
+        except:
+            self.entry_time = toIST_fromtimestamp(0)
         try:
             self.exit_time = toIST_fromtimestamp(float(entity.exit_time))
         except:
@@ -31,6 +34,9 @@ class JournalEntry(object):
         self.entry_target = entity.entry_target if 'entry_target' in entity.keys() else ''
         self.direction = entity.direction if 'direction' in entity.keys() else ''
         self.rating = entity.rating if 'rating' in entity.keys() else ''
+        self.strategy = entity.strategy if 'strategy' in entity.keys() else ''
+        self.timeframe = entity.timeframe if 'timeframe' in entity.keys() else ''
+        self.position_changes = []
     
     def is_open(self):
         return self.exit_time == toIST_fromtimestamp(0)

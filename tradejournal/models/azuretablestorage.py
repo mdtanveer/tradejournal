@@ -94,10 +94,13 @@ class Repository(object):
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
-    def update_journalentry(self, key, updated_entity):
+    def update_journalentry(self, key, input_entity):
         """Update the specified journalentry."""
         try:
             KEY_EXIT_TIME = 'exit_time'
+            updated_entity = dict(input_entity)
+            updated_entity.pop('entry_time')
+            updated_entity.pop('symbol')
             partition, row = _key_to_partition_and_row(key)
             entity = self.svc.get_entity(self.journalentry_table, partition, row)
 
