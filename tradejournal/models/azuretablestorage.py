@@ -111,7 +111,7 @@ class Repository(object):
                                   and updated_entity[KEY_EXIT_TIME] != '0' 
                                   and updated_entity[KEY_EXIT_TIME] != ''))
             if trade_closure:
-                self.add_chart(key, {'title':'Auto exit chart'})
+                self.add_chart(key, {'title':'Auto exit chart'}, updated_entity['timeframe'])
             entity.update(updated_entity)
             if KEY_EXIT_TIME in entity.keys() and entity[KEY_EXIT_TIME]:
                 entity[KEY_EXIT_TIME] = strtime_to_timestamp(entity[KEY_EXIT_TIME])
@@ -192,7 +192,7 @@ class Repository(object):
 
     def add_chart(self, key, entity, timeframe):
         """Add chart"""
-        if timeframe == '2h':
+        if not timeframe or timeframe == '2h':
             timeframe = '1h'
         RANGES = {'1h': '60d', '1d':'250d', '1wk': '900d'}
         try:
