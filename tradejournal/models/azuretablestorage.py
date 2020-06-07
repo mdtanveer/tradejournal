@@ -120,6 +120,26 @@ class Repository(object):
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
+    def delete_journalentry(self, key):
+        """Update the specified journalentry."""
+        try:
+            #delete comments
+            comments = self.get_comments(key)
+            for comment in comments:
+                partition, row = _key_to_partition_and_row(comment.key)
+                self.svc.delete_entity(self.comments_table, partition, row)
+
+            #delete charts
+            charts = self.get_charts(key)
+            for chart in charts:
+                self.delete_chart(chart.key)
+
+            #delete journal entry
+            partition, row = _key_to_partition_and_row(key)
+            self.svc.delete_entity(self.journalentry_table, partition, row)
+        except AzureMissingResourceHttpError:
+            raise JournalEntryNotFound()
+
     def add_sample_journalentries(self):
         """Adds a set of journalentries from data stored in a samples.json file."""
         for sample_journalentry in _load_samples_json():

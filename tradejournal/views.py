@@ -132,16 +132,12 @@ def edit(key):
             subtitle = "Edit Journal Entry"
         )
 
-@app.route('/journalentry/<key>', methods=['GET', 'POST'])
+@app.route('/journalentry/<key>/delete', methods=['GET'])
 @login_required
-def details(key):
-    """Renders the journalentry details page."""
-    error_message = ''
-    return render_template(
-        'details.html',
-        journalentry=repository.get_journalentry(key),
-        error_message=error_message,
-    )
+def delete_entry(key):
+    """Deletes the journalentry page."""
+    repository.delete_journalentry(key)
+    return redirect('/')
 
 @app.route('/journalentry/<key>/comments', methods=['GET', 'POST'])
 @login_required
