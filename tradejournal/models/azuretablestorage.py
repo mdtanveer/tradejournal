@@ -190,15 +190,18 @@ class Repository(object):
         comments.sort(key = lambda x: x.add_time, reverse=True)
         return comments
 
-    def add_chart(self, key, entity):
+    def add_chart(self, key, entity, timeframe):
         """Add chart"""
+        if timeframe == '2h':
+            timeframe = '1h'
+        RANGES = {'1h': '60d', '1d':'250d', '1wk': '900d'}
         try:
             partition, row = _key_to_partition_and_row(key)
             add_time = str(datetime.now().timestamp())
             local_file_name = "chart_" + str(uuid.uuid4()) + ".csv"
             entity = dict(entity)
             entity['data'] = local_file_name
-            yahooquote.get_yahoo_quote(partition).to_csv(local_file_name, index=False)
+            yahooquote.get_yahoo_quote(partition, RANGES[timeframe], timeframe).to_csv(local_file_name, index=False)
             # Create a blob client using the local file name as the name for the blob
             blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=local_file_name)
             

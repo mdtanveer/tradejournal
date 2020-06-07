@@ -206,13 +206,15 @@ def allcomments():
 def charts(key):
     """Renders the charts page."""
     error_message = ''
+    journalentry = repository.get_journalentry(key)
+
     if request.method == 'POST':
         try:
             if request.get_json():
                 data = request.get_json()
             else:
                 data = request.form
-            repository.add_chart(key, data)
+            repository.add_chart(key, data, journalentry.get_timeframe())
             return redirect('/journalentry/{0}/charts'.format(key))
         except KeyError:
             error_message = 'Unable to update'
@@ -224,7 +226,7 @@ def charts(key):
             error_message=error_message,
             form = form,
             journalentry=repository.get_journalentry(key),
-            timeframe='2h',
+            timeframe=journalentry.get_timeframe(),
             indicator='stochastic'
         )
 

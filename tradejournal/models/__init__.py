@@ -58,6 +58,11 @@ class JournalEntry(object):
     def is_aged(self, days):
         return (IST_now() - self.entry_time) >= timedelta(days=days)
 
+    def get_timeframe(self):
+        if not self.timeframe:
+            return '2h'
+        return self.timeframe
+
 
 class JournalEntryNotFound(Exception):
     """Exception raised when a trade entry object couldn't be retrieved from

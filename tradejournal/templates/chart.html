@@ -225,7 +225,7 @@
             .attr("dy", ".71em")
                 .style("text-anchor", "end")
             {%if journalentry %}
-        .text("{{journalentry.symbol}}");
+        .text("{{journalentry.symbol}}({{timeframe}})");
             {%endif%}
     svg.append("g")
             .attr("class", "volume")
