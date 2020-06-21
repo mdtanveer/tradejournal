@@ -256,7 +256,7 @@ class Repository(object):
         trade_entities = []
         if KEY_ENTRY_TIME in journalentry_entity.keys():
             query = "PartitionKey eq '%s' and RowKey ge '%s'"%(partition, journalentry_entity[KEY_ENTRY_TIME])
-            if KEY_EXIT_TIME in journalentry_entity.keys():
+            if KEY_EXIT_TIME in journalentry_entity.keys() and int(journalentry_entity[KEY_EXIT_TIME]):
                 query += " and RowKey le '%s'"%(journalentry_entity[KEY_EXIT_TIME])
             trade_entities = self.svc.query_entities(self.trades_table, query)
         trades = [_trade_from_entity(entity) for entity in trade_entities]
