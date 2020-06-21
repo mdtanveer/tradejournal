@@ -234,7 +234,7 @@
     svg.append("g")
               .attr("class", "tradearrow")
                 .attr("clip-path", "url(#ohlcClip)");
-            {%if len(trades) != 0%}
+            {%if trades|length != 0%}
             const trades = [
                 {%for trade in trades%}
                 {
