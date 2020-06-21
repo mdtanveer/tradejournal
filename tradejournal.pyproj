@@ -78,7 +78,7 @@
     <Content Include="tradejournal\templates\contact.html" />
     <Content Include="tradejournal\templates\comments.html" />
     <Content Include="tradejournal\templates\create.html" />
-    <Content Include="tradejournal\templates\details.html" />
+    <Content Include="tradejournal\templates\trades.html" />
     <Content Include="tradejournal\templates\edit.html" />
     <Content Include="tradejournal\templates\index.html" />
     <Content Include="tradejournal\templates\layout.html" />

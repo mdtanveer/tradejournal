@@ -227,7 +227,8 @@ def charts(key):
             form = form,
             journalentry=repository.get_journalentry(key),
             timeframe=journalentry.get_timeframe(),
-            indicator=journalentry.get_indicator()
+            indicator=journalentry.get_indicator(),
+            trades = repository.get_trades(key),
         )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
@@ -277,6 +278,19 @@ def fetch_chart(symbol):
         mimetype="text/csv",
         headers={"Content-disposition":
                  "attachment; filename=%s.csv"%symbol})
+
+
+@app.route('/journalentry/<key>/trades', methods=['GET'])
+@login_required
+def trades(key):
+    """Renders the trades page."""
+    journalentry = repository.get_journalentry(key)
+    return render_template(
+        'trades.html',
+        journalentry=journalentry,
+        trades = repository.get_trades(key),
+    )
+
 
 @app.route('/journalentry/<key>/charts/<chartkey>/delete', methods=['DELETE'])
 @login_required

@@ -11,8 +11,11 @@ import os, uuid
 import arrow
 import pytz
 
-from . import Chart, Comment, JournalEntry, JournalEntryNotFound
+from . import Chart, Comment, JournalEntry, JournalEntryNotFound, Trade
 from . import _load_samples_json
+
+KEY_ENTRY_TIME = 'entry_time'
+KEY_EXIT_TIME = 'exit_time'
 
 def _partition_and_row_to_key(partition, row):
     """Builds a journalentry/choice key out of azure table partition and row keys."""
@@ -36,6 +39,10 @@ def _chart_from_entity(entity):
     """Creates a journalentry object from the azure table journalentry entity."""
     return Chart(_partition_and_row_to_key(entity.PartitionKey, entity.RowKey), entity)
 
+def _trade_from_entity(entity):
+    """Creates a journalentry object from the azure table journalentry entity."""
+    return Trade(_partition_and_row_to_key(entity.PartitionKey, entity.RowKey), entity)
+
 def strtime_to_timestamp(input):
     if not input:
         return '0'
@@ -58,6 +65,7 @@ class Repository(object):
         self.journalentry_table = 'TradeEntryTable'
         self.comments_table = 'CommentsTable'
         self.charts_table = 'ChartsTable'
+        self.trades_table = 'TradesTable'
 
         self.svc = TableService(self.storage_name, connection_string=self.connection_string)
         self.svc.create_table(self.journalentry_table)
@@ -97,7 +105,6 @@ class Repository(object):
     def update_journalentry(self, key, input_entity):
         """Update the specified journalentry."""
         try:
-            KEY_EXIT_TIME = 'exit_time'
             updated_entity = dict(input_entity)
             updated_entity.pop('entry_time')
             updated_entity.pop('symbol')
@@ -148,14 +155,14 @@ class Repository(object):
 
     def create_journalentries(self, entity):
         """Adds a new journalentry"""
-        entry_time = strtime_to_timestamp(entity['entry_time'])
+        entry_time = strtime_to_timestamp(entity[KEY_ENTRY_TIME])
         entity = dict(entity)
         entity.update(
         {
             'PartitionKey': entity['symbol'],
             'RowKey': entry_time,
         })
-        for key in ['entry_time', 'exit_time']:
+        for key in [KEY_ENTRY_TIME, KEY_EXIT_TIME]:
             if key in entity.keys():
                 entity[key] = strtime_to_timestamp(entity[key])
         self.svc.insert_entity(self.journalentry_table, entity)
@@ -242,3 +249,15 @@ class Repository(object):
         blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=chartid)
         data = blob_client.download_blob().readall()
         return data
+
+    def get_trades(self, journalentry_key):
+        partition, row = _key_to_partition_and_row(journalentry_key)
+        journalentry_entity = self.svc.get_entity(self.journalentry_table, partition, row)
+        trade_entities = []
+        if KEY_ENTRY_TIME in journalentry_entity.keys():
+            query = "PartitionKey eq '%s' and RowKey ge '%s'"%(partition, journalentry_entity[KEY_ENTRY_TIME])
+            if KEY_EXIT_TIME in journalentry_entity.keys():
+                query += " and RowKey le '%s'"%(journalentry_entity[KEY_EXIT_TIME])
+            trade_entities = self.svc.query_entities(self.trades_table, query)
+        trades = [_trade_from_entity(entity) for entity in trade_entities]
+        return trades

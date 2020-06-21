@@ -234,12 +234,21 @@
     svg.append("g")
               .attr("class", "tradearrow")
                 .attr("clip-path", "url(#ohlcClip)");
+            const trades = [
+                {%for trade in trades%}
+                {
+                    date: parseDate("{{ trade.date|formatdatetimed3 }}"),
+                    type: "{{ trade.type }}",
+                    price: {{ trade.price }},
+                    quantity: {{ trade.quantity }} 
+            },
+            {%endfor%}
+            ];
             {%if journalentry and not not journalentry.entry_price %}
     const tradearrowoffsetperc = 0.01;
     const tradearrowoffsetentry = 1 + {{ -1 if journalentry.direction == 'LONG' else 1}}* tradearrowoffsetperc;
     const tradearrowoffsetexit = 1 + {{ 1 if journalentry.direction == 'LONG' else -1}}* tradearrowoffsetperc;
-
-    const trades = [
+    const trades_original = [
                 {
                     date: parseDate("{{ journalentry.entry_time|formatdatetimed3 }}"),
                     type: "{{ 'buy' if journalentry.direction == 'LONG' else 'sell'}}",
@@ -256,8 +265,8 @@
             {%endif%}
         ];
             {%else%}
-            const trades = [];
-            {%endif%}
+            const trades_original = [];
+            {% endif %}
 
     function draw(data) {
         if (plotHeikenAshi)

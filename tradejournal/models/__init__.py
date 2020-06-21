@@ -92,6 +92,15 @@ class Chart(object):
         self.data = entity.data
         self.relativeUrl = 'charts/' + entity.data
 
+class Trade(object):
+    def __init__(self, key, entity): 
+        self.key = key
+        self.date = toIST_fromtimestamp(float(entity.RowKey))
+        self.type = entity.trade_type
+        self.price = entity.price
+        self.quantity = entity.quantity
+        self.tradingsymbol = entity.tradingsymbol
+
 def _load_samples_json():
     """Loads polls from samples.json file."""
     samples_path = path.join(path.dirname(__file__), 'samples.json')
