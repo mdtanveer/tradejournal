@@ -9,25 +9,10 @@
     <h4>{{subtitle}}</h4>
     {% if journalentry.key %}
     <div class="btn-group" role="group" aria-label="First group">
-        <button type="submit" form="details-form" class="btn btn-success">Save</button>
         <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/comments">Comments</a>
         <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/charts">Charts</a>
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            &zwnj;<span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-right">
-            <li>
-                <a href="/journalentry/{{journalentry.key}}/trades">
-                    Trades
-                </a>
-                <a href="/journalentry/{{journalentry.key}}/delete">
-                    Delete
-                </a>
-            </li>
-        </ul>
+        <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/trades">Trades</a>
     </div>
-    {% else %}
-    <button type="submit" form="details-form" class="btn btn-success">Save</button>
     {% endif %}
     <form class="form-horizontal" id="details-form" action="" method="post" role="form">
         <div class="form-group">
@@ -83,5 +68,20 @@
             <input class="form-control" id="is_idea" name="is_idea" type="text" value="{{journalentry.is_idea}}">
         </div>
     </form>
+    <div class="btn-group" role="group" aria-label="Second group">
+        <button type="submit" form="details-form" class="btn btn-success">Save</button>
+        {% if journalentry.key %}
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            &zwnj;<span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li>
+                <a href="/journalentry/{{journalentry.key}}/delete">
+                    Delete
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
