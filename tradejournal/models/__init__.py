@@ -40,7 +40,13 @@ class JournalEntry(object):
         self.position_changes = []
     
     def is_open(self):
-        return self.exit_time == toIST_fromtimestamp(0)
+        return not self.has_valid_exit_time()
+
+    def has_valid_entry_time(self):
+        return self.entry_time != toIST_fromtimestamp(0)
+
+    def has_valid_exit_time(self):
+        return self.exit_time != toIST_fromtimestamp(0)
 
     def is_profitable(self):
         try:

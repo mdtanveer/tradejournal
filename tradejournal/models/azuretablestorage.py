@@ -6,7 +6,7 @@ from azure.common import AzureMissingResourceHttpError
 from azure.storage.table import TableService
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from . import yahooquote
-from datetime import datetime
+from datetime import datetime, timedelta
 import os, uuid
 import arrow
 import pytz
@@ -252,12 +252,14 @@ class Repository(object):
 
     def get_trades(self, journalentry_key):
         partition, row = _key_to_partition_and_row(journalentry_key)
-        journalentry_entity = self.svc.get_entity(self.journalentry_table, partition, row)
+        journalentry = self.get_journalentry(journalentry_key)
         trade_entities = []
-        if KEY_ENTRY_TIME in journalentry_entity.keys():
-            query = "PartitionKey eq '%s' and RowKey ge '%s'"%(partition, journalentry_entity[KEY_ENTRY_TIME])
-            if KEY_EXIT_TIME in journalentry_entity.keys() and journalentry_entity[KEY_EXIT_TIME] != '0':
-                query += " and RowKey le '%s'"%(journalentry_entity[KEY_EXIT_TIME])
+        if journalentry.has_valid_entry_time():
+            lower_timestamp = journalentry.entry_time - timedelta(minutes=15)
+            query = "PartitionKey eq '%s' and RowKey ge '%s'"%(partition, str(lower_timestamp.timestamp()))
+            if journalentry.has_valid_exit_time():
+                upper_timestamp = journalentry.exit_time + timedelta(minutes=15)
+                query += " and RowKey le '%s'"%(str(upper_timestamp.timestamp()))
             trade_entities = self.svc.query_entities(self.trades_table, query)
         trades = [_trade_from_entity(entity) for entity in trade_entities]
         return trades

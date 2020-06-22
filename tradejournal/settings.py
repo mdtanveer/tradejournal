@@ -11,8 +11,8 @@ REPOSITORY_NAME = environ.get('REPOSITORY_NAME', 'azurestorage')
 
 if REPOSITORY_NAME == 'azurestorage':
     REPOSITORY_SETTINGS = {
-        'STORAGE_NAME': environ.get('STORAGE_NAME', 'devstoreaccount1'),
-        'CONNECTION_STRING' : environ.get('CONNECTION_STRING', 'AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;')
+        'STORAGE_NAME': environ.get('STORAGE_NAME', ''),
+        'CONNECTION_STRING' : environ.get('CONNECTION_STRING', '')
     }
 elif REPOSITORY_NAME == 'memory':
     REPOSITORY_SETTINGS = {}
@@ -22,3 +22,5 @@ else:
 CLIENT_ID = environ.get('CLIENT_ID', '')
 CLIENT_SECRET =  environ.get('CLIENT_SECRET', '')
 TENANT_ID = environ.get('TENANT_ID', '')
+
+HTTP_SCHEME = environ.get('HTTP_SCHEME', 'https')

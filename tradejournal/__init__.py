@@ -39,12 +39,12 @@ oauth.register(
 
 @app.route('/login')
 def login():
-    redirect_uri = url_for('authorize', _external=True, _scheme='https')
+    redirect_uri = url_for('authorize', _external=True, _scheme=settings.HTTP_SCHEME)
     return oauth.microsoft.authorize_redirect(redirect_uri)
 
 @app.route('/authorize')
 def authorize():
-    redirect_uri = url_for('authorize', _external=True, _scheme='https')
+    redirect_uri = url_for('authorize', _external=True, _scheme=settings.HTTP_SCHEME)
     token = oauth.microsoft.authorize_access_token(redirect_uri=redirect_uri)
     userinfo = oauth.microsoft.parse_id_token(token)
     user = User(userinfo)
