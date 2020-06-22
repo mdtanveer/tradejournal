@@ -7,93 +7,81 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="container">
     <h4>{{subtitle}}</h4>
-    <form class="form-horizontal" id="details-form" action="" method="post" role="form">
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="symbol">Symbol:</label>
-            <input class="form-control col-sm-10" id="symbol" name="symbol" required type="text" value="{{journalentry.symbol}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="direction">Direction:</label>
-            <input class="form-control col-sm-10" id="direction" name="direction" required type="text" value="{{journalentry.direction}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="entry_time">Entry Time:</label>
-            <input class="form-control col-sm-10" id="entry_time" name="entry_time" required type="datetime-local" value="{{journalentry.entry_time|formatdatetimeinput}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="strategy">Strategy:</label>
-            <input class="form-control col-sm-10" id="strategy" name="strategy" type="text" value="{{journalentry.strategy}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="timeframe">Timeframe:</label>
-            <input class="form-control col-sm-10" id="timeframe" name="timeframe" type="text" value="{{journalentry.timeframe}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="exit_time">Exit Time:</label>
-            <input class="form-control col-sm-10" id="exit_time" name="exit_time" type="datetime-local" value="{{journalentry.exit_time | formatdatetimeinput if not zero_exit else ''}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="entry_price">Entry Price:</label>
-            <input class="form-control col-sm-10" id="entry_price" name="entry_price" type="text" value="{{journalentry.entry_price}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="exit_price">Exit Price:</label>
-            <input class="form-control col-sm-10" id="exit_price" name="exit_price" type="text" value="{{journalentry.exit_price}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="entry_sl">Entry SL:</label>
-            <input class="form-control col-sm-10" id="entry_sl" name="entry_sl" type="text" value="{{journalentry.entry_sl}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="entry_target">Entry Target:</label>
-            <input class="form-control col-sm-10" id="entry_target" name="entry_target" type="text" value="{{journalentry.entry_target}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="quantity">Quantity:</label>
-            <input class="form-control col-sm-10" id="quantity" name="quantity" type="text" value="{{journalentry.quantity}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="rating">Rating:</label>
-            <input class="form-control col-sm-10" id="rating" name="rating" type="text" value="{{journalentry.rating}}">
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="is_idea">Is Idea:</label>
-            <input class="form-control col-sm-10" id="is_idea" name="is_idea" type="text" value="{{journalentry.is_idea}}">
-        </div>
-    </form>
-
     {% if journalentry.key %}
-    <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-        <div class="btn-group mr-2" role="group" aria-label="First group">
-            <button type="submit" form="details-form" class="btn btn-success">Save</button>
-            <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/comments">Comments</a>
-            <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/charts">Charts</a>
-            <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/trades">Trades</a>
-            <a class="btn btn-secondary btn-danger" href="/journalentry/{{journalentry.key}}/delete">Delete</a>
-        </div>
+    <div class="btn-group" role="group" aria-label="First group">
+        <button type="submit" form="details-form" class="btn btn-success">Save</button>
+        <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/comments">Comments</a>
+        <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/charts">Charts</a>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            &zwnj;<span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li>
+                <a href="/journalentry/{{journalentry.key}}/trades">
+                    Trades
+                </a>
+                <a href="/journalentry/{{journalentry.key}}/delete">
+                    Delete
+                </a>
+            </li>
+        </ul>
     </div>
     {% else %}
-        <button type="submit" form="details-form" class="btn btn-success">Save</button>
+    <button type="submit" form="details-form" class="btn btn-success">Save</button>
     {% endif %}
-
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-
-    {% for message in messages %}
-    {% if "Error" not in message[1]: %}
-    <div class="alert alert-info">
-        <strong>Success! </strong> { { message[1] }}
-    </div>
-    {% endif %}
-
-    {% if "Error" in message[1]: %}
-    <div class="alert alert-warning">
-        { { message[1] }}
-    </div>
-    {% endif %}
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+    <form class="form-horizontal" id="details-form" action="" method="post" role="form">
+        <div class="form-group">
+            <label class="control-label" for="symbol">Symbol:</label>
+            <input class="form-control" id="symbol" name="symbol" required type="text" value="{{journalentry.symbol}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="direction">Direction:</label>
+            <input class="form-control" id="direction" name="direction" required type="text" value="{{journalentry.direction}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="entry_time">Entry Time:</label>
+            <input class="form-control" id="entry_time" name="entry_time" required type="datetime-local" value="{{journalentry.entry_time|formatdatetimeinput}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="strategy">Strategy:</label>
+            <input class="form-control" id="strategy" name="strategy" type="text" value="{{journalentry.strategy}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="timeframe">Timeframe:</label>
+            <input class="form-control" id="timeframe" name="timeframe" type="text" value="{{journalentry.timeframe}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="exit_time">Exit Time:</label>
+            <input class="form-control" id="exit_time" name="exit_time" type="datetime-local" value="{{journalentry.exit_time | formatdatetimeinput if not zero_exit else ''}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="entry_price">Entry Price:</label>
+            <input class="form-control" id="entry_price" name="entry_price" type="text" value="{{journalentry.entry_price}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="exit_price">Exit Price:</label>
+            <input class="form-control" id="exit_price" name="exit_price" type="text" value="{{journalentry.exit_price}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="entry_sl">Entry SL:</label>
+            <input class="form-control" id="entry_sl" name="entry_sl" type="text" value="{{journalentry.entry_sl}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="entry_target">Entry Target:</label>
+            <input class="form-control" id="entry_target" name="entry_target" type="text" value="{{journalentry.entry_target}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="quantity">Quantity:</label>
+            <input class="form-control" id="quantity" name="quantity" type="text" value="{{journalentry.quantity}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="rating">Rating:</label>
+            <input class="form-control" id="rating" name="rating" type="text" value="{{journalentry.rating}}">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="is_idea">Is Idea:</label>
+            <input class="form-control" id="is_idea" name="is_idea" type="text" value="{{journalentry.is_idea}}">
+        </div>
+    </form>
 </div>
 {% endblock %}
