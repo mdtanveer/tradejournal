@@ -166,6 +166,7 @@ class Repository(object):
             if key in entity.keys():
                 entity[key] = strtime_to_timestamp(entity[key])
         self.svc.insert_entity(self.journalentry_table, entity)
+        self.add_chart(key, {'title':'Auto entry chart'}, entity['timeframe'])
 
     def add_comment(self, key, comment_entity):
         """Add comments"""
