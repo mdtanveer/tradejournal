@@ -264,3 +264,12 @@ class Repository(object):
             trade_entities = self.svc.query_entities(self.trades_table, query)
         trades = [_trade_from_entity(entity) for entity in trade_entities]
         return trades
+
+    def get_all_trades(self):
+        """Returns all the trades from the repository."""
+        lower_timestamp = pytz.UTC.localize(datetime.utcnow()) - timedelta(days=30)
+        query = "RowKey ge '%s'"%str(lower_timestamp.timestamp())
+        trade_entities = self.svc.query_entities(self.trades_table, query)
+        trades = [_trade_from_entity(entity) for entity in trade_entities]
+        trades.sort(key = lambda x: x.date, reverse=True)
+        return trades
