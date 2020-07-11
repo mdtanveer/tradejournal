@@ -3,7 +3,7 @@ Repository of journalentries that stores data in Azure Table Storage.
 """
 
 from azure.common import AzureMissingResourceHttpError
-from azure.storage.table import TableService
+from azure.cosmosdb.table import TableService
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from . import yahooquote
 from datetime import datetime, timedelta

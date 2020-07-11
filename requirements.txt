@@ -1,5 +1,4 @@
 Flask
-azure-storage
 pandas
 arrow
 azure-storage-blob
@@ -8,3 +7,4 @@ flask_login
 authlib
 flask-paginate
 jsonpickle
+azure_cosmosdb_table
