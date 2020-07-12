@@ -31,6 +31,9 @@
   <ItemGroup>
     <Compile Include="app.py" />
     <Compile Include="tradejournal\models\yahooquote.py" />
+    <Compile Include="tradejournal\oauth.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tradejournal\__init__.py" />
     <Compile Include="tradejournal\settings.py" />
     <Compile Include="tradejournal\views.py" />

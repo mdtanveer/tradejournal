@@ -8,3 +8,4 @@ authlib
 flask-paginate
 jsonpickle
 azure_cosmosdb_table
+dash

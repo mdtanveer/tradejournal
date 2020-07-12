@@ -7,13 +7,13 @@ from datetime import datetime
 from flask import render_template, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
-from tradejournal import app
 from tradejournal.models import JournalEntry, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquote
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
 from flask_paginate import Pagination, get_page_parameter, get_page_args
 import jsonpickle
+from flask import current_app as app
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 
@@ -239,7 +239,7 @@ def chart_data(key, chartid):
         csv_data,
         mimetype="text/csv",
         headers={"Content-disposition":
-                 "attachment; filename=%s"%chartid})
+                    "attachment; filename=%s"%chartid})
 
 @app.route('/charts', methods=['GET'])
 def quick_charts():
@@ -277,7 +277,7 @@ def fetch_chart(symbol):
         csv_data,
         mimetype="text/csv",
         headers={"Content-disposition":
-                 "attachment; filename=%s.csv"%symbol})
+                    "attachment; filename=%s.csv"%symbol})
 
 
 @app.route('/journalentry/<key>/trades', methods=['GET'])
