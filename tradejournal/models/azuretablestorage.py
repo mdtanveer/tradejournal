@@ -12,7 +12,7 @@ import arrow
 import pytz
 
 from . import Chart, Comment, JournalEntry, JournalEntryNotFound, Trade
-from . import _load_samples_json
+from . import _load_samples_json, IST_now
 
 KEY_ENTRY_TIME = 'entry_time'
 KEY_EXIT_TIME = 'exit_time'
@@ -62,15 +62,17 @@ class Repository(object):
         self.name = 'Azure Table Storage'
         self.storage_name = settings['STORAGE_NAME']
         self.connection_string = settings['CONNECTION_STRING']
-        self.journalentry_table = 'TradeEntryTable'
-        self.comments_table = 'CommentsTable'
-        self.charts_table = 'ChartsTable'
-        self.trades_table = 'TradesTable'
+        self.TABLES = {
+            'journalentry' : 'TradeEntryTable',
+            'comments' : 'CommentsTable',
+            'charts' : 'ChartsTable',
+            'trades' : 'TradesTable'
+        }
 
         self.svc = TableService(self.storage_name, connection_string=self.connection_string)
-        self.svc.create_table(self.journalentry_table)
-        self.svc.create_table(self.comments_table)
-        self.svc.create_table(self.charts_table)
+        for tablename in self.TABLES.values():
+            if not self.svc.exists(tablename):
+                self.svc.create_table(tablename)
 
         # Create the BlobServiceClient object which will be used to create a container client
         self.blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
@@ -84,19 +86,24 @@ class Repository(object):
         except:
             self.container_client = self.blob_service_client.create_container(self.container_name)
 
+    def get_journalentries_helper(self, func, age):
+        lower_timestamp = IST_now() - timedelta(days=age)
+        query = "RowKey ge '%s'"%(str(lower_timestamp.timestamp()))
+        journalentry_entities = self.svc.query_entities(self.TABLES['journalentry'], query)
+        journalentries = [func(entity) for entity in journalentry_entities]
+        return journalentries
+
     def get_journalentries(self):
         """Returns all the journalentries from the repository."""
-        journalentry_entities = self.svc.query_entities(self.journalentry_table)
-        journalentries = [_journalentry_from_entity(entity) for entity in journalentry_entities]
+        journalentries = self.get_journalentries_helper(_journalentry_from_entity, 30)
         journalentries.sort(key = lambda x: x.entry_time, reverse=True)
-        journalentries = list(filter(lambda x: not x.is_aged(30), journalentries))
         return journalentries
 
     def get_journalentry(self, journalentry_key):
         """Returns a journalentry from the repository."""
         try:
             partition, row = _key_to_partition_and_row(journalentry_key)
-            journalentry_entity = self.svc.get_entity(self.journalentry_table, partition, row)
+            journalentry_entity = self.svc.get_entity(self.TABLES['journalentry'], partition, row)
             journalentry = _journalentry_from_entity(journalentry_entity)
             return journalentry
         except AzureMissingResourceHttpError:
@@ -109,7 +116,7 @@ class Repository(object):
             updated_entity.pop('entry_time')
             updated_entity.pop('symbol')
             partition, row = _key_to_partition_and_row(key)
-            entity = self.svc.get_entity(self.journalentry_table, partition, row)
+            entity = self.svc.get_entity(self.TABLES['journalentry'], partition, row)
 
             trade_closure = ((KEY_EXIT_TIME not in entity.keys() 
                               or entity[KEY_EXIT_TIME] == '0'
@@ -122,7 +129,7 @@ class Repository(object):
             entity.update(updated_entity)
             if KEY_EXIT_TIME in entity.keys() and entity[KEY_EXIT_TIME]:
                 entity[KEY_EXIT_TIME] = strtime_to_timestamp(entity[KEY_EXIT_TIME])
-            self.svc.update_entity(self.journalentry_table, entity)
+            self.svc.update_entity(self.TABLES["journalentry"], entity)
 
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
@@ -134,7 +141,7 @@ class Repository(object):
             comments = self.get_comments(key)
             for comment in comments:
                 partition, row = _key_to_partition_and_row(comment.key)
-                self.svc.delete_entity(self.comments_table, partition, row)
+                self.svc.delete_entity(self.TABLES["comments"], partition, row)
 
             #delete charts
             charts = self.get_charts(key)
@@ -143,7 +150,7 @@ class Repository(object):
 
             #delete journal entry
             partition, row = _key_to_partition_and_row(key)
-            self.svc.delete_entity(self.journalentry_table, partition, row)
+            self.svc.delete_entity(self.TABLES["journalentry"], partition, row)
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
@@ -165,7 +172,7 @@ class Repository(object):
         for key in [KEY_ENTRY_TIME, KEY_EXIT_TIME]:
             if key in entity.keys():
                 entity[key] = strtime_to_timestamp(entity[key])
-        self.svc.insert_entity(self.journalentry_table, entity)
+        self.svc.insert_entity(self.TABLES["journalentry"], entity)
         self.add_chart(_partition_and_row_to_key(entity['symbol'], entry_time), {'title':'Auto entry chart'}, entity['timeframe'])
 
     def add_comment(self, key, comment_entity):
@@ -180,20 +187,20 @@ class Repository(object):
                 'RowKey': add_time,
                 'add_time' : add_time
             })
-            self.svc.insert_entity(self.comments_table, comment_entity)
+            self.svc.insert_entity(self.TABLES["comments"], comment_entity)
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
     def get_comments(self, key):
         """Returns all the comments from the repository."""
         partition, row = _key_to_partition_and_row(key)
-        comment_entities = self.svc.query_entities(self.comments_table, "PartitionKey eq '%s'"%key)
+        comment_entities = self.svc.query_entities(self.TABLES["comments"], "PartitionKey eq '%s'"%key)
         comments = [_comment_from_entity(entity) for entity in comment_entities]
         return comments
 
     def get_all_comments(self):
         """Returns all the comments from the repository."""
-        comment_entities = self.svc.query_entities(self.comments_table)
+        comment_entities = self.svc.query_entities(self.TABLES["comments"])
         comments = [_comment_from_entity(entity) for entity in comment_entities]
         comments.sort(key = lambda x: x.add_time, reverse=True)
         return comments
@@ -224,25 +231,25 @@ class Repository(object):
                 'RowKey': add_time,
                 'add_time' : add_time
             })
-            self.svc.insert_entity(self.charts_table, entity)
+            self.svc.insert_entity(self.TABLES["charts"], entity)
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
     def delete_chart(self, key):
         try:
             partition, row = _key_to_partition_and_row(key)
-            entity = self.svc.get_entity(self.charts_table, partition, row)
+            entity = self.svc.get_entity(self.TABLES["charts"], partition, row)
             file_name = entity['data']
             blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=file_name)
             blob_client.delete_blob()
-            self.svc.delete_entity(self.charts_table, partition, row)
+            self.svc.delete_entity(self.TABLES["charts"], partition, row)
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
     def get_charts(self, key):
         """Returns all the charts from the repository."""
         partition, row = _key_to_partition_and_row(key)
-        chart_entities = self.svc.query_entities(self.charts_table, "PartitionKey eq '%s'"%key)
+        chart_entities = self.svc.query_entities(self.TABLES["charts"], "PartitionKey eq '%s'"%key)
         charts = [_chart_from_entity(entity) for entity in chart_entities]
         return charts
 
@@ -261,7 +268,7 @@ class Repository(object):
             if journalentry.has_valid_exit_time():
                 upper_timestamp = journalentry.exit_time + timedelta(minutes=15)
                 query += " and RowKey le '%s'"%(str(upper_timestamp.timestamp()))
-            trade_entities = self.svc.query_entities(self.trades_table, query)
+            trade_entities = self.svc.query_entities(self.TABLES["trades"], query)
         trades = [_trade_from_entity(entity) for entity in trade_entities]
         return trades
 
@@ -269,7 +276,7 @@ class Repository(object):
         """Returns all the trades from the repository."""
         lower_timestamp = pytz.UTC.localize(datetime.utcnow()) - timedelta(days=30)
         query = "RowKey ge '%s'"%str(lower_timestamp.timestamp())
-        trade_entities = self.svc.query_entities(self.trades_table, query)
+        trade_entities = self.svc.query_entities(self.TABLES["trades"], query)
         trades = [_trade_from_entity(entity) for entity in trade_entities]
         trades.sort(key = lambda x: x.date, reverse=True)
         return trades
