@@ -19,8 +19,8 @@ elif REPOSITORY_NAME == 'memory':
 else:
     raise ValueError('Unknown repository.')
 
-CLIENT_ID = environ.get('CLIENT_ID', '')
-CLIENT_SECRET =  environ.get('CLIENT_SECRET', '')
-TENANT_ID = environ.get('TENANT_ID', '')
+CLIENT_ID = environ.get('AZURE_CLIENT_ID', '')
+CLIENT_SECRET =  environ.get('AZURE_CLIENT_SECRET', '')
+TENANT_ID = environ.get('AZURE_TENANT_ID', '')
 
 HTTP_SCHEME = environ.get('HTTP_SCHEME', 'https')

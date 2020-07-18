@@ -7,5 +7,6 @@ flask_login
 authlib
 flask-paginate
 jsonpickle
-azure_cosmosdb_table
+azure-cosmosdb-table
 dash
+azure-keyvault-secrets

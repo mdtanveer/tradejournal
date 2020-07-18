@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% for type, table in data %}
+<h3>{{ type }}</h3>
+<br />
+{{ table | safe }}
+{% endfor %}
+{% endblock %}

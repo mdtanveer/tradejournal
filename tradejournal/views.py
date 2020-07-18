@@ -301,6 +301,15 @@ def all_trades():
         trades = repository.get_all_trades(),
     )
 
+@app.route('/positions', methods=['GET'])
+@login_required
+def positions():
+    """Renders the positions page."""
+    position_data = repository.get_position_data()
+    return render_template(
+        'positions.html',
+        data = position_data,
+    )
 
 @app.route('/journalentry/<key>/charts/<chartkey>/delete', methods=['DELETE'])
 @login_required

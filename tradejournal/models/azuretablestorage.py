@@ -5,11 +5,14 @@ Repository of journalentries that stores data in Azure Table Storage.
 from azure.common import AzureMissingResourceHttpError
 from azure.cosmosdb.table import TableService
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
-from . import yahooquote
+from . import yahooquote, azurekeyvault
 from datetime import datetime, timedelta
 import os, uuid
 import arrow
 import pytz
+import requests
+import pandas as pd
+import re
 
 from . import Chart, Comment, JournalEntry, JournalEntryNotFound, Trade
 from . import _load_samples_json, IST_now
@@ -49,6 +52,19 @@ def strtime_to_timestamp(input):
     else:
         return str(pytz.timezone('Asia/Calcutta').localize(datetime.strptime(input, '%Y-%m-%dT%H:%M')).timestamp())
 
+def get_symbol(tradingsymbol):
+    symbol = re.split(r'\d+', tradingsymbol)[0]
+    return symbol
+
+def get_inst_type(tradingsymbol):
+    t = re.split(r'\d+', tradingsymbol)[-1]
+    if t == 'CE' or t == 'PE':
+        return 'option'
+    elif t.endswith('FUT'):
+        return 'future'
+    else:
+        return 'default'
+
 class Repository(object):
     """Azure Twable Storage repository."""
     def __init__(self, settings):
@@ -68,7 +84,7 @@ class Repository(object):
             'charts' : 'ChartsTable',
             'trades' : 'TradesTable'
         }
-
+        self.session = None
         self.svc = TableService(self.storage_name, connection_string=self.connection_string)
         for tablename in self.TABLES.values():
             if not self.svc.exists(tablename):
@@ -79,6 +95,7 @@ class Repository(object):
 
         # Create a unique name for the container
         self.container_name = "charts"
+        self.kvclient = None
 
         # Create the container
         try:
@@ -280,3 +297,51 @@ class Repository(object):
         trades = [_trade_from_entity(entity) for entity in trade_entities]
         trades.sort(key = lambda x: x.date, reverse=True)
         return trades
+
+    def get_position_data(self):
+        if not self.kvclient:
+            self.kvclient = azurekeyvault.AzureKeyVaultClient()
+            self.kvclient.fetch_secrets()
+
+        data_found = False
+        if self.session:
+            z = self.session.get("https://kite.zerodha.com/oms/portfolio/positions")
+            data_found = (z.status_code == 200)
+        if not data_found:
+            self.session = requests.Session()
+            x = self.session.post("https://kite.zerodha.com/api/login", 
+                                  data = {'user_id': self.kvclient.get_secret('zerodha-login'), 
+                                          'password': self.kvclient.get_secret('zerodha-password')})
+            res = x.json()
+            tfd = res['data']
+            del(tfd['twofa_type'])
+            del(tfd['twofa_status'])
+            tfd['twofa_value'] = self.kvclient.get_secret('zerodha-pin')
+            y = self.session.post("https://kite.zerodha.com/api/twofa", data = tfd)
+            self.session.headers.update({'Authorization': 'enctoken '+y.cookies['enctoken']})
+            z = self.session.get("https://kite.zerodha.com/oms/portfolio/positions")
+        data = z.json()['data']['net']
+        df = pd.DataFrame(data)
+        COLUMNS = ['tradingsymbol', 'quantity', 'average_price', 'last_price', 'unrealised']
+        df = df[COLUMNS]
+        df['symbol'] = df['tradingsymbol'].apply(get_symbol)
+        df['itype'] = df['tradingsymbol'].apply(get_inst_type)
+
+        trades = self.get_journalentries_helper(lambda x:x, 60)
+        tdf = pd.DataFrame(trades)
+        tdf = tdf[(tdf['exit_time'] =='0') & (tdf['is_idea']!='Y')]  
+        tdf = tdf[['symbol','strategy', 'timeframe']]
+
+        out = df.merge(tdf, left_on='symbol', right_on='symbol', how='left')
+        grp = out.groupby('itype')
+
+        position_data = []
+        for groupname in grp.groups.keys():
+            cols = list(COLUMNS)
+            cols.extend(['strategy', 'timeframe'])
+            df = grp.get_group(groupname)[cols]
+            position_data.append((groupname, df.to_html()))
+
+        return position_data
+
+
