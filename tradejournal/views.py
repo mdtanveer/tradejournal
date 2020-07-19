@@ -304,8 +304,9 @@ def all_trades():
 @app.route('/positions', methods=['GET'])
 @login_required
 def positions():
+    groupby = request.args.get('groupby', 'itype')
     """Renders the positions page."""
-    position_data = repository.get_position_data()
+    position_data = repository.get_position_data(groupby)
     return render_template(
         'positions.html',
         data = position_data,

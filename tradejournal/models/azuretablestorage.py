@@ -17,6 +17,8 @@ import re
 from . import Chart, Comment, JournalEntry, JournalEntryNotFound, Trade
 from . import _load_samples_json, IST_now
 
+pd.set_option("display.precision", 2)
+
 KEY_ENTRY_TIME = 'entry_time'
 KEY_EXIT_TIME = 'exit_time'
 
@@ -298,7 +300,7 @@ class Repository(object):
         trades.sort(key = lambda x: x.date, reverse=True)
         return trades
 
-    def get_position_data(self):
+    def get_position_data(self, groupby='itype'):
         if not self.kvclient:
             self.kvclient = azurekeyvault.AzureKeyVaultClient()
             self.kvclient.fetch_secrets()
@@ -322,7 +324,7 @@ class Repository(object):
             z = self.session.get("https://kite.zerodha.com/oms/portfolio/positions")
         data = z.json()['data']['net']
         df = pd.DataFrame(data)
-        COLUMNS = ['tradingsymbol', 'quantity', 'average_price', 'last_price', 'unrealised']
+        COLUMNS = ['tradingsymbol', 'unrealised', 'quantity', 'average_price', 'last_price', ]
         df = df[COLUMNS]
         df['symbol'] = df['tradingsymbol'].apply(get_symbol)
         df['itype'] = df['tradingsymbol'].apply(get_inst_type)
@@ -333,14 +335,21 @@ class Repository(object):
         tdf = tdf[['symbol','strategy', 'timeframe']]
 
         out = df.merge(tdf, left_on='symbol', right_on='symbol', how='left')
-        grp = out.groupby('itype')
+        out['strategy'] = out['strategy'].fillna('default')
+        groupby = groupby if groupby in out.columns else 'itype'
+        grp = out.groupby(groupby)
 
         position_data = []
         for groupname in grp.groups.keys():
             cols = list(COLUMNS)
-            cols.extend(['strategy', 'timeframe'])
             df = grp.get_group(groupname)[cols]
-            position_data.append((groupname, df.to_html(index=False, classes='table table-hover')))
+            meta = {
+                'name': groupname,
+                'count' : df.shape[0],
+                'unrealised_tot': round(df['unrealised'].sum(), 2)
+                }
+
+            position_data.append((meta, df.to_html(index=False, classes='table table-hover')))
 
         return position_data
 
