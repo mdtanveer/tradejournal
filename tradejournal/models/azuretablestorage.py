@@ -112,8 +112,8 @@ class Repository(object):
 
     def get_journalentries(self):
         """Returns all the journalentries from the repository."""
-        journalentries = self.get_journalentries_helper(_journalentry_from_entity, 30)
-        journalentries.sort(key = lambda x: x.entry_time, reverse=True)
+        journalentries = self.get_journalentries_helper(_journalentry_from_entity, 60)
+        journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)
         return journalentries
 
     def get_journalentry(self, journalentry_key):
@@ -340,7 +340,7 @@ class Repository(object):
             cols = list(COLUMNS)
             cols.extend(['strategy', 'timeframe'])
             df = grp.get_group(groupname)[cols]
-            position_data.append((groupname, df.to_html()))
+            position_data.append((groupname, df.to_html(index=False, classes='table table-hover')))
 
         return position_data
 

@@ -8,7 +8,7 @@
         {% for journalentry in journalentries %}
         <tr>
             <td>
-                <h4>
+                <h3>
                     {%if not not journalentry.is_idea%}
                     <span class="glyphicon glyphicon-fire text-warning"></span>
                     {%else%}
@@ -23,7 +23,7 @@
                     {%endif%}
                     {%endif%}
                     <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.symbol}}</a><br />
-                </h4>
+                </h3>
                 <span class="text-muted">
                     <i>entered {{journalentry.get_entry_time()}}</i><br />
                     <i>{{ journalentry.direction.lower()}},{{ journalentry.strategy.lower()}},{{ journalentry.timeframe.lower()}}</i>
