@@ -104,7 +104,7 @@ class Repository(object):
             self.container_client = self.blob_service_client.create_container(self.container_name)
 
     def get_journalentries_helper(self, func, age):
-        lower_timestamp = IST_now() - timedelta(days=age)
+        lower_timestamp = pytz.UTC.localize(datetime.utcnow()) - timedelta(days=age)
         query = "RowKey ge '%s'"%(str(lower_timestamp.timestamp()))
         journalentry_entities = self.svc.query_entities(self.TABLES['journalentry'], query)
         journalentries = [func(entity) for entity in journalentry_entities]
@@ -329,7 +329,7 @@ class Repository(object):
 
         trades = self.get_journalentries_helper(lambda x:x, 60)
         tdf = pd.DataFrame(trades)
-        tdf = tdf[(tdf['exit_time'] =='0') & (tdf['is_idea']!='Y')]  
+        tdf = tdf.query('(exit_time =="0" | exit_time == "") & is_idea !="Y"')
         tdf = tdf[['symbol','strategy', 'timeframe']]
 
         out = df.merge(tdf, left_on='symbol', right_on='symbol', how='left')
