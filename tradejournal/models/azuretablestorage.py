@@ -301,27 +301,28 @@ class Repository(object):
         return trades
 
     def get_position_data(self, groupby='itype'):
+        TIMEOUT=3
         if not self.kvclient:
             self.kvclient = azurekeyvault.AzureKeyVaultClient()
             self.kvclient.fetch_secrets()
 
         data_found = False
         if self.session:
-            z = self.session.get("https://kite.zerodha.com/oms/portfolio/positions")
+            z = self.session.get("https://kite.zerodha.com/oms/portfolio/positions", timeout=TIMEOUT)
             data_found = (z.status_code == 200)
         if not data_found:
             self.session = requests.Session()
             x = self.session.post("https://kite.zerodha.com/api/login", 
                                   data = {'user_id': self.kvclient.get_secret('zerodha-login'), 
-                                          'password': self.kvclient.get_secret('zerodha-password')})
+                                          'password': self.kvclient.get_secret('zerodha-password')}, timeout=TIMEOUT)
             res = x.json()
             tfd = res['data']
             del(tfd['twofa_type'])
             del(tfd['twofa_status'])
             tfd['twofa_value'] = self.kvclient.get_secret('zerodha-pin')
-            y = self.session.post("https://kite.zerodha.com/api/twofa", data = tfd)
+            y = self.session.post("https://kite.zerodha.com/api/twofa", data = tfd, timeout=TIMEOUT)
             self.session.headers.update({'Authorization': 'enctoken '+y.cookies['enctoken']})
-            z = self.session.get("https://kite.zerodha.com/oms/portfolio/positions")
+            z = self.session.get("https://kite.zerodha.com/oms/portfolio/positions", timeout=TIMEOUT)
         data = z.json()['data']['net']
         df = pd.DataFrame(data)
         COLUMNS = ['tradingsymbol', 'unrealised', 'quantity', 'average_price', 'last_price', ]

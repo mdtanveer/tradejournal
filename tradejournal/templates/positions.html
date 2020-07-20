@@ -1,9 +1,13 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% if not error %}
 {% for meta, table in data %}
 <h3>{{ meta['name'] }}&nbsp;({{meta['unrealised_tot']}})</h3>
 <br />
 {{ table | safe }}
 {% endfor %}
+{% else %}
+<p>{{error}}</p>
+{% endif %}
 {% endblock %}

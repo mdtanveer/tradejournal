@@ -14,6 +14,7 @@ from flask_login import login_required
 from flask_paginate import Pagination, get_page_parameter, get_page_args
 import jsonpickle
 from flask import current_app as app
+import sys, traceback
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 
@@ -306,12 +307,19 @@ def all_trades():
 def positions():
     groupby = request.args.get('groupby', 'strategy')
     """Renders the positions page."""
-    position_data = repository.get_position_data(groupby)
-    position_data.sort(key=lambda x: x[0]['name'], reverse=True)
-    return render_template(
-        'positions.html',
-        data = position_data,
-    )
+    error = None
+    try:
+        position_data = repository.get_position_data(groupby)
+    except Exception:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        error = traceback.format_exception(exc_type, exc_value, exc_tb)
+    if position_data:
+        position_data.sort(key=lambda x: x[0]['name'], reverse=True)
+        return render_template(
+            'positions.html',
+            data = position_data,
+            error=error,
+        )
 
 @app.route('/journalentry/<key>/charts/<chartkey>/delete', methods=['DELETE'])
 @login_required
