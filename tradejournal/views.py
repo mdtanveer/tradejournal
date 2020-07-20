@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import render_template, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
-from tradejournal.models import JournalEntry, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquote
+from tradejournal.models import JournalEntry, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
@@ -266,14 +266,14 @@ def quick_charts():
 def fetch_chart(symbol):
     tf = request.args.get('tf', '2h')
     if tf == '2h' or tf == '1h':
-        yahoo_params = (symbol, '90d', '1h')
+        yahoo_params = (symbol, '90d', '1h', '.BO')
     elif tf == '1d':
-        yahoo_params = (symbol, '1y', '1d')
+        yahoo_params = (symbol, '1y', '1d', '.NS')
     elif tf == '1wk':
-        yahoo_params = (symbol, '5y', '1wk')
+        yahoo_params = (symbol, '5y', '1wk', '.NS')
     else:
         raise Exception('Unrecognized timeframe')
-    csv_data=yahooquote.get_yahoo_quote(*yahoo_params).to_csv(index=False)
+    csv_data=yahooquotes.get_quote_data(*yahoo_params).to_csv(index=False)
     return Response(
         csv_data,
         mimetype="text/csv",

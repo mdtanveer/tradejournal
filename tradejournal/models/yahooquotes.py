@@ -19,13 +19,13 @@ YAHOO_SYMBOL_MAPPINGS={
     'EURINR' : 'EURINR=X',
 }
 
-def get_yahoo_symbol(symbol):
+def get_yahoo_symbol(symbol, preferred_exc):
     if symbol in YAHOO_SYMBOL_MAPPINGS.keys():
         return YAHOO_SYMBOL_MAPPINGS[symbol]
-    return symbol+'.BO'
+    return symbol+preferred_exc
  
-def get_yahoo_quote(symbol='RELIANCE', data_range='1d', data_interval='1h'):
-    ysymbol = get_yahoo_symbol(symbol)
+def get_quote_data(symbol='RELIANCE', data_range='1d', data_interval='1h', preferred_exc='.BO'):
+    ysymbol = get_yahoo_symbol(symbol, preferred_exc)
     res = requests.get('https://query1.finance.yahoo.com/v8/finance/chart/{ysymbol}?range={data_range}&interval={data_interval}'.format(**locals()))
     data = res.json()
     body = data['chart']['result'][0]    
@@ -40,14 +40,14 @@ def get_yahoo_quote(symbol='RELIANCE', data_range='1d', data_interval='1h'):
     
     return df
 
-def get_all_quotes(listname, data_range, data_interval, output_dir):
+def get_all_quotes(listname, data_range, data_interval, output_dir, preferred_exc):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
     with open(listname) as fin:
         for symbol in fin.readlines():
             symbol = symbol.strip()
             try:
-                data = get_quote_data(symbol, data_range, data_interval)
+                data = get_quote_data(symbol, data_range, data_interval, preferred_exc)
                 data.to_csv(output_dir+'\\'+symbol+'.csv', float_format='%.2f', index=False)
             except KeyboardInterrupt: 
                 raise

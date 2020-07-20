@@ -5,7 +5,7 @@ Repository of journalentries that stores data in Azure Table Storage.
 from azure.common import AzureMissingResourceHttpError
 from azure.cosmosdb.table import TableService
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
-from . import yahooquote, azurekeyvault
+from . import yahooquotes, azurekeyvault
 from datetime import datetime, timedelta
 import os, uuid
 import arrow
@@ -235,7 +235,8 @@ class Repository(object):
             local_file_name = "chart_" + str(uuid.uuid4()) + ".csv"
             entity = dict(entity)
             entity['data'] = local_file_name
-            yahooquote.get_yahoo_quote(partition, RANGES[timeframe], timeframe).to_csv(local_file_name, index=False)
+            preferred_exc = '.BO' if timeframe == '1h' else '.NS'
+            yahooquotes.get_quote_data(partition, RANGES[timeframe], timeframe, preferred_exc).to_csv(local_file_name, index=False)
             # Create a blob client using the local file name as the name for the blob
             blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=local_file_name)
             
