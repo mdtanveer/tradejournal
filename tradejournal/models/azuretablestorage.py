@@ -225,19 +225,25 @@ class Repository(object):
         comments.sort(key = lambda x: x.add_time, reverse=True)
         return comments
 
-    def add_chart(self, key, entity, timeframe):
-        """Add chart"""
+    def get_chart_data_from_yahoo(self, symbol, timeframe):
+        #For intraday data is always returned in 1h timeframe
         if not timeframe or timeframe == '2h':
             timeframe = '1h'
         RANGES = {'1h': '6mo', '1d':'2y', '1wk': '5y'}
+        preferred_exc = '.BO' if timeframe == '1h' else '.NS'
+        df = yahooquotes.get_quote_data(symbol, RANGES[timeframe], timeframe, preferred_exc)
+        return df
+
+    def add_chart(self, key, entity, timeframe):
+        """Add chart"""
         try:
             partition, row = _key_to_partition_and_row(key)
             add_time = str(datetime.now().timestamp())
             local_file_name = "chart_" + str(uuid.uuid4()) + ".csv"
             entity = dict(entity)
             entity['data'] = local_file_name
-            preferred_exc = '.BO' if timeframe == '1h' else '.NS'
-            yahooquotes.get_quote_data(partition, RANGES[timeframe], timeframe, preferred_exc).to_csv(local_file_name, index=False)
+            yd = self.get_chart_data_from_yahoo(partition, timeframe)
+            yd.to_csv(local_file_name, index=False)
             # Create a blob client using the local file name as the name for the blob
             blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=local_file_name)
             
@@ -274,17 +280,27 @@ class Repository(object):
         charts = [_chart_from_entity(entity) for entity in chart_entities]
         return charts
 
+    def resample_data(self, data, target_tf):
+        df = pd.read_csv(StringIO(data.decode('ascii')))
+        data = resample.resample_quote_data(df, target_tf).to_csv(index=False)
+        return data
+
     def get_chart_data(self, chartid, tf, typ):
         blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=chartid)
         data = blob_client.download_blob().readall()
         if typ == 'original':
             if tf == '2h':
-                df = pd.read_csv(StringIO(data.decode('ascii')))
-                data = resample.resample_quote_data(df, '2H').to_csv(index=False)
+                data = self.resample_data(data, '2H')
         elif typ == 'mother':
-            df = pd.read_csv(StringIO(data.decode('ascii')))
             MOTHER_CHART_TF={'2h': '1D', '1d': '1W', '1W': '1M'}
-            data = resample.resample_quote_data(df, MOTHER_CHART_TF[tf]).to_csv(index=False)
+            data = self.resample_data(data, MOTHER_CHART_TF[tf])
+        elif typ.startswith('latest'):
+            symbol = typ.split('_')[1]
+            df = self.get_chart_data_from_yahoo(symbol, tf)
+            if tf == '2h':
+                data = resample.resample_quote_data(df, target_tf).to_csv(index=False)
+            else:
+                data = df.to_csv(index=False)
         return data
 
     def get_trades(self, journalentry_key):
