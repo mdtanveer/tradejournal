@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import render_template, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
-from tradejournal.models import JournalEntry, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes
+from tradejournal.models import JournalEntry, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
@@ -235,7 +235,9 @@ def charts(key):
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
 @login_required
 def chart_data(key, chartid):
-    csv_data = repository.get_chart_data(chartid)
+    tf = request.args.get('tf', '2h')
+    typ = request.args.get('type', 'original')
+    csv_data = repository.get_chart_data(chartid, tf, typ)
     return Response(
         csv_data,
         mimetype="text/csv",
@@ -273,7 +275,10 @@ def fetch_chart(symbol):
         yahoo_params = (symbol, '5y', '1wk', '.NS')
     else:
         raise Exception('Unrecognized timeframe')
-    csv_data=yahooquotes.get_quote_data(*yahoo_params).to_csv(index=False)
+    yd=yahooquotes.get_quote_data(*yahoo_params)
+    if tf == '2h':
+        yd = resample.resample_quote_data(yd, '2H')
+    csv_data = yd.to_csv(index=False)
     return Response(
         csv_data,
         mimetype="text/csv",

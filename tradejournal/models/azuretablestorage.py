@@ -5,7 +5,7 @@ Repository of journalentries that stores data in Azure Table Storage.
 from azure.common import AzureMissingResourceHttpError
 from azure.cosmosdb.table import TableService
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
-from . import yahooquotes, azurekeyvault
+from . import yahooquotes, azurekeyvault, resample
 from datetime import datetime, timedelta
 import os, uuid
 import arrow
@@ -13,6 +13,7 @@ import pytz
 import requests
 import pandas as pd
 import re
+from io import StringIO
 
 from . import Chart, Comment, JournalEntry, JournalEntryNotFound, Trade
 from . import _load_samples_json, IST_now
@@ -228,7 +229,7 @@ class Repository(object):
         """Add chart"""
         if not timeframe or timeframe == '2h':
             timeframe = '1h'
-        RANGES = {'1h': '60d', '1d':'250d', '1wk': '900d'}
+        RANGES = {'1h': '6mo', '1d':'2y', '1wk': '5y'}
         try:
             partition, row = _key_to_partition_and_row(key)
             add_time = str(datetime.now().timestamp())
@@ -273,9 +274,17 @@ class Repository(object):
         charts = [_chart_from_entity(entity) for entity in chart_entities]
         return charts
 
-    def get_chart_data(self, chartid):
+    def get_chart_data(self, chartid, tf, typ):
         blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=chartid)
         data = blob_client.download_blob().readall()
+        if typ == 'original':
+            if tf == '2h':
+                df = pd.read_csv(StringIO(data.decode('ascii')))
+                data = resample.resample_quote_data(df, '2H').to_csv(index=False)
+        elif typ == 'mother':
+            df = pd.read_csv(StringIO(data.decode('ascii')))
+            MOTHER_CHART_TF={'2h': '1D', '1d': '1W', '1W': '1M'}
+            data = resample.resample_quote_data(df, MOTHER_CHART_TF[tf]).to_csv(index=False)
         return data
 
     def get_trades(self, journalentry_key):
