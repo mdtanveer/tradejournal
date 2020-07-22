@@ -276,8 +276,11 @@ def fetch_chart(symbol):
     else:
         raise Exception('Unrecognized timeframe')
     yd=yahooquotes.get_quote_data(*yahoo_params)
-    if tf == '2h':
+    
+    # For intraday, always override to 2h timeframe
+    if tf == '2h' or tf == '1h':
         yd = resample.resample_quote_data(yd, '2H')
+    
     csv_data = yd.to_csv(index=False)
     return Response(
         csv_data,
