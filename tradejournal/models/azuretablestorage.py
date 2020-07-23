@@ -298,7 +298,7 @@ class Repository(object):
             symbol = typ.split('_')[1]
             df = self.get_chart_data_from_yahoo(symbol, tf)
             if tf == '2h':
-                data = resample.resample_quote_data(df, target_tf).to_csv(index=False)
+                data = resample.resample_quote_data(df, '2H').to_csv(index=False)
             else:
                 data = df.to_csv(index=False)
         return data
