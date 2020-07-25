@@ -40,6 +40,9 @@ class JournalEntry(object):
         self.tradingsymbol = entity.tradingsymbol if 'tradingsymbol' in entity.keys() and not not entity['tradingsymbol'] else ''
         self.position_changes = []
     
+    def isidea(self):
+        return self.is_idea == 'Y'
+
     def is_open(self):
         return not self.has_valid_exit_time()
 

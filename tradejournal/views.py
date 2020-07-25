@@ -4,7 +4,7 @@ Routes and views for the flask application.
 import json
 from datetime import datetime
 
-from flask import render_template, redirect, request, Response
+from flask import render_template, make_response, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
 from tradejournal.models import JournalEntry, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
@@ -33,14 +33,28 @@ def home():
     """Renders the home page, with a list of all journalentrys."""
     journalentries=repository.get_journalentries()
     page, per_page, offset = get_page_args()
-    pagination = Pagination(page=page, total=len(journalentries), search=False, record_name='journalentries',css_framework='bootstrap4')
-    return render_template(
+    try:
+        subpage = request.args['subpage']
+        page = int(request.cookies.get('page', "1"))
+    except:
+        subpage = request.cookies.get('subpage', 'open')
+    if subpage == 'idea':
+        entries = list(filter(lambda x: x.isidea(), journalentries))
+    elif subpage == 'open':
+        entries = list(filter(lambda x: x.is_open() and not x.isidea(), journalentries))
+    elif subpage == 'closed':
+        entries = list(filter(lambda x: not x.is_open() and not x.isidea(), journalentries))
+    pagination = Pagination(page=page, total=len(entries), search=False, record_name='journalentries',css_framework='bootstrap4')
+    response = make_response(render_template(
         'index.html',
         title='Journal Entries',
         year=datetime.now().year,
-        journalentries=journalentries[offset:offset+per_page],
+        journalentries=entries[offset:offset+per_page],
         pagination=pagination
-    )
+    ))
+    response.set_cookie('subpage', subpage)
+    response.set_cookie('page', str(page))
+    return response
 
 @app.route('/js/<path:path>')
 @login_required
