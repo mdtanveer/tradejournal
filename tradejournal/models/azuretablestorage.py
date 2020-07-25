@@ -359,9 +359,9 @@ class Repository(object):
         trades = self.get_journalentries_helper(lambda x:x, 60)
         tdf = pd.DataFrame(trades)
         tdf = tdf.query('(exit_time =="0" | exit_time == "") & is_idea !="Y"')
-        tdf = tdf[['symbol','strategy', 'timeframe']]
+        tdf = tdf[['symbol','strategy', 'timeframe', 'tradingsymbol']]
 
-        out = df.merge(tdf, left_on='symbol', right_on='symbol', how='left')
+        out = df.merge(tdf, left_on=['symbol', 'tradingsymbol'], right_on=['symbol', 'tradingsymbol'], how='left')
         out['strategy'] = out['strategy'].fillna('default')
         groupby = groupby if groupby in out.columns else 'itype'
         grp = out.groupby(groupby)

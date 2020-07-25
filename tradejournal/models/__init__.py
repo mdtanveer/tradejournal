@@ -37,6 +37,7 @@ class JournalEntry(object):
         self.strategy = entity.strategy if 'strategy' in entity.keys() and not not entity['strategy'] else 'tkcross'
         self.timeframe = entity.timeframe if 'timeframe' in entity.keys() and not not entity['timeframe'] else '2h'
         self.is_idea = entity.is_idea if 'is_idea' in entity.keys() else ''
+        self.tradingsymbol = entity.tradingsymbol if 'tradingsymbol' in entity.keys() and not not entity['tradingsymbol'] else ''
         self.position_changes = []
     
     def is_open(self):

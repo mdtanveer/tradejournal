@@ -316,6 +316,7 @@ def positions():
     groupby = request.args.get('groupby', 'strategy')
     """Renders the positions page."""
     error = None
+    position_data = None
     try:
         position_data = repository.get_position_data(groupby)
     except Exception:
@@ -323,11 +324,11 @@ def positions():
         error = traceback.format_exception(exc_type, exc_value, exc_tb)
     if position_data:
         position_data.sort(key=lambda x: x[0]['name'], reverse=True)
-        return render_template(
-            'positions.html',
-            data = position_data,
-            error=error,
-        )
+    return render_template(
+        'positions.html',
+        data = position_data,
+        error=error,
+    )
 
 @app.route('/journalentry/<key>/charts/<chartkey>/delete', methods=['DELETE'])
 @login_required
