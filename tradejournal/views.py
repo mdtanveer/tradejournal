@@ -36,8 +36,10 @@ def home():
     try:
         subpage = request.args['subpage']
     except:
-        page = int(request.cookies.get('page', "1"))
         subpage = request.cookies.get('subpage', 'open')
+    if not 'page' in request.args.keys():
+        page = int(request.cookies.get('page', "1"))
+
     if subpage == 'idea':
         entries = list(filter(lambda x: x.isidea(), journalentries))
     elif subpage == 'open':

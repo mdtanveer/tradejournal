@@ -2,11 +2,43 @@
 
 {% block content %}
 {% if not error %}
-{% for meta, table in data %}
-<h3>{{ meta['name'] }}&nbsp;({{meta['unrealised_tot']}})</h3>
-<br />
-{{ table | safe }}
-{% endfor %}
+    <div class="panel-group" style="margin-top:20px">
+        {% for meta, table in data %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a data-toggle="collapse" href="#collapse_{{ meta['name'] }}">{{ meta['name'] }}</a>
+                </h3>
+            </div>
+            <div id="collapse_{{ meta['name'] }}" class="panel-collapse collapse">
+                <div>
+                    <table class="table table-hover remove-bottom-margin">
+                        <tbody>
+                            {% for row in table %}
+                            <tr>
+                                <td>
+                                    <h5>{{row['tradingsymbol']}}</h5>
+                                    <span class="text-muted">
+                                        <i>{{row['quantity']}}</i><br />
+                                        <i>{{ row['average_price']}}</i>
+                                    </span>
+                                </td>
+                                <td style="text-align:right">
+                                    <h5>{{row['unrealised']}}</h5>
+                                    <span class="text-muted">
+                                        <i>{{row['last_price']}}</i>
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-footer">Total: {{meta['unrealised_tot']}}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 {% else %}
 <p>{{error}}</p>
 {% endif %}

@@ -376,7 +376,7 @@ class Repository(object):
                 'unrealised_tot': round(df['unrealised'].sum(), 2)
                 }
 
-            position_data.append((meta, df.to_html(index=False, classes='table table-hover')))
+            position_data.append((meta, df.apply(lambda x: x.to_dict(), axis=1)))
 
         return position_data
 
