@@ -1,17 +1,10 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<script type="text/javascript">
-    $(function(){
-        $('.nav a').click(function(){
-            $(this).parent().addClass('active').siblings().removeClass('active')
-        })
-    })
-</script>
 <ul class="nav nav-tabs">
-    <li id="open" class="active"><a href="home?subpage=open">Open</a></li>
-    <li id="close"><a href="home?subpage=closed">Closed</a></li>
-    <li id="ideas"><a href="home?subpage=idea">Ideas</a></li>
+    <li id="open" class="{{"active" if subpage=="open" else ""}}"><a href="home?subpage=open">Open</a></li>
+    <li id="close" class="{{"active" if subpage=="closed" else ""}}"><a href="home?subpage=closed">Closed</a></li>
+    <li id="idea" class="{{"active" if subpage=="idea" else ""}}"><a href="home?subpage=idea">Ideas</a></li>
 </ul>
 {% if journalentries %}
 <table class="table table-hover">

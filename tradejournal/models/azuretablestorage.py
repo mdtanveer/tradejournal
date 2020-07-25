@@ -377,7 +377,8 @@ class Repository(object):
                 }
 
             position_data.append((meta, df.apply(lambda x: x.to_dict(), axis=1)))
+        grand_total = round(out['unrealised'].sum(), 2)
 
-        return position_data
+        return (position_data, grand_total)
 
 

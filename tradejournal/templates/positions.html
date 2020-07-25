@@ -3,6 +3,35 @@
 {% block content %}
 {% if not error %}
     <div class="panel-group" style="margin-top:20px">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a data-toggle="collapse" href="#collapse_summary">summary</a>
+                </h3>
+            </div>
+            <div id="collapse_summary" class="panel-collapse collapse">
+                <div>
+                    <table class="table table-hover remove-bottom-margin">
+                        <tbody>
+                            {% for meta, table in data %}
+                            <tr>
+                                <td>
+                                    <h5>{{meta['name']}}</h5>
+                                    <span class="text-muted">
+                                        <i>{{meta['count']}} trades</i>
+                                    </span>
+                                </td>
+                                <td style="text-align:right">
+                                    <h5>{{meta['unrealised_tot']}}</h5>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-footer" style="text-align:right">Total: {{grand_total}}</div>
+            </div>
+        </div>
         {% for meta, table in data %}
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -19,14 +48,14 @@
                                 <td>
                                     <h5>{{row['tradingsymbol']}}</h5>
                                     <span class="text-muted">
-                                        <i>{{row['quantity']}}</i><br />
-                                        <i>{{ row['average_price']}}</i>
+                                        <i>Avg: {{ row['average_price']}}</i><br/>
+                                        <i>Qty: {{row['quantity']}}</i>
                                     </span>
                                 </td>
                                 <td style="text-align:right">
                                     <h5>{{row['unrealised']}}</h5>
                                     <span class="text-muted">
-                                        <i>{{row['last_price']}}</i>
+                                        <i>LTP: {{row['last_price']}}</i>
                                     </span>
                                 </td>
                             </tr>
@@ -34,7 +63,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="panel-footer">Total: {{meta['unrealised_tot']}}</div>
+                <div class="panel-footer" style="text-align:right">Total: {{meta['unrealised_tot']}}</div>
             </div>
         </div>
         {% endfor %}

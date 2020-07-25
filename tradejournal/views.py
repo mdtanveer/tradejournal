@@ -52,7 +52,8 @@ def home():
         title='Journal Entries',
         year=datetime.now().year,
         journalentries=entries[offset:offset+per_page],
-        pagination=pagination
+        pagination=pagination,
+        subpage=subpage
     ))
     response.set_cookie('subpage', subpage)
     response.set_cookie('page', str(page))
@@ -333,8 +334,9 @@ def positions():
     """Renders the positions page."""
     error = None
     position_data = None
+    grand_total = 0
     try:
-        position_data = repository.get_position_data(groupby)
+        position_data, grand_total = repository.get_position_data(groupby)
     except Exception:
         exc_type, exc_value, exc_tb = sys.exc_info()
         error = traceback.format_exception(exc_type, exc_value, exc_tb)
@@ -344,6 +346,7 @@ def positions():
         'positions.html',
         data = position_data,
         error=error,
+        grand_total = grand_total
     )
 
 @app.route('/journalentry/<key>/charts/<chartkey>/delete', methods=['DELETE'])
