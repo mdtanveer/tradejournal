@@ -35,8 +35,8 @@ def home():
     page, per_page, offset = get_page_args()
     try:
         subpage = request.args['subpage']
-        page = int(request.cookies.get('page', "1"))
     except:
+        page = int(request.cookies.get('page', "1"))
         subpage = request.cookies.get('subpage', 'open')
     if subpage == 'idea':
         entries = list(filter(lambda x: x.isidea(), journalentries))
