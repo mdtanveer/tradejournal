@@ -135,3 +135,20 @@ path.difference {
     fill: #BBBBBB;
     opacity: 0.5;
 }
+
+.bollinger path {
+    fill: none;
+    stroke-width: 1;
+}
+
+    .bollinger path.upper {
+        stroke: #0000AA;
+    }
+
+    .bollinger path.lower {
+        stroke: #FF9999;
+    }
+
+    .bollinger path.middle {
+        stroke: #BBBBBB;
+    }

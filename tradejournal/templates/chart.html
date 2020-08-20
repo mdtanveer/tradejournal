@@ -11,6 +11,9 @@
                 <button type="button" class="btn btn-secondary btn-success" onclick="RenderNextChart();">
                     <span class="glyphicon glyphicon-chevron-right"></span>
                 </button>
+                <button type="button" class="btn btn-secondary btn-warning" onclick="ToggleIndicator();">
+                    <span class="glyphicon glyphicon-barcode"></span>
+                </button>
             </div>
             <div>
                 <center>
@@ -115,11 +118,19 @@
     }
 
     var g_indicator = "{{ indicator }}";
+    var g_primaryIndicator = "{{overlay_indicator if not not overlay_indicator else 'ichimoku'}}";
 
-    var ichimoku = techan.plot.ichimoku()
+    if (g_primaryIndicator == "ichimoku") {
+        var ichimoku = techan.plot.ichimoku()
             .xScale(x)
             .yScale(y);
-
+    }
+    else {
+        var bollinger = techan.plot.bollinger()
+            .xScale(x)
+            .yScale(y);
+    }
+    
     var xAxis = d3.axisBottom(x);
 
     var yAxis = d3.axisLeft(y)
@@ -197,9 +208,14 @@
             .attr("class", "indicator-plot")
             .attr("clip-path", function(d, i) { return "url(#indicatorClip-" + i + ")"; });
 
-    var ichimokuIndicator = techan.indicator.ichimoku();
-    // Don't show where indicators don't have data
-    var indicatorPreRoll = ichimokuIndicator.kijunSen()+ichimokuIndicator.senkouSpanB();
+    if (g_primaryIndicator == "ichimoku") {
+        var ichimokuIndicator = techan.indicator.ichimoku();
+        // Don't show where indicators don't have data
+        var indicatorPreRoll = ichimokuIndicator.kijunSen() + ichimokuIndicator.senkouSpanB();
+    } else {
+        var bollingerIndicator = techan.indicator.bollinger();
+    }
+
     var volume = techan.plot.volume()
             .accessor(candlestick.accessor())   // Set the accessor to a ohlc accessor so we get highlighted bars
             .xScale(x)
@@ -211,8 +227,8 @@
         .orient(function(d) { return d.type.startsWith("buy") ? "up" : "down"; })
 
     svg.append("g")
-            .attr("class", "ichimoku")
-            .attr("clip-path", "url(#ohlcClip)");
+        .attr("class", g_primaryIndicator)
+        .attr("clip-path", "url(#ohlcClip)");
 
     svg.append("g")
             .attr("class", "candlestick")
@@ -284,20 +300,28 @@
         {
             candlestickData = data;
         }
-        var ichimokuData = ichimokuIndicator(data);
 
-        x.domain(data.map(ichimokuIndicator.accessor().d));
-        // Calculate the y domain for visible data points (ensure to include Kijun Sen additional data offset)
-        var y_domain = techan.scale.plot.ichimoku(ichimokuData.slice(indicatorPreRoll - ichimokuIndicator.kijunSen())).domain();
-        y_domain = [y_domain[0] * 0.95, y_domain[1] * 1.05];
-        y.domain(y_domain);
-        yVolume.domain(techan.scale.plot.volume(data.slice(indicatorPreRoll-ichimokuIndicator.kijunSen())).domain());
+        if (g_primaryIndicator == "ichimoku") {
+            var ichimokuData = ichimokuIndicator(data);
+            x.domain(data.map(ichimokuIndicator.accessor().d));
+            // Calculate the y domain for visible data points (ensure to include Kijun Sen additional data offset)
+            var y_domain = techan.scale.plot.ichimoku(ichimokuData.slice(indicatorPreRoll - ichimokuIndicator.kijunSen())).domain();
+            y_domain = [y_domain[0] * 0.95, y_domain[1] * 1.05];
+            y.domain(y_domain);
+            yVolume.domain(techan.scale.plot.volume(data.slice(indicatorPreRoll - ichimokuIndicator.kijunSen())).domain());
 
-        // Logic to ensure that at least +KijunSen displacement is applied to display cloud plotted ahead of ohlc
-        x.zoomable().clamp(false).domain([indicatorPreRoll, data.length+ichimokuIndicator.kijunSen()]);
+            // Logic to ensure that at least +KijunSen displacement is applied to display cloud plotted ahead of ohlc
+            x.zoomable().clamp(false).domain([indicatorPreRoll, data.length + ichimokuIndicator.kijunSen()]);
+            svg.selectAll("g.ichimoku").datum(ichimokuData).call(ichimoku);
+        } else {
+            var bollingerData = bollingerIndicator(data);
+            x.domain(bollingerData.map(bollingerIndicator.accessor().d));
+            y.domain(techan.scale.plot.bollinger(bollingerData).domain());
+            yVolume.domain(techan.scale.plot.volume(data).domain());
+            svg.selectAll("g.bollinger").datum(bollingerData).call(bollinger);
 
+        }
         svg.selectAll("g.candlestick").datum(candlestickData).call(candlestick);
-        svg.selectAll("g.ichimoku").datum(ichimokuData).call(ichimoku);
         svg.selectAll("g.x.axis").call(xAxis);
         svg.selectAll("g.y.axis").call(yAxis);
         svg.selectAll("g.volume").datum(data).call(volume);
@@ -363,7 +387,7 @@
                 params = new URLSearchParams(temp[1]);
                 params.set('tf', timeFrame);
                 if (resampleType) {
-                    params.set('type', resampleType)
+                    params.set('type', resampleType);
                 }
                 relativeUrl = temp[0] + '?' + params;
                 d3.csv(relativeUrl, D3_DataCallback)
@@ -402,6 +426,15 @@
             if (charts.length > 0)
                 RenderChart(currentChartIndex, g_timeFrame, g_resampleType);
             }
+
+        function ToggleIndicator() {
+            oind = g_primaryIndicator == "bollinger" ? "ichimoku" : "bollinger";
+            params = new URLSearchParams(window.location.search);
+            params.set('oind', oind);
+            newUrl = window.location.origin + window.location.pathname + '?' + params;
+            window.location.href = newUrl;
+        }
+
         {%if journalentry%}
             function DeleteCurrentChart() {
                 $.ajax({

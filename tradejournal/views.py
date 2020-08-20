@@ -237,6 +237,9 @@ def charts(key):
         except KeyError:
             error_message = 'Unable to update'
     else:
+        indicator = request.args.get('ind', journalentry.get_indicator())
+        overlay_indicator = request.args.get('oind', 'ichimoku')
+
         form = ChartForm()
         return render_template(
             'chart.html',
@@ -245,7 +248,8 @@ def charts(key):
             form = form,
             journalentry=repository.get_journalentry(key),
             timeframe=journalentry.get_timeframe(),
-            indicator=journalentry.get_indicator(),
+            indicator=indicator,
+            overlay_indicator=overlay_indicator,
             trades = repository.get_trades(key),
         )
 
@@ -269,6 +273,8 @@ def quick_charts():
         symbols = request.args['symbols'].split(',')
         tf = request.args.get('tf', '2h')
         indicator = request.args.get('ind', 'stochastic')
+        overlay_indicator = request.args.get('oind', 'ichimoku')
+
         charts = [{'key':'', 'title': symbol, 'data': symbol, 'relativeUrl':'charts/%s?tf=%s'%(symbol, tf)} for symbol in symbols]
         return render_template(
             'chart.html',
@@ -277,6 +283,7 @@ def quick_charts():
             journalentry=None,
             timeframe=tf,
             indicator=indicator,
+            overlay_indicator=overlay_indicator,
         )
     else:
         return ('', 204)
