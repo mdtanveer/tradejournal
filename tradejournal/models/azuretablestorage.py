@@ -85,7 +85,8 @@ class Repository(object):
             'journalentry' : 'TradeEntryTable',
             'comments' : 'CommentsTable',
             'charts' : 'ChartsTable',
-            'trades' : 'TradesTable'
+            'trades' : 'TradesTable',
+            'summarypnl': 'SummaryPnLTable'
         }
         self.session = None
         self.svc = TableService(self.storage_name, connection_string=self.connection_string)
@@ -381,4 +382,8 @@ class Repository(object):
 
         return (position_data, grand_total)
 
+    def get_summary_pnl(self):
+        """Returns all the summary pnl from the repository."""
+        summaries = self.svc.query_entities(self.TABLES["summarypnl"])
+        return summaries
 

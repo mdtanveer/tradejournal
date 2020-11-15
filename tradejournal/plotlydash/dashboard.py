@@ -7,6 +7,8 @@ import dash_html_components as html
 import dash_core_components as dcc
 from .data import create_dataframe
 from .layout import html_layout
+from ..models import azuretablestorage
+import plotly.graph_objs as go
 
 
 def create_dashboard(server):
@@ -14,10 +16,6 @@ def create_dashboard(server):
     dash_app = dash.Dash(
         server=server,
         routes_pathname_prefix='/dashboard/',
-        external_stylesheets=[
-            '/static/dist/css/styles.css',
-            'https://fonts.googleapis.com/css?family=Lato'
-        ]
     )
 
     # Load DataFrame
@@ -31,20 +29,15 @@ def create_dashboard(server):
         children=[dcc.Graph(
             id='histogram-graph',
             figure={
-                'data': [{
-                    'x': df['complaint_type'],
-                    'text': df['complaint_type'],
-                    'customdata': df['key'],
-                    'name': '311 Calls by region.',
-                    'type': 'histogram'
-                }],
+                'data': [go.Bar(
+                    x = df['PartitionKey'],
+                    y = df['NetRealizedPnL'],
+                )],
                 'layout': {
-                    'title': 'NYC 311 Calls category.',
-                    'height': 500,
-                    'padding': 150
+                    'title': 'Monthly Profit/Loss table',
                 }
             }),
-            create_data_table(df)
+            create_data_table(df[["PartitionKey", "NetRealizedPnL", "UnrealizedPnL"]])
         ],
         id='dash-container'
     )

@@ -34,6 +34,9 @@
     <Compile Include="tradejournal\oauth.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tradejournal\plotlydash\dashboard.py" />
+    <Compile Include="tradejournal\plotlydash\data.py" />
+    <Compile Include="tradejournal\plotlydash\layout.py" />
     <Compile Include="tradejournal\__init__.py" />
     <Compile Include="tradejournal\settings.py" />
     <Compile Include="tradejournal\views.py" />
@@ -44,6 +47,8 @@
   <ItemGroup>
     <Folder Include="tradejournal\" />
     <Folder Include="tradejournal\models\" />
+    <Folder Include="tradejournal\plotlydash\" />
+    <Folder Include="tradejournal\plotlydash\__pycache__\" />
     <Folder Include="tradejournal\static\" />
     <Folder Include="tradejournal\static\content\" />
     <Folder Include="tradejournal\static\fonts\" />
@@ -54,6 +59,9 @@
     <Content Include="requirements.txt" />
     <None Include="trade-journal - Web Deploy.pubxml" />
     <Content Include="tradejournal\models\samples.json" />
+    <Content Include="tradejournal\plotlydash\__pycache__\dashboard.cpython-38.pyc" />
+    <Content Include="tradejournal\plotlydash\__pycache__\data.cpython-38.pyc" />
+    <Content Include="tradejournal\plotlydash\__pycache__\layout.cpython-38.pyc" />
     <Content Include="tradejournal\static\content\bootstrap.css" />
     <Content Include="tradejournal\static\content\bootstrap.min.css" />
     <Content Include="tradejournal\static\content\site.css" />
