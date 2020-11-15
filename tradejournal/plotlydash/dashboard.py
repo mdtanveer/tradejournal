@@ -30,14 +30,14 @@ def create_dashboard(server):
             id='histogram-graph',
             figure={
                 'data': [go.Bar(
-                    x = df['PartitionKey'],
+                    x = df['RowKey'],
                     y = df['NetRealizedPnL'],
                 )],
                 'layout': {
                     'title': 'Monthly Profit/Loss table',
                 }
             }),
-            create_data_table(df[["PartitionKey", "NetRealizedPnL", "UnrealizedPnL"]])
+            create_data_table(df[["RowKey", "NetRealizedPnL", "UnrealizedPnL"]])
         ],
         id='dash-container'
     )
