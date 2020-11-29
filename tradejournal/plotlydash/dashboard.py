@@ -37,7 +37,7 @@ def layout_func():
     df_orig = create_dataframe()
     df_orig["FY"] = df_orig['RowKey'].apply(getFY)
     df = df_orig.tail(18)
-    df_yearly = df_orig.groupby(['FY']).sum().reset_index()
+    df_yearly = df_orig[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
 
     return  html.Div(
         children=[dcc.Graph(
@@ -66,7 +66,8 @@ def layout_func():
                 )],
                 'layout': {
                     'title': 'Yearly Profit/Loss table',
-                    'plot_bgcolor': '#f8f8f8'
+                    'plot_bgcolor': '#f8f8f8',
+                    'xaxis': {'type':'category'}
                 }
             }),
         ],
