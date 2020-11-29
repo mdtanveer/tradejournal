@@ -18,31 +18,49 @@ def create_dashboard(server):
         routes_pathname_prefix='/dashboard/',
     )
 
-    # Load DataFrame
-    df = create_dataframe()
-
     # Custom HTML layout
     dash_app.index_string = html_layout
 
     # Create Layout
-    dash_app.layout = html.Div(
+    dash_app.layout = layout_func
+    return dash_app.server
+
+def layout_func():
+    # Load DataFrame
+    df = create_dataframe()
+    df_yearly = df.groupby(['PartitionKey']).sum().reset_index()
+
+    return  html.Div(
         children=[dcc.Graph(
-            id='histogram-graph',
+            id='monthly-chart',
             figure={
                 'data': [go.Bar(
                     x = df['RowKey'],
                     y = df['NetRealizedPnL'],
+                    text=df['NetRealizedPnL'].apply(lambda x: "%0.2fL"%(x/100000.0)),
+                    textposition='auto',
                 )],
                 'layout': {
                     'title': 'Monthly Profit/Loss table',
                 }
             }),
-            create_data_table(df[["RowKey", "NetRealizedPnL", "UnrealizedPnL"]])
+            dcc.Graph(
+            id='yearly-chart',
+            figure={
+                'data': [go.Bar(
+                    x = df_yearly['PartitionKey'],
+                    y = df_yearly['NetRealizedPnL'],
+                    text=df_yearly['NetRealizedPnL'].apply(lambda x: "%0.2fL"%(x/100000.0)),
+                    textposition='auto',
+                    marker_color='lightsalmon'
+                )],
+                'layout': {
+                    'title': 'Yearly Profit/Loss table',
+                }
+            }),
         ],
         id='dash-container'
     )
-    return dash_app.server
-
 
 def create_data_table(df):
     """Create Dash datatable from Pandas DataFrame."""
