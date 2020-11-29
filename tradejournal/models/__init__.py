@@ -34,8 +34,8 @@ class JournalEntry(object):
         self.entry_target = entity.entry_target if 'entry_target' in entity.keys() else ''
         self.direction = entity.direction if 'direction' in entity.keys() else ''
         self.rating = entity.rating if 'rating' in entity.keys() else ''
-        self.strategy = entity.strategy if 'strategy' in entity.keys() and not not entity['strategy'] else 'tkcross'
-        self.timeframe = entity.timeframe if 'timeframe' in entity.keys() and not not entity['timeframe'] else '2h'
+        self.strategy = entity.strategy if 'strategy' in entity.keys() and not not entity['strategy'] else 'macdhdivergence'
+        self.timeframe = entity.timeframe if 'timeframe' in entity.keys() and not not entity['timeframe'] else '1d'
         self.is_idea = entity.is_idea if 'is_idea' in entity.keys() else ''
         self.tradingsymbol = entity.tradingsymbol if 'tradingsymbol' in entity.keys() and not not entity['tradingsymbol'] else ''
         self.position_changes = []
