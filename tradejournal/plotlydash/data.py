@@ -8,4 +8,4 @@ def create_dataframe():
     """Create Pandas DataFrame from local CSV."""
     summaries = repository.get_summary_pnl()
     df = pd.DataFrame(summaries)
-    return df.tail(18)
+    return df

@@ -25,10 +25,19 @@ def create_dashboard(server):
     dash_app.layout = layout_func
     return dash_app.server
 
+def getFY(datestr):
+    year, month, day = map(lambda x: int(x), datestr.split('-'))
+    if month <= 3:
+        return year - 1
+    else: 
+        return year
+
 def layout_func():
     # Load DataFrame
-    df = create_dataframe()
-    df_yearly = df.groupby(['PartitionKey']).sum().reset_index()
+    df_orig = create_dataframe()
+    df_orig["FY"] = df_orig['RowKey'].apply(getFY)
+    df = df_orig.tail(18)
+    df_yearly = df_orig.groupby(['FY']).sum().reset_index()
 
     return  html.Div(
         children=[dcc.Graph(
@@ -42,13 +51,14 @@ def layout_func():
                 )],
                 'layout': {
                     'title': 'Monthly Profit/Loss table',
+                    'plot_bgcolor': '#f8f8f8'
                 }
             }),
             dcc.Graph(
             id='yearly-chart',
             figure={
                 'data': [go.Bar(
-                    x = df_yearly['PartitionKey'],
+                    x = df_yearly['FY'],
                     y = df_yearly['NetRealizedPnL'],
                     text=df_yearly['NetRealizedPnL'].apply(lambda x: "%0.2fL"%(x/100000.0)),
                     textposition='auto',
@@ -56,6 +66,7 @@ def layout_func():
                 )],
                 'layout': {
                     'title': 'Yearly Profit/Loss table',
+                    'plot_bgcolor': '#f8f8f8'
                 }
             }),
         ],
