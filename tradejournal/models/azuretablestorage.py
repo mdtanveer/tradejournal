@@ -120,6 +120,16 @@ class Repository(object):
         journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)
         return journalentries
 
+    def get_journalentries_forview(self):
+        """Returns all the journalentries from the repository."""
+        journalentries = self.get_journalentries()
+        comments = self.get_all_comments_for_count()
+        charts = self.get_all_charts_for_count()
+        for entry in journalentries:
+            entry.comment_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, comments)))
+            entry.chart_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, charts)))
+        return journalentries
+    
     def get_journalentry(self, journalentry_key):
         """Returns a journalentry from the repository."""
         try:
@@ -219,12 +229,20 @@ class Repository(object):
         comments = [_comment_from_entity(entity) for entity in comment_entities]
         return comments
 
-    def get_all_comments(self):
+    def get_all_comments(self, forCount=False):
         """Returns all the comments from the repository."""
-        comment_entities = self.svc.query_entities(self.TABLES["comments"])
+        if not forCount:
+            comment_entities = self.svc.query_entities(self.TABLES["comments"])
+        else:
+            comment_entities = self.svc.query_entities(self.TABLES["comments"], select="PartitionKey")
         comments = [_comment_from_entity(entity) for entity in comment_entities]
         comments.sort(key = lambda x: x.add_time, reverse=True)
         return comments
+
+    def get_all_comments_for_count(self):
+        """Returns all the comments from the repository for counting"""
+        comment_entities = self.svc.query_entities(self.TABLES["comments"], select="PartitionKey")
+        return comment_entities
 
     def get_chart_data_from_yahoo(self, symbol, timeframe):
         #For intraday data is always returned in 1h timeframe
@@ -280,6 +298,17 @@ class Repository(object):
         chart_entities = self.svc.query_entities(self.TABLES["charts"], "PartitionKey eq '%s'"%key)
         charts = [_chart_from_entity(entity) for entity in chart_entities]
         return charts
+
+    def get_all_charts(self):
+        """Returns all the comments from the repository."""
+        chart_entities = self.svc.query_entities(self.TABLES["charts"])
+        charts = [_chart_from_entity(entity) for entity in chart_entities]
+        return charts
+
+    def get_all_charts_for_count(self):
+        """Returns all the comments from the repository for counting"""
+        chart_entities = self.svc.query_entities(self.TABLES["charts"], select="PartitionKey")
+        return chart_entities
 
     def resample_data(self, data, target_tf):
         df = pd.read_csv(StringIO(data.decode('ascii')))

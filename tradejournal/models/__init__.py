@@ -39,6 +39,8 @@ class JournalEntry(object):
         self.is_idea = entity.is_idea if 'is_idea' in entity.keys() else ''
         self.tradingsymbol = entity.tradingsymbol if 'tradingsymbol' in entity.keys() and not not entity['tradingsymbol'] else ''
         self.position_changes = []
+        self.comment_count = 0
+        self.chart_count = 0
     
     def isidea(self):
         return self.is_idea == 'Y'
@@ -79,6 +81,12 @@ class JournalEntry(object):
             return 'stochastic'
         else:
             return 'macd'
+
+    def get_comment_count(self):
+        return self.comment_count
+    
+    def get_chart_count(self):
+        return self.chart_count
 
 
 class JournalEntryNotFound(Exception):

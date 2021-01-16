@@ -31,7 +31,7 @@ class ChartForm(Form):
 @login_required
 def home():
     """Renders the home page, with a list of all journalentrys."""
-    journalentries=repository.get_journalentries()
+    journalentries=repository.get_journalentries_forview()
     page, per_page, offset = get_page_args()
     try:
         subpage = request.args['subpage']
@@ -53,7 +53,7 @@ def home():
         year=datetime.now().year,
         journalentries=entries[offset:offset+per_page],
         pagination=pagination,
-        subpage=subpage
+        subpage=subpage,
     ))
     response.set_cookie('subpage', subpage)
     response.set_cookie('page', str(page))

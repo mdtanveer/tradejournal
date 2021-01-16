@@ -29,8 +29,11 @@
                     <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.symbol}}</a><br />
                 </h5>
                 <span class="text-muted">
+                    <a href="/journalentry/{{journalentry.key}}/comments"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
+                    <a href="/journalentry/{{journalentry.key}}/charts"><i>{{ journalentry.get_chart_count()}} charts</i></a> <br/>
                     <i>entered {{journalentry.get_entry_time()}}</i><br />
-                    <i>{{ journalentry.direction.lower()}},{{ journalentry.strategy.lower()}},{{ journalentry.timeframe.lower()}}</i>
+                    <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i><br/>
+                    <i>{{ journalentry.tradingsymbol}}</i>
                 </span>
             </td>
         </tr>
