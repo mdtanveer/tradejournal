@@ -7,39 +7,39 @@
     <li id="idea" class="{{"active" if subpage=="idea" else ""}}"><a href="home?subpage=idea">Ideas</a></li>
 </ul>
 {% if journalentries %}
-<table class="table table-hover">
-    <tbody>
         {% for journalentry in journalentries %}
-        <tr>
-            <td>
-                <h5>
-                    {%if not not journalentry.is_idea%}
-                    <span class="glyphicon glyphicon-fire text-warning"></span>
-                    {%else%}
-                    {%if journalentry.is_open()%}
-                    <span class="glyphicon glyphicon-play-circle text-primary"></span>
-                    {%else%}
-                    {%if journalentry.is_profitable()%}
-                    <span class="glyphicon glyphicon-circle-arrow-up text-success"></span>
-                    {%else%}
-                    <span class="glyphicon glyphicon-circle-arrow-down text-danger"></span>
-                    {%endif%}
-                    {%endif%}
-                    {%endif%}
-                    <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.symbol}}</a><br />
-                </h5>
-                <span class="text-muted">
-                    <a href="/journalentry/{{journalentry.key}}/comments"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
-                    <a href="/journalentry/{{journalentry.key}}/charts"><i>{{ journalentry.get_chart_count()}} charts</i></a> <br/>
-                    <i>entered {{journalentry.get_entry_time()}}</i><br />
-                    <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i><br/>
-                    <i>{{ journalentry.tradingsymbol}}</i>
-                </span>
-            </td>
-        </tr>
+                <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h5>
+                                {%if not not journalentry.is_idea%}
+                                <span class="glyphicon glyphicon-fire text-warning"></span>
+                                {%else%}
+                                {%if journalentry.is_open()%}
+                                <span class="glyphicon glyphicon-play-circle text-primary"></span>
+                                {%else%}
+                                {%if journalentry.is_profitable()%}
+                                <span class="glyphicon glyphicon-circle-arrow-up text-success"></span>
+                                {%else%}
+                                <span class="glyphicon glyphicon-circle-arrow-down text-danger"></span>
+                                {%endif%}
+                                {%endif%}
+                                {%endif%}
+                                <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.symbol}}</a>
+                            </h5>
+                        </div>
+                    <div class="panel-body">
+                        <span class="text-muted panel-text">
+                            <i>entered {{journalentry.get_entry_time()}}</i><br />
+                            <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i><br/>
+                            <small> <i>{{ journalentry.tradingsymbol}}</i><br/> </small>
+                        </span>
+                    </div>
+                    <div class="panel-footer">
+                        <a href="/journalentry/{{journalentry.key}}/comments"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
+                        <a href="/journalentry/{{journalentry.key}}/charts"><i>{{ journalentry.get_chart_count()}} charts</i></a> <br/>
+                    </div>
+                </div>
         {% endfor %}
-    </tbody>
-</table>
 {{ pagination.links }}
 {% else %}
 <p>No journalentries available.</p>
