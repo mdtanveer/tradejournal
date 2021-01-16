@@ -25,30 +25,75 @@ def create_dashboard(server):
     dash_app.layout = layout_func
     return dash_app.server
 
-def getFY(datestr):
-    year, month, day = map(lambda x: int(x), datestr.split('-'))
+def getFY(date):
+    year, month = date.year, date.month
     if month <= 3:
         return year - 1
     else: 
         return year
 
+def toLakhs(amount):
+    return  "%0.2fL"%(amount/100000.0)
+
 def layout_func():
     # Load DataFrame
     df_orig = create_dataframe()
     df_orig["FY"] = df_orig['RowKey'].apply(getFY)
-    df = df_orig.tail(18)
-    df_yearly = df_orig[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
+    #df_orig["NetRealizedPnL"] = df_orig['NetRealizedPnL'].apply(lambda x: "%0.2fL"%(x/100000.0))
+    df = df_orig
+    
+    df_nfo = df[df['PartitionKey']=='NFO']
+    df_mcx = df[df['PartitionKey']=='MCX']
+    df_tot = df.groupby('RowKey', as_index=False).agg({'FY':'first', 'NetRealizedPnL':'sum'})
+
+    df_nfo_yearly = df_nfo[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
+    df_mcx_yearly = df_mcx[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
+    df_tot_yearly = df_tot[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
 
     return  html.Div(
         children=[dcc.Graph(
+            id='line-chart',
+            figure={
+                'data': [
+                    go.Line(
+                        name="Total",
+                        x = df_tot['RowKey'],
+                        y = df_tot['NetRealizedPnL'].cumsum(),
+                        text=df_tot['NetRealizedPnL'].cumsum().apply(toLakhs),
+                        textposition='auto',
+                    )
+                    ],
+                'layout': {
+                    'title': 'Cumulative profit/loss',
+                    'plot_bgcolor': '#f8f8f8'
+                }
+            }),
+            dcc.Graph(
             id='monthly-chart',
             figure={
-                'data': [go.Bar(
-                    x = df['RowKey'],
-                    y = df['NetRealizedPnL'],
-                    text=df['NetRealizedPnL'].apply(lambda x: "%0.2fL"%(x/100000.0)),
-                    textposition='auto',
-                )],
+                'data': [
+                    go.Bar(
+                        name="MCX",
+                        x = df_mcx['RowKey'],
+                        y = df_mcx['NetRealizedPnL'],
+                        text=df_mcx['NetRealizedPnL'].apply(toLakhs),
+                        textposition='auto',
+                    ),
+                    go.Bar(
+                        name="NFO",
+                        x = df_nfo['RowKey'],
+                        y = df_nfo['NetRealizedPnL'],
+                        text=df_nfo['NetRealizedPnL'].apply(toLakhs),
+                        textposition='auto',
+                    ),
+                    go.Bar(
+                        name="Total",
+                        x = df_tot['RowKey'],
+                        y = df_tot['NetRealizedPnL'],
+                        text=df_tot['NetRealizedPnL'].apply(toLakhs),
+                        textposition='auto',
+                    ),
+                    ],
                 'layout': {
                     'title': 'Monthly Profit/Loss table',
                     'plot_bgcolor': '#f8f8f8'
@@ -57,13 +102,29 @@ def layout_func():
             dcc.Graph(
             id='yearly-chart',
             figure={
-                'data': [go.Bar(
-                    x = df_yearly['FY'],
-                    y = df_yearly['NetRealizedPnL'],
-                    text=df_yearly['NetRealizedPnL'].apply(lambda x: "%0.2fL"%(x/100000.0)),
-                    textposition='auto',
-                    marker_color='lightsalmon'
-                )],
+                'data': [
+                    go.Bar(
+                        name="MCX",
+                        x = df_mcx_yearly['FY'],
+                        y = df_mcx_yearly['NetRealizedPnL'],
+                        text=df_mcx_yearly['NetRealizedPnL'].apply(toLakhs),
+                        textposition='auto',
+                        ),
+                    go.Bar(
+                        name="NFO",
+                        x = df_nfo_yearly['FY'],
+                        y = df_nfo_yearly['NetRealizedPnL'],
+                        text=df_nfo_yearly['NetRealizedPnL'].apply(toLakhs),
+                        textposition='auto',
+                        ),
+                    go.Bar(
+                        name="Total",
+                        x = df_tot_yearly['FY'],
+                        y = df_tot_yearly['NetRealizedPnL'],
+                        text=df_tot_yearly['NetRealizedPnL'].apply(toLakhs),
+                        textposition='auto',
+                        ),
+                    ],
                 'layout': {
                     'title': 'Yearly Profit/Loss table',
                     'plot_bgcolor': '#f8f8f8',
