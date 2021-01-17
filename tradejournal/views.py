@@ -37,8 +37,10 @@ def home():
         subpage = request.args['subpage']
     except:
         subpage = request.cookies.get('subpage', 'open')
-    if not 'page' in request.args.keys():
-        page = int(request.cookies.get('page', "1"))
+
+    if subpage != request.cookies.get('subpage', 'open'):
+        page = int(request.cookies.get('page_'+subpage, "1"))
+        offset = per_page*(page-1)
 
     if subpage == 'idea':
         entries = list(filter(lambda x: x.isidea(), journalentries))
@@ -56,7 +58,7 @@ def home():
         subpage=subpage,
     ))
     response.set_cookie('subpage', subpage)
-    response.set_cookie('page', str(page))
+    response.set_cookie('page_'+subpage, str(page))
     return response
 
 @app.route('/js/<path:path>')
