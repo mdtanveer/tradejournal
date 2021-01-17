@@ -22,6 +22,7 @@ pd.set_option("display.precision", 2)
 
 KEY_ENTRY_TIME = 'entry_time'
 KEY_EXIT_TIME = 'exit_time'
+ROLLING_AGE=60
 
 def _partition_and_row_to_key(partition, row):
     """Builds a journalentry/choice key out of azure table partition and row keys."""
@@ -116,7 +117,7 @@ class Repository(object):
 
     def get_journalentries(self):
         """Returns all the journalentries from the repository."""
-        journalentries = self.get_journalentries_helper(_journalentry_from_entity, 60)
+        journalentries = self.get_journalentries_helper(_journalentry_from_entity, ROLLING_AGE)
         journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)
         return journalentries
 
@@ -241,7 +242,9 @@ class Repository(object):
 
     def get_all_comments_for_count(self):
         """Returns all the comments from the repository for counting"""
-        comment_entities = self.svc.query_entities(self.TABLES["comments"], select="PartitionKey")
+        lower_timestamp = pytz.UTC.localize(datetime.utcnow()) - timedelta(days=ROLLING_AGE)
+        query = "RowKey ge '%s'"%(str(lower_timestamp.timestamp()))
+        comment_entities = self.svc.query_entities(self.TABLES["comments"], query, select="PartitionKey")
         return comment_entities
 
     def get_chart_data_from_yahoo(self, symbol, timeframe):
@@ -307,7 +310,9 @@ class Repository(object):
 
     def get_all_charts_for_count(self):
         """Returns all the comments from the repository for counting"""
-        chart_entities = self.svc.query_entities(self.TABLES["charts"], select="PartitionKey")
+        lower_timestamp = pytz.UTC.localize(datetime.utcnow()) - timedelta(days=ROLLING_AGE)
+        query = "RowKey ge '%s'"%(str(lower_timestamp.timestamp()))
+        chart_entities = self.svc.query_entities(self.TABLES["charts"], query, select="PartitionKey")
         return chart_entities
 
     def resample_data(self, data, target_tf):
