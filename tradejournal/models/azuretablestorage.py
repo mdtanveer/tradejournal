@@ -22,7 +22,9 @@ pd.set_option("display.precision", 2)
 
 KEY_ENTRY_TIME = 'entry_time'
 KEY_EXIT_TIME = 'exit_time'
-ROLLING_AGE=60
+ROLLING_AGE=180
+RANGES = {'1h': '6mo', '1d':'2y', '1wk': '5y'}
+FWD_BUFFER = {'1h': 2, '2h': 2, '1d':5, '1wk': 15}
 
 def _partition_and_row_to_key(partition, row):
     """Builds a journalentry/choice key out of azure table partition and row keys."""
@@ -247,24 +249,33 @@ class Repository(object):
         comment_entities = self.svc.query_entities(self.TABLES["comments"], query, select="PartitionKey")
         return comment_entities
 
-    def get_chart_data_from_yahoo(self, symbol, timeframe):
+    def get_chart_data_from_yahoo(self, symbol, timeframe, context_date=None):
         #For intraday data is always returned in 1h timeframe
         if not timeframe or timeframe == '2h':
             timeframe = '1h'
-        RANGES = {'1h': '6mo', '1d':'2y', '1wk': '5y'}
         preferred_exc = '.BO' if timeframe == '1h' else '.NS'
-        df = yahooquotes.get_quote_data(symbol, RANGES[timeframe], timeframe, preferred_exc)
+        df = yahooquotes.get_quote_data(symbol, RANGES[timeframe], timeframe,
+                preferred_exc, context_date)
         return df
 
     def add_chart(self, key, entity, timeframe):
         """Add chart"""
         try:
             partition, row = _key_to_partition_and_row(key)
+
+            journalentry_entity = self.svc.get_entity(self.TABLES['journalentry'], partition, row)
+            journalentry = _journalentry_from_entity(journalentry_entity)
+            context_date = None
+            if journalentry.has_valid_exit_time():
+                context_date = journalentry.exit_time + timedelta(days=FWD_BUFFER[timeframe])
+            elif journalentry.has_valid_entry_time():
+                context_date = journalentry.exit_time + timedelta(days=FWD_BUFFER[timeframe])
+
             add_time = str(datetime.now().timestamp())
             local_file_name = "chart_" + str(uuid.uuid4()) + ".csv"
             entity = dict(entity)
             entity['data'] = local_file_name
-            yd = self.get_chart_data_from_yahoo(partition, timeframe)
+            yd = self.get_chart_data_from_yahoo(partition, timeframe, context_date)
             yd.to_csv(local_file_name, index=False)
             # Create a blob client using the local file name as the name for the blob
             blob_client = self.blob_service_client.get_blob_client(container=self.container_name, blob=local_file_name)

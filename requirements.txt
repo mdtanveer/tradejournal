@@ -11,3 +11,4 @@ azure-cosmosdb-table
 dash
 azure-keyvault-secrets
 azure-identity
+yfinance
