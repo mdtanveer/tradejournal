@@ -241,8 +241,10 @@ def charts(key):
     else:
         indicator = request.args.get('ind', journalentry.get_indicator())
         overlay_indicator = request.args.get('oind', 'ichimoku')
-
-        form = ChartForm()
+        form = CommentForm()
+        comments=repository.get_comments(key)
+        page, per_page, offset = get_page_args()
+        pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
         return render_template(
             'chart.html',
             charts=jsonpickle.encode(repository.get_charts(key), unpicklable=False),
@@ -253,6 +255,8 @@ def charts(key):
             indicator=indicator,
             overlay_indicator=overlay_indicator,
             trades = repository.get_trades(key),
+            comments=comments[offset:offset+per_page],
+            pagination = pagination
         )
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])

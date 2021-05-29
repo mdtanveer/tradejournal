@@ -264,7 +264,6 @@ class TJChart
                     return;
             }
 
-            document.getElementById('title').innerText = this.charts[i].title + " (" + (i+1) + " of " + this.charts.length + ")";
             document.getElementById('main').hidden = false;
             
             var selfInstance = this;
@@ -288,8 +287,16 @@ class TJChart
                 }
                 selfInstance.draw(data);
                 if(selfInstance.symbol == null)
-                    document.getElementById('charttitle').innerHTML = selfInstance.charts[selfInstance.currentChartIndex].data + ' (' + selfInstance.timeFrame + ')';
+                {
+                    document.getElementById('charttitle').innerHTML = selfInstance.charts[i].data + ' (' + selfInstance.timeFrame + ')';
+                }
+                else
+                {
+                    document.getElementById('charttitle').innerHTML = selfInstance.charts[i].title + " (" + (i+1) + " of " + selfInstance.charts.length + ") "
+                        + selfInstance.symbol + ' (' + selfInstance.timeFrame + ')';
+                }
             }
+
             if (this.charts[i].raw_data == null) {
                 var temp = this.charts[i].relativeUrl.split('?');
                 var params = new URLSearchParams(temp[1]);
@@ -343,7 +350,7 @@ class TJChart
 
         DeleteCurrentChart() {
             $.ajax({
-                url: 'this.charts/' + this.charts[this.currentChartIndex].key + '/delete',
+                url: 'charts/' + this.charts[this.currentChartIndex].key + '/delete',
                 type: 'DELETE',
                 success: function(result) {
                     window.location.reload();
