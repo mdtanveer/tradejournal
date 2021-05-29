@@ -366,7 +366,7 @@ def positions():
         grand_total = grand_total
     )
 
-@app.route('/journalentry/<year>/<month>/<serial>', methods=['GET'])
+@app.route('/journalentry/monthlyreview/<year>/<month>/<serial>', methods=['GET'])
 @login_required
 def monthly_review(year, month, serial):
     """Renders the monthly review page."""
