@@ -1,0 +1,53 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container">
+        <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
+        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderPreviousChart();">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();">
+                    <span class="glyphicon glyphicon-barcode"></span>
+                </button>
+            </div>
+            <div>
+                <center>
+                    <h5 id="title"></h5>
+                </center>
+            </div>
+        </div>
+        <div id="main">
+            <div id="chart"></div>
+        </div>
+        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChart('2h');">I</button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChart('1d');">D</button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChart('1wk');">W</button>
+            </div>
+        </div>
+    </div>
+        <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
+        <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
+        <script type="text/javascript" src="/static/scripts/tradejournalchart.js"></script>
+        <script type="text/javascript">
+            var charts = JSON.parse('{{ charts | safe}}');
+            const trades = [];
+            var secondaryIndicator = "{{ indicator }}";
+            var primaryIndicator = "{{overlay_indicator if not not overlay_indicator else 'ichimoku'}}";
+
+            var g_chartInstance = new TJChart(null, charts, trades, null, primaryIndicator, secondaryIndicator);
+            if (charts.length > 0) {
+                g_chartInstance.RenderChart();
+            }
+            else {
+                document.getElementById('title').innerText = "No charts available";
+                document.getElementById('main').hidden = true;
+            }
+        </script>
+{% endblock %}

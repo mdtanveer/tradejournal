@@ -24,7 +24,6 @@
         <div id="main">
             <div id="chart"></div>
         </div>
-        {%if journalentry%}
         <form class="input-group" method="post" role="form">
             <input type="text" class="form-control" id="title" name="title">
             <div class="input-group-btn">
@@ -51,15 +50,6 @@
                 <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart(g_timeFrame, 'latest_{{journalentry.symbol}}');">L</button>
             </div>
         </div>
-        {%else%}
-        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group mr-2" role="group" aria-label="First group">
-                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart('2h');">I</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart('1d');">D</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart('1wk');">W</button>
-            </div>
-        </div>
-        {%endif%}
     </div>
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
@@ -101,7 +91,10 @@
             {%else%}
                 const trades = [];
             {% endif %}
-            var g_chartInstance = new TJChart("{{journalentry.symbol}}", charts, trades, "{{journalentry.timeframe}}", "ichimoku", "macd");
+            var secondaryIndicator = "{{ indicator }}";
+            var primaryIndicator = "{{overlay_indicator if not not overlay_indicator else 'ichimoku'}}";
+
+            var g_chartInstance = new TJChart("{{journalentry.symbol}}", charts, trades, "{{journalentry.timeframe}}", primaryIndicator, secondaryIndicator);
             if (charts.length > 0) {
                 g_chartInstance.RenderChart();
             }

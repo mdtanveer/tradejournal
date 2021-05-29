@@ -279,7 +279,7 @@ def quick_charts():
 
         charts = [{'key':'', 'title': symbol, 'data': symbol, 'relativeUrl':'charts/%s?tf=%s'%(symbol, tf)} for symbol in symbols]
         return render_template(
-            'chart.html',
+            'publicchart.html',
             charts=jsonpickle.encode(charts, unpicklable=False),
             error_message=error_message,
             journalentry=None,

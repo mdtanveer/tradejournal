@@ -7,7 +7,7 @@ class TJChart
         this.resampleType = 'original';
         this.secondaryIndicator = secondaryIndicator;
         this.primaryIndicator = primaryIndicator;
-        this.currentChartIndex = 0;
+        this.currentChartIndex = charts.length - 1;
 
         this.dataWindowSize = 250;
         var windowW = Math.round(window.innerWidth*0.81);
@@ -182,7 +182,7 @@ class TJChart
 
         this.svg.append("g")
                 .attr("class", "y axis")
-            .append("text")
+                .append("text")
                 .attr('id', 'charttitle')
                 .attr("transform", "rotate(-90)")
                 .attr("y", 6)
@@ -265,6 +265,7 @@ class TJChart
 
             document.getElementById('title').innerText = this.charts[i].title + " (" + (i+1) + " of " + this.charts.length + ")";
             document.getElementById('main').hidden = false;
+            
             var selfInstance = this;
             function D3_DataCallback(error, data) {
                 selfInstance.charts[i].raw_data = data;
@@ -285,11 +286,14 @@ class TJChart
                     data = data.slice(data.length - selfInstance.dataWindowSize, data.length)
                 }
                 selfInstance.draw(data);
+                if(selfInstance.symbol == null)
+                    document.getElementById('charttitle').innerHTML = selfInstance.charts[selfInstance.currentChartIndex].data + ' (' + selfInstance.timeFrame + ')';
             }
             if (this.charts[i].raw_data == null) {
                 var temp = this.charts[i].relativeUrl.split('?');
                 var params = new URLSearchParams(temp[1]);
-                params.set('tf', this.timeFrame);
+                if(this.timeFrame)
+                    params.set('tf', this.timeFrame);
                 if (this.resampleType) {
                     params.set('type', this.resampleType);
                 }
@@ -300,7 +304,8 @@ class TJChart
             }
         }
 
-        RenderCurrentChart() {
+        RenderCurrentChart(timeFrame) {
+            this.timeFrame = timeFrame;
             this.charts[this.currentChartIndex].raw_data = null;
             this.RenderChart();
         }
