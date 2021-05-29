@@ -1,6 +1,6 @@
 class TJChart
 {
-    Setup(symbol, charts, trades, timeframe, primaryIndicator, secondaryIndicator)
+    constructor(symbol, charts, trades, timeframe, primaryIndicator, secondaryIndicator)
     {
         this.charts = charts;
         this.timeFrame = timeframe;
@@ -101,10 +101,10 @@ class TJChart
         defs.selectAll("indicatorClip").data([0])
             .enter()
                 .append("clipPath")
-                .attr("id", function(d, i) { return "indicatorClip-" + e })
+                .attr("id", function(d, i) { return "indicatorClip-" + i })
             .append("rect")
                 .attr("x", 0)
-                .attr("y", function(d,  { return indicatorTop(i); }))
+                .attr("y", function(d, i)  { return indicatorTop(i); })
                 .attr("width", dim.plot.width)
                 .attr("height", dim.indicator.height);
 
@@ -257,7 +257,7 @@ class TJChart
 
 
         RenderChart() {
-            i = this.currentChartIndex;
+            var i = this.currentChartIndex;
             if (i >= this.charts.length) 
             {
                     return;

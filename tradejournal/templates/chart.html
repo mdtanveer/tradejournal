@@ -101,7 +101,7 @@
             {%else%}
                 const trades = [];
             {% endif %}
-            g_chartInstance = new TJChart({{journalentry.symbol}}, charts, trades, {{journalentry.timeframe}}, "ichimoku", "macd")
+            var g_chartInstance = new TJChart("{{journalentry.symbol}}", charts, trades, "{{journalentry.timeframe}}", "ichimoku", "macd");
             if (charts.length > 0) {
                 g_chartInstance.RenderChart();
             }
@@ -110,4 +110,4 @@
                 document.getElementById('main').hidden = true;
             }
         </script>
-        {% endblock %}
+{% endblock %}
