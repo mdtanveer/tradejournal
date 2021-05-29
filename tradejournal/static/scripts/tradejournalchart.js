@@ -1,7 +1,14 @@
-function TJChart()
+class TJChart
 {
-    funtion Setup(symbol, charts, trades, timeframe)
+    Setup(symbol, charts, trades, timeframe, primaryIndicator, secondaryIndicator)
     {
+        this.charts = charts;
+        this.timeFrame = timeframe;
+        this.resampleType = 'original';
+        this.secondaryIndicator = secondaryIndicator;
+        this.primaryIndicator = primaryIndicator;
+        this.currentChartIndex = 0;
+
         var dataWindowSize = 250;
         var windowW = Math.round(window.innerWidth*0.81);
         var windowH = Math.round(window.innerHeight*0.70);
@@ -27,7 +34,6 @@ function TJChart()
 
         var indicatorTop = d3.scaleLinear()
                 .range([dim.indicator.top, dim.indicator.bottom]);
-        var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
         var x = techan.scale.financetime()
                 .range([0, dim.plot.width]);
@@ -55,10 +61,8 @@ function TJChart()
             var heikinashiIndicator = techan.indicator.heikinashi();
         }
 
-        var g_indicator = "{{ indicator }}";
-        var g_primaryIndicator = "{{overlay_indicator if not not overlay_indicator else 'ichimoku'}}";
 
-        if (g_primaryIndicator == "ichimoku") {
+        if (this.primaryIndicator == "ichimoku") {
             var ichimoku = techan.plot.ichimoku()
                 .xScale(x)
                 .yScale(y);
@@ -97,10 +101,10 @@ function TJChart()
         defs.selectAll("indicatorClip").data([0])
             .enter()
                 .append("clipPath")
-                .attr("id", function(d, i) { return "indicatorClip-" + i; })
+                .attr("id", function(d, i) { return "indicatorClip-" + e })
             .append("rect")
                 .attr("x", 0)
-                .attr("y", function(d, i) { return indicatorTop(i); })
+                .attr("y", function(d,  { return indicatorTop(i); }))
                 .attr("width", dim.plot.width)
                 .attr("height", dim.indicator.height);
 
@@ -108,7 +112,7 @@ function TJChart()
         var indicatorScale = d3.scaleLinear()
                 .range([indicatorTop(0)+dim.indicator.height, indicatorTop(0)]);
 
-                if (g_indicator == "stochastic") {
+                if (this.secondaryIndicator == "stochastic") {
                     var stochastic = techan.plot.stochastic()
                         .xScale(x)
                         .yScale(indicatorScale);
@@ -146,7 +150,7 @@ function TJChart()
                 .attr("class", "indicator-plot")
                 .attr("clip-path", function(d, i) { return "url(#indicatorClip-" + i + ")"; });
 
-        if (g_primaryIndicator == "ichimoku") {
+        if (this.primaryIndicator == "ichimoku") {
             var ichimokuIndicator = techan.indicator.ichimoku();
             // Don't show where indicators don't have data
             var indicatorPreRoll = ichimokuIndicator.kijunSen() + ichimokuIndicator.senkouSpanB();
@@ -165,7 +169,7 @@ function TJChart()
             .orient(function(d) { return d.type.startsWith("buy") ? "up" : "down"; })
 
         svg.append("g")
-            .attr("class", g_primaryIndicator)
+            .attr("class", this.primaryIndicator)
             .attr("clip-path", "url(#ohlcClip)");
 
         svg.append("g")
@@ -183,10 +187,8 @@ function TJChart()
                 .attr("transform", "rotate(-90)")
                 .attr("y", 6)
                 .attr("dy", ".71em")
-                    .style("text-anchor", "end")
-                {%if journalentry %}
-            .text("{{journalentry.symbol}}({{timeframe}})");
-                {%endif%}
+                .style("text-anchor", "end")
+                .text(symbol + '(' + timeframe + ')');
         svg.append("g")
                 .attr("class", "volume")
                 .attr("clip-path", "url(#ohlcClip)");
@@ -196,7 +198,7 @@ function TJChart()
                     .attr("clip-path", "url(#ohlcClip)");
     }
 
-    function draw(data) {
+    draw(data) {
         if (plotHeikenAshi)
         {
             candlestickData = heikinashiIndicator(data);
@@ -206,7 +208,7 @@ function TJChart()
             candlestickData = data;
         }
 
-        if (g_primaryIndicator == "ichimoku") {
+        if (this.primaryIndicator == "ichimoku") {
             var ichimokuData = ichimokuIndicator(data);
             x.domain(data.map(ichimokuIndicator.accessor().d));
             // Calculate the y domain for visible data points (ensure to include Kijun Sen additional data offset)
@@ -231,7 +233,7 @@ function TJChart()
         svg.selectAll("g.y.axis").call(yAxis);
         svg.selectAll("g.volume").datum(data).call(volume);
 
-        if (g_indicator == "stochastic") {
+        if (this.secondaryIndicator == "stochastic") {
             var stochasticData = stochasticIndicator(data);
             indicatorScale.domain(techan.scale.plot.stochastic(stochasticData).domain());
             svg.selectAll("g.indicator .indicator-plot").datum(stochasticData).call(stochastic);
@@ -253,24 +255,20 @@ function TJChart()
         svg.selectAll("g.tradearrow").datum(chartTrades).call(tradearrow);
     }
 
-            var charts = JSON.parse('{{ charts | safe}}');
-            var g_timeFrame = '{{ timeframe }}';
-            var g_resampleType = 'original';
 
-        function RenderChart(i, timeFrame, resampleType=null) {
-            if (i >= charts.length) 
+        RenderChart() {
+            i = this.currentChartIndex;
+            if (i >= this.charts.length) 
             {
                     return;
             }
 
-            document.getElementById('title').innerText = charts[i].title + " (" + (i+1) + " of " + charts.length + ")";
-            {%if not journalentry%}
-            document.getElementById('charttitle').innerHTML = charts[currentChartIndex].data + ' (' + timeFrame[1].toUpperCase() + ')';
-            {%endif%}
+            document.getElementById('title').innerText = this.charts[i].title + " (" + (i+1) + " of " + this.charts.length + ")";
             document.getElementById('main').hidden = false;
             function D3_DataCallback(error, data) {
-                charts[i].raw_data = data;
+                this.charts[i].raw_data = data;
                 data = data.map(function (d) {
+                    var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
                     // Open, high, low, close generally not required, is being used here to demonstrate colored volume
                     // bars
                     return {
@@ -287,68 +285,56 @@ function TJChart()
                 }
                 draw(data);
             }
-            if (charts[i].raw_data == null) {
-                var temp = charts[i].relativeUrl.split('?');
+            if (this.charts[i].raw_data == null) {
+                var temp = this.charts[i].relativeUrl.split('?');
                 params = new URLSearchParams(temp[1]);
-                params.set('tf', timeFrame);
+                params.set('tf', this.timeFrame);
                 if (resampleType) {
                     params.set('type', resampleType);
                 }
                 relativeUrl = temp[0] + '?' + params;
                 d3.csv(relativeUrl, D3_DataCallback)
             } else {
-                D3_DataCallback(null, charts[i].raw_data);
+                D3_DataCallback(null, this.charts[i].raw_data);
             }
         }
 
-        var currentChartIndex = 0;
-        if (charts.length > 0) {
-                currentChartIndex = charts.length - 1;
-            RenderChart(currentChartIndex, g_timeFrame, g_resampleType);
+        RenderCurrentChart() {
+            this.charts[this.currentChartIndex].raw_data = null;
+            RenderChart(this.currentChartIndex, this.timeFrame, resampleType);
         }
-        else {
-            document.getElementById('title').innerText = "No charts available";
-            document.getElementById('main').hidden = true;
+
+        RenderNextChart() {
+            this.currentChartIndex++;
+            if (this.currentChartIndex >= this.charts.length)
+                this.currentChartIndex = 0;
+            if (this.charts.length > 0)
+                RenderChart(this.currentChartIndex, this.timeFrame, this.resampleType);
+        }
+
+        RenderPreviousChart() {
+            this.currentChartIndex--;
+            if (this.currentChartIndex < 0)
+                this.currentChartIndex = this.charts.length-1;
+            if (this.charts.length > 0)
+                RenderChart(this.currentChartIndex, this.timeFrame, this.resampleType);
             }
 
-        function RenderCurrentChart(timeFrame, resampleType=null) {
-            charts[currentChartIndex].raw_data = null;
-            RenderChart(currentChartIndex, timeFrame, resampleType);
-        }
-
-        function RenderNextChart() {
-            currentChartIndex++;
-            if (currentChartIndex >= charts.length)
-                currentChartIndex = 0;
-            if (charts.length > 0)
-                RenderChart(currentChartIndex, g_timeFrame, g_resampleType);
-        }
-
-        function RenderPreviousChart() {
-            currentChartIndex--;
-            if (currentChartIndex < 0)
-                currentChartIndex = charts.length-1;
-            if (charts.length > 0)
-                RenderChart(currentChartIndex, g_timeFrame, g_resampleType);
-            }
-
-        function ToggleIndicator() {
-            oind = g_primaryIndicator == "bollinger" ? "ichimoku" : "bollinger";
+        ToggleIndicator() {
+            oind = this.primaryIndicator == "bollinger" ? "ichimoku" : "bollinger";
             params = new URLSearchParams(window.location.search);
             params.set('oind', oind);
             newUrl = window.location.origin + window.location.pathname + '?' + params;
             window.location.href = newUrl;
         }
 
-        {%if journalentry%}
-            function DeleteCurrentChart() {
-                $.ajax({
-                    url: 'charts/' + charts[currentChartIndex].key + '/delete',
-                    type: 'DELETE',
-                    success: function(result) {
-                        window.location.reload();
-                    }
-                });
-            }
-        {%endif%}
+        DeleteCurrentChart() {
+            $.ajax({
+                url: 'this.charts/' + this.charts[this.currentChartIndex].key + '/delete',
+                type: 'DELETE',
+                success: function(result) {
+                    window.location.reload();
+                }
+            });
+        }
 }

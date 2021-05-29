@@ -65,6 +65,8 @@
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
         <script type="text/javascript" src="/static/scripts/tradejournalchart.js"></script>
         <script type="text/javascript">
+            var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+            var charts = JSON.parse('{{ charts | safe}}');
             {%if trades|length != 0%}
                 const trades = [
                 {%for trade in trades%}
@@ -99,5 +101,13 @@
             {%else%}
                 const trades = [];
             {% endif %}
-        {% endblock %}
+            g_chartInstance = new TJChart({{journalentry.symbol}}, charts, trades, {{journalentry.timeframe}}, "ichimoku", "macd")
+            if (charts.length > 0) {
+                g_chartInstance.RenderChart();
+            }
+            else {
+                document.getElementById('title').innerText = "No charts available";
+                document.getElementById('main').hidden = true;
+            }
         </script>
+        {% endblock %}
