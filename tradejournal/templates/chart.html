@@ -26,7 +26,7 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li>
-                        <a href="edit">Edit</a>
+                        <a href="/journalentry/{{journalentry.key}}/edit">Edit</a>
                         <a href="javascript:g_chartInstance.DeleteCurrentChart();"> Delete </a>
                     </li>
                 </ul>
@@ -35,18 +35,26 @@
         <div id="main">
             <div id="chart"></div>
         </div>
+        <h4>
+            {%if not not journalentry.is_idea%}
+                <span class="glyphicon glyphicon-fire text-warning"></span>
+            {%else%}
+                {%if journalentry.is_open()%}
+                    <span class="glyphicon glyphicon-play-circle text-primary"></span>
+                {%else%}
+                    {%if journalentry.is_profitable()%}
+                        <span class="glyphicon glyphicon-circle-arrow-up text-success"></span>
+                    {%else%}
+                        <span class="glyphicon glyphicon-circle-arrow-down text-danger"></span>
+                    {%endif%}
+                {%endif%}
+            {%endif%}
+            {{journalentry.symbol}} (<i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i>)
+        </h4>
     <table class="table">
-        <tr>
-            <td>Direction</td>
-            <td>{{journalentry.direction}}</td>
-        </tr>
         <tr class="form-group">
             <td>Entry Time</td>
             <td>{{journalentry.entry_time|formatdatetimedisplay}}</td>
-        </tr>
-        <tr>
-            <td>Strategy</td>
-            <td>{{journalentry.strategy}}</td>
         </tr>
         <tr>
             <td>Exit Time</td>
@@ -116,13 +124,13 @@
         <script type="text/javascript">
             $("#postcommentbutton").click(function(event){        
                 event.preventDefault();
-                $.post("comments", $("#commentform").serialize(), function(data) {
+                $.post("/journalentry/{{journalentry.key}}/comments", $("#commentform").serialize(), function(data) {
                     $("#commentform")[0].reset();
                     window.location.reload();
                 });
                 });   
             $("#chartcapturebutton").click(function(event){        
-                $.post("charts", {}, function(data) {
+                $.post("/journalentry/{{journalentry.key}}/charts", {}, function(data) {
                     window.location.reload();
                 });
                 });   
@@ -168,7 +176,8 @@
             var secondaryIndicator = "{{ indicator }}";
             var primaryIndicator = "{{overlay_indicator if not not overlay_indicator else 'ichimoku'}}";
 
-            var g_chartInstance = new TJChart("{{journalentry.symbol}}", charts, trades, "{{journalentry.timeframe}}", primaryIndicator, secondaryIndicator);
+            var g_chartInstance = new TJChart("{{journalentry.key}}", "{{journalentry.symbol}}", charts, 
+                trades, "{{journalentry.timeframe}}", primaryIndicator, secondaryIndicator);
             if (charts.length > 0) {
                 g_chartInstance.RenderChart();
             }

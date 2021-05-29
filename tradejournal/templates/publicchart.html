@@ -41,7 +41,7 @@
             var secondaryIndicator = "{{ indicator }}";
             var primaryIndicator = "{{overlay_indicator if not not overlay_indicator else 'ichimoku'}}";
 
-            var g_chartInstance = new TJChart(null, charts, trades, null, primaryIndicator, secondaryIndicator);
+            var g_chartInstance = new TJChart(null, null, charts, trades, null, primaryIndicator, secondaryIndicator);
             if (charts.length > 0) {
                 g_chartInstance.RenderChart();
             }

@@ -1,7 +1,8 @@
 class TJChart
 {
-    constructor(symbol, charts, trades, timeframe, primaryIndicator, secondaryIndicator)
+    constructor(key, symbol, charts, trades, timeframe, primaryIndicator, secondaryIndicator)
     {
+        this.key = key;
         this.symbol = symbol;
         this.charts = charts;
         this.timeFrame = timeframe;
@@ -306,6 +307,10 @@ class TJChart
                     params.set('type', this.resampleType);
                 }
                 var relativeUrl = temp[0] + '?' + params;
+                if(this.symbol != null && this.key != null)
+                {
+                    relativeUrl = "/journalentry/"+this.key+"/"+relativeUrl;
+                }
                 d3.csv(relativeUrl, D3_DataCallback)
             } else {
                 D3_DataCallback(null, this.charts[i].raw_data);
@@ -350,7 +355,7 @@ class TJChart
 
         DeleteCurrentChart() {
             $.ajax({
-                url: 'charts/' + this.charts[this.currentChartIndex].key + '/delete',
+                url: '/journalentry/'+this.key+'/'+charts+'/' + this.charts[this.currentChartIndex].key + '/delete',
                 type: 'DELETE',
                 success: function(result) {
                     window.location.reload();

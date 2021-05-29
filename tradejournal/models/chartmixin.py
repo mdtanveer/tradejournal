@@ -30,7 +30,7 @@ class ChartMixin:
             if journalentry.has_valid_exit_time():
                 context_date = journalentry.exit_time + timedelta(days=tju.FWD_BUFFER[timeframe])
             elif journalentry.has_valid_entry_time():
-                context_date = journalentry.exit_time + timedelta(days=tju.FWD_BUFFER[timeframe])
+                context_date = journalentry.entry_time + timedelta(days=tju.FWD_BUFFER[timeframe])
 
             add_time = str(datetime.now().timestamp())
             local_file_name = "chart_" + str(uuid.uuid4()) + ".csv"

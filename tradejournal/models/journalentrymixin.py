@@ -3,6 +3,7 @@ import pytz
 from datetime import datetime, timedelta
 from . import JournalEntry, JournalEntryNotFound
 from azure.common import AzureMissingResourceHttpError
+import calendar
 
 class JournalEntryMixin:
     def get_journalentries_helper(self, func, age):
@@ -103,3 +104,14 @@ class JournalEntryMixin:
                 entity[key] = strtime_to_timestamp(entity[key])
         self.svc.insert_entity(self.TABLES["journalentry"], entity)
         self.add_chart(tju.partition_and_row_to_key(entity['symbol'], entry_time), {'title':'Auto entry chart'}, entity['timeframe'])
+
+    def get_journalentry_for_monthly_review(self, year, month, serial):
+        lower_timestamp = pytz.UTC.localize(datetime(year, month, 1))
+        upper_timestamp = pytz.UTC.localize(datetime(year, month, calendar.monthrange(year, month)[1]))
+        query = "RowKey ge '%s' and RowKey le '%s'"%(str(lower_timestamp.timestamp()), str(upper_timestamp.timestamp()))
+        journalentries = list(self.svc.query_entities(self.TABLES['journalentry'], query))
+        journalentries.sort(key = lambda x: x.entry_time, reverse=True)
+        count = len(journalentries)
+        if serial >= count or serial < 0:
+            serial = 1
+        return tju.journalentry_from_entity(journalentries[serial-1])

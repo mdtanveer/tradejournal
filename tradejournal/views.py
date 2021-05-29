@@ -221,6 +221,26 @@ def allcomments():
             pagination = pagination
         )
 
+def chartview_helper(journalentry, indicator, overlay_indicator, error_message):
+    form = CommentForm()
+    key = journalentry.key
+    comments=repository.get_comments(key)
+    page, per_page, offset = get_page_args()
+    pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
+    return render_template(
+        'chart.html',
+        charts=jsonpickle.encode(repository.get_charts(key), unpicklable=False),
+        error_message=error_message,
+        form = form,
+        journalentry=journalentry,
+        timeframe=journalentry.get_timeframe(),
+        indicator=indicator,
+        overlay_indicator=overlay_indicator,
+        trades = repository.get_trades(key),
+        comments=comments[offset:offset+per_page],
+        pagination = pagination
+    )
+
 @app.route('/journalentry/<key>/charts', methods=['GET', 'POST'])
 @login_required
 def charts(key):
@@ -241,23 +261,7 @@ def charts(key):
     else:
         indicator = request.args.get('ind', journalentry.get_indicator())
         overlay_indicator = request.args.get('oind', 'ichimoku')
-        form = CommentForm()
-        comments=repository.get_comments(key)
-        page, per_page, offset = get_page_args()
-        pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
-        return render_template(
-            'chart.html',
-            charts=jsonpickle.encode(repository.get_charts(key), unpicklable=False),
-            error_message=error_message,
-            form = form,
-            journalentry=repository.get_journalentry(key),
-            timeframe=journalentry.get_timeframe(),
-            indicator=indicator,
-            overlay_indicator=overlay_indicator,
-            trades = repository.get_trades(key),
-            comments=comments[offset:offset+per_page],
-            pagination = pagination
-        )
+        return chartview_helper(journalentry, indicator, overlay_indicator, error_message)
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
 @login_required
@@ -361,6 +365,17 @@ def positions():
         error=error,
         grand_total = grand_total
     )
+
+@app.route('/journalentry/<year>/<month>/<serial>', methods=['GET'])
+@login_required
+def monthly_review(year, month, serial):
+    """Renders the monthly review page."""
+    journalentry = repository.get_journalentry_for_monthly_review(int(year), int(month), int(serial))
+
+    indicator = request.args.get('ind', journalentry.get_indicator())
+    overlay_indicator = request.args.get('oind', 'ichimoku')
+    return chartview_helper(journalentry, indicator, overlay_indicator, '')
+
 
 @app.route('/journalentry/<key>/charts/<chartkey>/delete', methods=['DELETE'])
 @login_required
