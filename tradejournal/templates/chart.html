@@ -45,9 +45,9 @@
         </form>
         <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group mr-2" role="group" aria-label="First group">
-                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart(g_timeFrame, 'original');">O</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart(g_timeFrame, 'mother');">M</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="RenderCurrentChart(g_timeFrame, 'latest_{{journalentry.symbol}}');">L</button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartResampleTF('original');">O</button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartResampleTF('mother');">M</button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartResampleTF('latest_{{journalentry.symbol}}');">L</button>
             </div>
         </div>
     </div>

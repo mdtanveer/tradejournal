@@ -2,6 +2,7 @@ class TJChart
 {
     constructor(symbol, charts, trades, timeframe, primaryIndicator, secondaryIndicator)
     {
+        this.symbol = symbol;
         this.charts = charts;
         this.timeFrame = timeframe;
         this.resampleType = 'original';
@@ -304,8 +305,14 @@ class TJChart
             }
         }
 
-        RenderCurrentChart(timeFrame) {
+        RenderCurrentChartSwitchTF(timeFrame) {
             this.timeFrame = timeFrame;
+            this.charts[this.currentChartIndex].raw_data = null;
+            this.RenderChart();
+        }
+
+        RenderCurrentChartResampleTF(resampleType) {
+            this.resampleType = resampleType;
             this.charts[this.currentChartIndex].raw_data = null;
             this.RenderChart();
         }
