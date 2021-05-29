@@ -5,13 +5,13 @@
         <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
         <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group mr-2" role="group" aria-label="First group">
-                <button type="button" class="btn btn-secondary btn-success" onclick="RenderPreviousChart();">
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderPreviousChart();">
                     <span class="glyphicon glyphicon-chevron-left"></span>
                 </button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="RenderNextChart();">
+                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
                     <span class="glyphicon glyphicon-chevron-right"></span>
                 </button>
-                <button type="button" class="btn btn-secondary btn-warning" onclick="ToggleIndicator();">
+                <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();">
                     <span class="glyphicon glyphicon-barcode"></span>
                 </button>
             </div>
@@ -37,7 +37,7 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li>
-                        <a href="javascript:DeleteCurrentChart();">
+                        <a href="javascript:g_chartInstance.DeleteCurrentChart();">
                             Delete
                         </a>
                     </li>
