@@ -35,7 +35,7 @@
         </div>
         <div class="form-group">
             <label class="control-label" for="exit_time">Exit Time:</label>
-            <input class="form-control" id="exit_time" name="exit_time" type="datetime-local" value="{{journalentry.exit_time | formatdatetimeinput if not zero_exit else ''}}">
+            <input class="form-control" id="exit_time" name="exit_time" type="datetime-local" value="{{journalentry.exit_time | formatdatetimeinput}}">
         </div>
         <div class="form-group">
             <label class="control-label" for="entry_price">Entry Price:</label>

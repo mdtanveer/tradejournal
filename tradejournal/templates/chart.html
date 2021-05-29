@@ -6,19 +6,17 @@
         <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group mr-2" role="group" aria-label="First group">
                 <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderPreviousChart();">
-                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    <i class="bi-chevron-left" style="font-size: 2rem;"></i>
                 </button>
                 <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
-                    <span class="glyphicon glyphicon-chevron-right"></span>
+                    <i class="bi-chevron-right" style="font-size: 2rem;"></i>
                 </button>
                 <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();">
-                    <span class="glyphicon glyphicon-barcode"></span>
+                    <i class="bi-bar-chart-line" style="font-size: 2rem;"></i>
                 </button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartResampleTF('original');">O</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartResampleTF('mother');">M</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartResampleTF('latest_{{journalentry.symbol}}');">L</button>
+                <button type="button" id="charttypetogglebtn" class="btn btn-secondary btn-success">O</button>
                 <button id="chartcapturebutton" type="submit" class="btn btn-success">
-                    &zwnj;<span class="glyphicon glyphicon-camera"></span>
+                    <i class="bi-camera" style="font-size: 2rem;"></i>
                 </button>
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     &zwnj;<span class="caret"></span>
@@ -27,6 +25,7 @@
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li>
                         <a href="/journalentry/{{journalentry.key}}/edit">Edit</a>
+                        <a href="/journalentry/monthlyreview/{{journalentry.entry_time.year}}/{{journalentry.entry_time.month}}/1">Monthly Review</a>
                         <a href="javascript:g_chartInstance.DeleteCurrentChart();"> Delete </a>
                     </li>
                 </ul>
@@ -57,8 +56,13 @@
                     {%endif%}
                 {%endif%}
             {%endif%}
-            {{journalentry.symbol}} (<i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i>)
+            {{journalentry.symbol}} 
         </h4>
+        <h5>
+            <span class="text-muted panel-text">
+                <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i>
+            </span>
+        </h5>
     <table class="table">
         <tr class="form-group">
             <td>Entry Time</td>
@@ -142,13 +146,21 @@
                     window.location.reload();
                 });
                 });   
+            var charttypes = ["original", "mother", "latest_{{journalentry.symbol}}"]
+            var charttypescounter = 0;
+            $("#charttypetogglebtn").click(function(event){
+                charttypescounter++;
+                charttypescounter = charttypescounter%3;
+                g_chartInstance.RenderCurrentChartResampleTF(charttypes[charttypescounter]);
+                $("#charttypetogglebtn").text(charttypes[charttypescounter][0].toUpperCase());
+            });
         </script>
         <script type="text/javascript">
             if(window.location.href.includes("monthlyreview")) {
-                $("#reviewbuttons").show()
+                $("#reviewbuttons").show();
             }
             else {
-                $("#reviewbuttons").hide()
+                $("#reviewbuttons").hide();
             }
             function incdecUrlHelper(url, addendum) {
                 var components = url.split('/');

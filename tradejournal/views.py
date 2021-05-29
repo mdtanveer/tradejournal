@@ -124,7 +124,6 @@ def create():
         return render_template(
         'create.html',
         journalentry = journalentry,
-        zero_exit = True,
         pagetitle = "Create New",
         subtitle = "Create New Journal Entry"
     )
@@ -147,7 +146,6 @@ def edit(key):
         return render_template(
             'create.html',
             journalentry = journalentry,
-            zero_exit = (journalentry.exit_time == toIST_fromtimestamp(0)),
             pagetitle = "Edit Entry",
             subtitle = "Edit Journal Entry"
         )
@@ -392,6 +390,8 @@ def page_not_found(error):
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):
     if value is None:
         return ""
+    if value == toIST_fromtimestamp(0):
+        return ""
     return value.strftime(format)
 
 
@@ -400,6 +400,8 @@ def format_datetime(value, format="%d-%m-%Y %I:%M %p"):
     if value is None:
         return ""
     now = IST_now()
+    if value == toIST_fromtimestamp(0):
+        return ""
     if now.year == value.year:
         return value.strftime("%h %d, %I:%M %p")
     else:
