@@ -45,7 +45,10 @@
                     </div>
                 </div>
         {% endfor %}
-{{ pagination.links }}
+<div class="pagination-sm" 
+        {{ pagination.links }}
+</div>
+        
 {% else %}
 <p>No journalentries available.</p>
 <br />

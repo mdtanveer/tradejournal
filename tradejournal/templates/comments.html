@@ -5,7 +5,7 @@
 <h4>
     Comments
     {% if not allcomments %}
-    <span class="badge badge-light">
+    <span class="badge bg-secondary">
         {{journalentry.symbol}}
     </span>
     {% endif %}
@@ -18,7 +18,7 @@
         <th>
             {{ comment.add_time | formatdatetimedisplay }}
             {% if allcomments %}
-            <br /><span class="badge badge-light">{{comment.symbol}}</span>
+            <br /><span class="badge bg-secondary">{{comment.symbol}}</span>
             {% endif %}
         </th>
         <td>
@@ -32,7 +32,9 @@
     </tr>
     {% endfor %}
 </table>
-{{ pagination.links }}
+<div class="pagination-sm" 
+        {{ pagination.links }}
+</div>
 {% else %}
 <p>No comments available.</p>
 <br />
