@@ -159,12 +159,10 @@
                 $("#charttypetogglebtn").text(charttypes[charttypescounter][0].toUpperCase());
             });
             window.onbeforeunload = function() {
-                if($("#commenttitlebox").val() || $("#commentbox").val())
-                {
+                if($("#commenttitlebox").val() || $("#commentbox").val()) {
                     return "If you leave this page you will lose your unsaved changes";
                 }
-                else
-                {
+                else {
                     return null;
                 }
             }
