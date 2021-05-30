@@ -4,33 +4,32 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade Journal</title>
-    <link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/content/site.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <script src="/static/scripts/modernizr-2.6.2.js"></script>
+    <script src="/static/scripts/jquery-1.10.2.js"></script>
+    <script src="/static/scripts/respond.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <nav class="navbar navbar-dark bg-dark navbar-expand-sm mb-2">
         <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a href="/" class="navbar-brand">Trade Journal</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{{url_for('create')}}">New Entry</a></li>
-                    <li><a href="{{url_for('allcomments')}}">Comments</a></li>
-                    <li><a href="{{url_for('positions')}}">Positions</a></li>
-                    <li><a href="/dashboard">Dashboard</a></li>
+            <a href="/" class="navbar-brand">Trade Journal</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('create')}}">New Entry</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('allcomments')}}">Comments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('positions')}}">Positions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
                 </ul>
             </div>
         </div>
-    </div>
+    </nav>
 
     <div class="container body-content">
         {% block content %}{% endblock %}
@@ -40,9 +39,7 @@
         </footer>
     </div>
 
-    <script src="/static/scripts/jquery-1.10.2.js"></script>
-    <script src="/static/scripts/bootstrap.js"></script>
-    <script src="/static/scripts/respond.js"></script>
+    
     {% block scripts %}{% endblock %}
 
 </body>

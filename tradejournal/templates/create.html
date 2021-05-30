@@ -6,10 +6,12 @@
 <div class="container">
     <h4>{{subtitle}}</h4>
     {% if journalentry.key %}
-    <div class="btn-group" role="group" aria-label="First group">
-        <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/comments">Comments</a>
-        <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/charts">Charts</a>
-        <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/trades">Trades</a>
+    <div class="text-center">
+        <div class="btn-group" role="group" aria-label="First group">
+            <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/comments">Comments</a>
+            <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/charts">Charts</a>
+            <a class="btn btn-secondary btn-success" href="/journalentry/{{journalentry.key}}/trades">Trades</a>
+        </div>
     </div>
     {% endif %}
     <form class="form-horizontal" id="details-form" action="" method="post" role="form">
@@ -73,12 +75,12 @@
     <div class="btn-group" role="group" aria-label="Second group">
         <button type="submit" form="details-form" class="btn btn-success">Save</button>
         {% if journalentry.key %}
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             &zwnj;<span class="caret"></span>
         </button>
-        <ul class="dropdown-menu dropdown-menu-right">
+        <ul class="dropdown-menu">
             <li>
-                <a href="/journalentry/{{journalentry.key}}/delete">
+                <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/delete">
                     Delete
                 </a>
             </li>

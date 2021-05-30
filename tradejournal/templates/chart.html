@@ -1,68 +1,67 @@
-﻿{% extends "layout.html" %}
+{% extends "layout.html" %}
 
 {% block content %}
-    <div class="container">
-        <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
-        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group mr-2" role="group" aria-label="First group">
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderPreviousChart();">
-                    <i class="bi-chevron-left" style="font-size: 2rem;"></i>
-                </button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
-                    <i class="bi-chevron-right" style="font-size: 2rem;"></i>
-                </button>
-                <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();">
-                    <i class="bi-bar-chart-line" style="font-size: 2rem;"></i>
-                </button>
-                <button type="button" id="charttypetogglebtn" class="btn btn-secondary btn-success">O</button>
-                <button id="chartcapturebutton" type="submit" class="btn btn-success">
-                    <i class="bi-camera" style="font-size: 2rem;"></i>
-                </button>
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    &zwnj;<span class="caret"></span>
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                    <li>
-                        <a href="/journalentry/{{journalentry.key}}/edit">Edit</a>
-                        <a href="/journalentry/monthlyreview/{{journalentry.entry_time.year}}/{{journalentry.entry_time.month}}/1">Monthly Review</a>
-                        <a href="javascript:g_chartInstance.DeleteCurrentChart();"> Delete </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div id="main">
-            <div id="chart"></div>
-        </div>
-        <div id="reviewbuttons">
-            <button type="button" class="btn btn-secondary btn-success float-left" id = "nexttradebtn">
-                <span class="glyphicon glyphicon-chevron-left"></span>
+<div class="container">
+    <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
+    <div class="text-center" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderPreviousChart();">
+                <i class="bi-chevron-left" style="font-size: 1rem;"></i>
             </button>
-            <button type="button" class="btn btn-secondary btn-success float-right" id="prevtradebtn">
-                <span class="glyphicon glyphicon-chevron-right"></span>
+            <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
+                <i class="bi-chevron-right" style="font-size: 1rem;"></i>
             </button>
+            <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();">
+                <i class="bi-bar-chart-line" style="font-size: 1rem;"></i>
+            </button>
+            <button type="button" id="charttypetogglebtn" class="btn btn-secondary btn-success">O</button>
+            <button id="chartcapturebutton" type="submit" class="btn btn-success">
+                <i class="bi-camera" style="font-size: 1rem;"></i>
+            </button>
+            <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li>
+                    <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/edit">Edit</a>
+                    <a class="dropdown-item" href="/journalentry/monthlyreview/{{journalentry.entry_time.year}}/{{journalentry.entry_time.month}}/1">Monthly Review</a>
+                    <a class="dropdown-item" href="javascript:g_chartInstance.DeleteCurrentChart();"> Delete </a>
+                </li>
+            </ul>
         </div>
-        <h4>
-            {%if not not journalentry.is_idea%}
-                <span class="glyphicon glyphicon-fire text-warning"></span>
+    </div>
+    <div id="main">
+        <div id="chart"></div>
+    </div>
+    <div id="reviewbuttons">
+        <button type="button" class="btn btn-secondary btn-success float-left" id = "nexttradebtn">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-success float-right" id="prevtradebtn">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </button>
+    </div>
+    <h4>
+        {%if not not journalentry.is_idea%}
+            <i class="bi-lightbulb text-warning" style="font-size: 1rem;"></i>
+        {%else%}
+            {%if journalentry.is_open()%}
+                <i class="bi-play-circle" style="font-size: 1rem;"></i>
             {%else%}
-                {%if journalentry.is_open()%}
-                    <span class="glyphicon glyphicon-play-circle text-primary"></span>
+                {%if journalentry.is_profitable()%}
+                    <i class="bi-arrow-up-circle text-success" style="font-size: 1rem;"></i>
                 {%else%}
-                    {%if journalentry.is_profitable()%}
-                        <span class="glyphicon glyphicon-circle-arrow-up text-success"></span>
-                    {%else%}
-                        <span class="glyphicon glyphicon-circle-arrow-down text-danger"></span>
-                    {%endif%}
+                    <i class="bi-arrow-down-circle text-danger" style="font-size: 1rem;"></i>
                 {%endif%}
             {%endif%}
-            {{journalentry.symbol}} 
-        </h4>
-        <h5>
-            <span class="text-muted panel-text">
-                <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i>
-            </span>
-        </h5>
+        {%endif%}
+        {{journalentry.symbol}} 
+    </h4>
+    <h5>
+        <span class="text-muted panel-text">
+            <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i>
+        </span>
+    </h5>
     <table class="table">
         <tr class="form-group">
             <td>Entry Time</td>
@@ -90,44 +89,45 @@
         </tr>
     </table>
 
-<h4> Comments </h4>
-<br />
-{% if comments %}
-<table class="table table-hover">
-    {% for comment in comments %}
-    <tr>
-        <th>
-            {{ comment.add_time | formatdatetimedisplay }}
-        </th>
-        <td>
-            {%if comment.title %}
-            <b>
-                {{ comment.title }}
-            </b><br />
-            {% endif %}
-            {{ comment.text }}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{{ pagination.links }}
-{% else %}
-<p>No comments available.</p>
-<br />
-{% endif %}
-<form action="" method="post" role="form" id="commentform">
-    <div class="form-group">
-        <div class="input text">
-            <label for="title">Title:</label>
-            <input class="form-control" id="title" name="title" type="text" value="">
+    <h4> Comments </h4>
+    <br />
+    {% if comments %}
+    <table class="table table-hover">
+        {% for comment in comments %}
+        <tr>
+            <th>
+                {{ comment.add_time | formatdatetimedisplay }}
+            </th>
+            <td>
+                {%if comment.title %}
+                <b>
+                    {{ comment.title }}
+                </b><br />
+                {% endif %}
+                {{ comment.text }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {{ pagination.links }}
+    {% else %}
+    <p>No comments available.</p>
+    <br />
+    {% endif %}
+    <form action="" method="post" role="form" id="commentform">
+        <div class="form-group">
+            <div class="input text">
+                <label for="title">Title:</label>
+                <input class="form-control" id="title" name="title" type="text" value="">
+            </div>
+            <div class="input text">
+                <label for="text">Text:</label>
+                <textarea class="form-control" id="text" name="text" required></textarea>
+            </div>
         </div>
-        <div class="input text">
-            <label for="text">Text:</label>
-            <textarea class="form-control" id="text" name="text" required></textarea>
-        </div>
-    </div>
-    <button type="submit" class="btn btn-success" id="postcommentbutton">Post Comment</button>
-</form>
+        <button type="submit" class="btn btn-success" id="postcommentbutton">Post Comment</button>
+    </form>
+</div>
 
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>

@@ -1,26 +1,27 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<ul class="nav nav-tabs">
-    <li id="open" class="{{"active" if subpage=="open" else ""}}"><a href="home?subpage=open">Open</a></li>
-    <li id="close" class="{{"active" if subpage=="closed" else ""}}"><a href="home?subpage=closed">Closed</a></li>
-    <li id="idea" class="{{"active" if subpage=="idea" else ""}}"><a href="home?subpage=idea">Ideas</a></li>
+<div class="container">
+<ul class="nav nav-pills">
+    <li id="open" class="{{"active" if subpage=="open" else ""}} nav-item"><a href="home?subpage=open">Open</a></li>
+    <li id="close" class="{{"active" if subpage=="closed" else ""}} nav-item"><a href="home?subpage=closed">Closed</a></li>
+    <li id="idea" class="{{"active" if subpage=="idea" else ""}} nav-item"><a href="home?subpage=idea">Ideas</a></li>
 </ul>
 {% if journalentries %}
         {% for journalentry in journalentries %}
-                <div class="panel panel-info">
-                    <div class="panel-body">
+                <div class="card">
+                    <div class="card-body">
                         <h5>
                             {%if not not journalentry.is_idea%}
-                                <span class="glyphicon glyphicon-fire text-warning"></span>
+                                <i class="bi-lightbulb text-warning" style="font-size: 1rem;"></i>
                             {%else%}
                                 {%if journalentry.is_open()%}
-                                    <span class="glyphicon glyphicon-play-circle text-primary"></span>
+                                    <i class="bi-play-circle" style="font-size: 1rem;"></i>
                                 {%else%}
                                     {%if journalentry.is_profitable()%}
-                                        <span class="glyphicon glyphicon-circle-arrow-up text-success"></span>
+                                        <i class="bi-arrow-up-circle text-success" style="font-size: 1rem;"></i>
                                     {%else%}
-                                        <span class="glyphicon glyphicon-circle-arrow-down text-danger"></span>
+                                        <i class="bi-arrow-down-circle text-danger" style="font-size: 1rem;"></i>
                                     {%endif%}
                                 {%endif%}
                             {%endif%}
@@ -32,7 +33,7 @@
                             <small> <i>{{ journalentry.tradingsymbol}}</i><br/> </small>
                         </span>
                     </div>
-                    <div class="panel-footer">
+                    <div class="card-footer">
                         <a href="/journalentry/{{journalentry.key}}/comments"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
                         <a href="/journalentry/{{journalentry.key}}/charts"><i>{{ journalentry.get_chart_count()}} charts</i></a> <br/>
                     </div>
@@ -43,5 +44,5 @@
 <p>No journalentries available.</p>
 <br />
 {% endif %}
-
+</div>
 {% endblock %}
