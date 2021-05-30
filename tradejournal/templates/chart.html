@@ -41,7 +41,7 @@
             <i class="bi-chevron-right"></i>
         </button>
     </div>
-    <h4>
+    <h5>
         {%if not not journalentry.is_idea%}
             <i class="bi-lightbulb text-warning"></i>
         {%else%}
@@ -56,12 +56,12 @@
             {%endif%}
         {%endif%}
         {{journalentry.symbol}} 
-    </h4>
-    <h5>
+    </h5>
+    <h6>
         <span class="text-muted panel-text">
             <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i>
         </span>
-    </h5>
+    </h6>
     <table class="table">
         <tr>
             <td>Instrument</td>
@@ -122,11 +122,11 @@
         <div class="form-group">
             <div class="input text">
                 <label for="title">Title:</label>
-                <input class="form-control" id="title" name="title" type="text" value="">
+                <input id="commenttitlebox" class="form-control" name="title" type="text" value="">
             </div>
             <div class="input text">
                 <label for="text">Text:</label>
-                <textarea class="form-control" id="text" name="text" required></textarea>
+                <textarea id="commentbox" class="form-control" name="text" required></textarea>
             </div>
         </div>
         <button type="submit" class="btn btn-success" id="postcommentbutton">Post Comment</button>
@@ -158,6 +158,16 @@
                 g_chartInstance.RenderCurrentChartResampleTF(charttypes[charttypescounter]);
                 $("#charttypetogglebtn").text(charttypes[charttypescounter][0].toUpperCase());
             });
+            window.onbeforeunload = function() {
+                if($("#commenttitlebox").val() || $("#commentbox").val())
+                {
+                    return "If you leave this page you will lose your unsaved changes";
+                }
+                else
+                {
+                    return null;
+                }
+            }
         </script>
         <script type="text/javascript">
             if(window.location.href.includes("monthlyreview")) {

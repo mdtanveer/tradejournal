@@ -17,7 +17,7 @@
         {% for journalentry in journalentries %}
                 <div class="card mb-2">
                     <div class="card-body">
-                        <h5>
+                        <h6>
                             {%if not not journalentry.is_idea%}
                                 <i class="bi-lightbulb text-warning" style="font-size: 1rem;"></i>
                             {%else%}
@@ -32,7 +32,7 @@
                                 {%endif%}
                             {%endif%}
                             <a href="/journalentry/{{journalentry.key}}/charts">{{journalentry.symbol}}</a>
-                        </h5>
+                        </h6>
                         <span class="text-muted panel-text">
                             <i>entered {{journalentry.get_entry_time()}}</i><br />
                             <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i><br/>
@@ -45,7 +45,7 @@
                     </div>
                 </div>
         {% endfor %}
-<div class="pagination-sm" 
+<div class="d-flex pagination-sm flex-sm-wrap">
         {{ pagination.links }}
 </div>
         
