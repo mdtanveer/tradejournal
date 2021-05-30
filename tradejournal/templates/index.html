@@ -2,10 +2,16 @@
 
 {% block content %}
 <div class="container">
-<ul class="nav nav-pills">
-    <li id="open" class="{{"active" if subpage=="open" else ""}} nav-item"><a href="home?subpage=open">Open</a></li>
-    <li id="close" class="{{"active" if subpage=="closed" else ""}} nav-item"><a href="home?subpage=closed">Closed</a></li>
-    <li id="idea" class="{{"active" if subpage=="idea" else ""}} nav-item"><a href="home?subpage=idea">Ideas</a></li>
+<ul class="nav nav-tabs justify-content-center">
+    <li id="open" class="nav-item">
+        <a class="nav-link {{"active" if subpage=="open" else ""}}" href="home?subpage=open">Open</a>
+    </li>
+    <li id="close" class="nav-item">
+        <a class="nav-link {{"active" if subpage=="closed" else ""}}" href="home?subpage=closed">Closed</a>
+    </li>
+    <li id="idea" class="nav-item">
+        <a class="nav-link {{"active" if subpage=="idea" else ""}}" href="home?subpage=idea">Ideas</a>
+    </li>
 </ul>
 {% if journalentries %}
         {% for journalentry in journalentries %}
