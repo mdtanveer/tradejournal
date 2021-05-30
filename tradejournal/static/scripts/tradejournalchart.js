@@ -18,7 +18,7 @@ class TJChart
 
         var dim = {
             width: windowW, height: windowH,
-            margin: { top: 10, right: 0, bottom: 30, left: 0 },
+            margin: { top: 10, right: 0, bottom: 40, left: 0 },
             ohlc: { height: 305 },
             indicator: { height: 65, padding: 5 }
         };
@@ -355,7 +355,7 @@ class TJChart
 
         DeleteCurrentChart() {
             $.ajax({
-                url: '/journalentry/'+this.key+'/'+charts+'/' + this.charts[this.currentChartIndex].key + '/delete',
+                url: '/journalentry/'+this.key+'/'+'charts'+'/' + this.charts[this.currentChartIndex].key + '/delete',
                 type: 'DELETE',
                 success: function(result) {
                     window.location.reload();
