@@ -13,12 +13,12 @@ class TJChart
 
         this.dataWindowSize = 250;
         var windowW = Math.round(window.innerWidth*0.81);
-        var windowH = Math.round(window.innerHeight*0.70);
+        var windowH = Math.round(window.innerHeight*0.60);
         var currentScrip = "";
 
         var dim = {
             width: windowW, height: windowH,
-            margin: { top: 10, right: 0, bottom: 50, left: 0 },
+            margin: { top: 10, right: 0, bottom: 30, left: 0 },
             ohlc: { height: 305 },
             indicator: { height: 65, padding: 5 }
         };
