@@ -57,8 +57,8 @@ class JournalEntryMixin:
             if trade_closure:
                 self.add_chart(key, {'title':'Auto exit chart'}, updated_entity['timeframe'])
             entity.update(updated_entity)
-            if tju.KEY_EXIT_TIME in entity.keys() and entity[KEY_EXIT_TIME]:
-                entity[tju.KEY_EXIT_TIME] = strtime_to_timestamp(entity[KEY_EXIT_TIME])
+            if tju.KEY_EXIT_TIME in entity.keys() and entity[tju.KEY_EXIT_TIME]:
+                entity[tju.KEY_EXIT_TIME] = tju.strtime_to_timestamp(entity[tju.KEY_EXIT_TIME])
             self.svc.update_entity(self.TABLES["journalentry"], entity)
 
         except AzureMissingResourceHttpError:
@@ -92,7 +92,7 @@ class JournalEntryMixin:
 
     def create_journalentries(self, entity):
         """Adds a new journalentry"""
-        entry_time = strtime_to_timestamp(entity[tju.KEY_ENTRY_TIME])
+        entry_time = tju.strtime_to_timestamp(entity[tju.KEY_ENTRY_TIME])
         entity = dict(entity)
         entity.update(
         {
@@ -101,7 +101,7 @@ class JournalEntryMixin:
         })
         for key in [tju.KEY_ENTRY_TIME, tju.KEY_EXIT_TIME]:
             if key in entity.keys():
-                entity[key] = strtime_to_timestamp(entity[key])
+                entity[key] = tju.strtime_to_timestamp(entity[key])
         self.svc.insert_entity(self.TABLES["journalentry"], entity)
         self.add_chart(tju.partition_and_row_to_key(entity['symbol'], entry_time), {'title':'Auto entry chart'}, entity['timeframe'])
 
