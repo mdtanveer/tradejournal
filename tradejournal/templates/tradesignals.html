@@ -106,7 +106,7 @@
                 $("#entry_sl").html(tradesignals[i].entry_sl);
                 $("#lotsize").html(tradesignals[i].lotsize);
                 $("#entry_price").html(tradesignals[i].entry_price);
-                var parseDate = d3.timeParse("%d-%m-%Y"); 
+                var parseDate = d3.timeParse("%m/%d/%Y"); 
                 var tradearrowoffsetperc = 0.02;
                 var tradearrowoffsetentry = 1 + tradearrowoffsetperc;
                 if (tradesignals[i].direction == "Buy")
