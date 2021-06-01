@@ -381,10 +381,33 @@ def chart_delete(key, chartkey):
     repository.delete_chart(chartkey)
     return Response("{}", status=200, mimetype='application/json')
 
-@app.errorhandler(JournalEntryNotFound)
-def page_not_found(error):
-    """Renders error page."""
-    return 'JournalEntry does not exist.', 404
+@app.route('/tradesignals/<date>/<timeframe>/<strategy>', methods=['GET'])
+def tradesignals(date, timeframe, strategy):
+    """Renders the charts page."""
+    error_message = ''
+    tf = request.args.get('tf', '2h')
+    indicator = request.args.get('ind', 'stochastic')
+    overlay_indicator = request.args.get('oind', 'ichimoku')
+    tradesignals = repository.get_tradesignals(date, timeframe, strategy)
+    charts = [{'key':'', 
+                'title': t.symbol,
+                'data': t.symbol,
+                'relativeUrl':t.relativeUrl
+                } for t in tradesignals]
+    return render_template(
+        'tradesignals.html',
+        tradesignals = tradesignals,
+        error_message=error_message,
+        timeframe=tf,
+        indicator=indicator,
+        overlay_indicator=overlay_indicator,
+        charts=jsonpickle.encode(charts, unpicklable=False),
+    )
+
+@app.route('/tradesignals/<date>/<timeframe>', methods=['POST'])
+def post_tradesignals(date, timeframe):
+    repository.create_tradesignals(date, timeframe, request.get_json())
+    return redirect('/')
 
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):

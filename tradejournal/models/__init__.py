@@ -119,6 +119,22 @@ class Trade(object):
         self.quantity = entity.quantity
         self.tradingsymbol = entity.tradingsymbol
 
+class TradeSignal(object):
+    def __init__(self, entity): 
+        self.symbol = entity.symbol
+        self.signalreportdate, self.timeframe, self.strategy = entity.PartitionKey.split('_')        
+        self.timeframe = entity.PartitionKey.split('_')[1]        
+        self.strategy = entity.PartitionKey.split('_')[2]        
+        self.signaldatetime = entity.datetime        
+        self.score = entity.score 
+        self.direction = entity.direction 
+        self.entry_price  = entity.entry_price 
+        self.entry_sl  = entity.entry_sl 
+        self.entry_target  = entity.entry_target 
+        self.lotsize = entity.lotsize
+        TF = {'daily':'1d', 'weekly':'1wk', 'intraday':'2h'}
+        self.relativeUrl = '/charts/%s?tf=%s'%(self.symbol, TF[self.timeframe])
+
 def _load_samples_json():
     """Loads polls from samples.json file."""
     samples_path = path.join(path.dirname(__file__), 'samples.json')

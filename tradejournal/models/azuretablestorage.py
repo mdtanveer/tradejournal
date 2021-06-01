@@ -10,8 +10,10 @@ from .journalentrymixin import JournalEntryMixin
 from .commentmixin import CommentMixin
 from .trademixin import TradeMixin
 from .positionmixin import PositionMixin
+from .tradesignalsmixin import TradeSignalsMixin
 
-class Repository(JournalEntryMixin, ChartMixin, CommentMixin, TradeMixin, PositionMixin):
+class Repository(JournalEntryMixin, ChartMixin,
+        CommentMixin, TradeMixin, PositionMixin, TradeSignalsMixin):
     """Azure Twable Storage repository."""
     def __init__(self, settings):
         """Initializes the repository with the specified settings dict.
@@ -29,7 +31,8 @@ class Repository(JournalEntryMixin, ChartMixin, CommentMixin, TradeMixin, Positi
             'comments' : 'CommentsTable',
             'charts' : 'ChartsTable',
             'trades' : 'TradesTable',
-            'summarypnl': 'SummaryPnLTable'
+            'summarypnl': 'SummaryPnLTable',
+            'tradesignals': 'TradeSignalsTable'
         }
         self.session = None
         self.svc = TableService(self.storage_name, connection_string=self.connection_string)
