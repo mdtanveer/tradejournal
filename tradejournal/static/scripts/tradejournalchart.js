@@ -252,14 +252,16 @@ class TJChart
         }
         this.svg.selectAll("g.indicator .axis.left").call(this.indicatorAxisLeft);
 
-        if (trades.length == 2 && trades[1].date > data[data.length - 1].date) {
-            var chartTrades = [...trades].splice(0, 1);
+        if (this.trades) {
+            if (this.trades.length == 2 && this.trades[1].date > data[data.length - 1].date) {
+                var chartTrades = [...this.trades].splice(0, 1);
+            }
+            else {
+                var chartTrades = this.trades;
+            }
+            this.svg.selectAll("g.tradearrow").selectAll("*").remove();
+            this.svg.selectAll("g.tradearrow").datum(chartTrades).call(this.tradearrow);
         }
-        else {
-            var chartTrades = trades;
-        }
-        this.svg.selectAll("g.tradearrow").selectAll("*").remove();
-        this.svg.selectAll("g.tradearrow").datum(chartTrades).call(this.tradearrow);
     }
 
 
@@ -375,5 +377,9 @@ class TJChart
             for (var i=0; i<this.eventTargets.length; i++) {
                 this.eventTargets[i].dispatchEvent(cusevent)
             }
+        }
+        
+        SetTrades(trades) {
+            this.trades = trades;
         }
 }

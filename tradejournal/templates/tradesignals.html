@@ -82,6 +82,10 @@
         <script>
             function SetTradeSignalDetails(e){
                 var i = e.originalEvent.detail;
+                if (i >= tradesignals.length)
+                    i = tradesignals.length - 1 ;
+                if (i < 0)
+                    i = 0;
                 SetTradeSignalDetailsHelper(i);
             }
 
@@ -102,6 +106,19 @@
                 $("#entry_sl").html(tradesignals[i].entry_sl);
                 $("#lotsize").html(tradesignals[i].lotsize);
                 $("#entry_price").html(tradesignals[i].entry_price);
+                var parseDate = d3.timeParse("%d-%m-%Y"); 
+                var tradearrowoffsetperc = 0.02;
+                var tradearrowoffsetentry = 1 + tradearrowoffsetperc;
+                if (tradesignals[i].direction == "Buy")
+                    var tradearrowoffsetentry = 1 - tradearrowoffsetperc;
+
+                g_chartInstance.SetTrades(
+                    [{
+                        date: parseDate(tradesignals[i].signaldate),
+                        type: tradesignals[i].direction.toLowerCase(),
+                        price: tradesignals[i].entry_price * tradearrowoffsetentry,
+                        quantity: 1
+                    }]);
             }
 
             if(tradesignals.length > 0)
