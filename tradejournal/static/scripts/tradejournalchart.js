@@ -1,6 +1,6 @@
 class TJChart
 {
-    constructor(key, symbol, charts, trades, timeframe, primaryIndicator, secondaryIndicator)
+    constructor(key, symbol, charts, trades, timeframe, primaryIndicator, secondaryIndicator, eventTargets=null)
     {
         this.key = key;
         this.symbol = symbol;
@@ -9,7 +9,12 @@ class TJChart
         this.resampleType = 'original';
         this.secondaryIndicator = secondaryIndicator;
         this.primaryIndicator = primaryIndicator;
-        this.currentChartIndex = charts.length - 1;
+        if(symbol)
+            this.currentChartIndex = charts.length - 1;
+        else
+            this.currentChartIndex = 0;
+        this.eventTargets=eventTargets;
+        this.DispatchCurrentIndexChanged();
 
         this.dataWindowSize = 250;
         var windowW = Math.round(window.innerWidth*0.81);
@@ -331,6 +336,7 @@ class TJChart
 
         RenderNextChart() {
             this.currentChartIndex++;
+            this.DispatchCurrentIndexChanged();
             if (this.currentChartIndex >= this.charts.length)
                 this.currentChartIndex = 0;
             if (this.charts.length > 0)
@@ -339,6 +345,7 @@ class TJChart
 
         RenderPreviousChart() {
             this.currentChartIndex--;
+            this.DispatchCurrentIndexChanged();
             if (this.currentChartIndex < 0)
                 this.currentChartIndex = this.charts.length-1;
             if (this.charts.length > 0)
@@ -361,5 +368,12 @@ class TJChart
                     window.location.reload();
                 }
             });
+        }
+
+        DispatchCurrentIndexChanged() {
+            const cusevent = new CustomEvent('cidxchanged', { detail : this.currentChartIndex });
+            for (var i=0; i<this.eventTargets.length; i++) {
+                this.eventTargets[i].dispatchEvent(cusevent)
+            }
         }
 }

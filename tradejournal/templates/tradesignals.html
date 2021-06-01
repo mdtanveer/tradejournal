@@ -15,10 +15,11 @@
                     <i class="bi-bar-chart-line"></i>
                 </button>
             </div>
-            <div>
-                <center>
-                    <h5 id="title"></h5>
-                </center>
+            <div class="text-center mx-auto">
+                <h5>
+                    <i id="symbolicon" class="bi-arrow-up-circle text-success"></i>
+                    <span id="title"></span>
+                </h5>
             </div>
         </div>
         <div id="main">
@@ -31,17 +32,45 @@
                 <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartSwitchTF('1wk');">W</button>
             </div>
         </div>
+        <h5> Details </h5>
+        <table class="table" id="detailstable">
+            <tr>
+                <td>Signal Date</td>
+                <td id="signaldate"></td>
+            </tr>
+            <tr>
+                <td>Direction</td>
+                <td id="direction"></td>
+            </tr>
+            <tr>
+                <td>Score</td>
+                <td id="score"></td>
+            </tr>
+            <tr>
+                <td>Entry price</td>
+                <td id="entry_price"></td>
+            </tr>
+            <tr>
+                <td>Stop Loss</td>
+                <td id="entry_sl"></td>
+            </tr>
+            <tr>
+                <td>Lot Size</td>
+                <td id="lotsize"></td>
+            </tr>
+        </table>
     </div>
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
         <script type="text/javascript" src="/static/scripts/tradejournalchart.js"></script>
         <script type="text/javascript">
             var charts = JSON.parse('{{ charts | safe}}');
+            var tradesignals = JSON.parse('{{tradesignals|safe}}');
             const trades = [];
             var secondaryIndicator = "{{ indicator }}";
             var primaryIndicator = "{{overlay_indicator if not not overlay_indicator else 'ichimoku'}}";
 
-            var g_chartInstance = new TJChart(null, null, charts, trades, null, primaryIndicator, secondaryIndicator);
+            var g_chartInstance = new TJChart(null, null, charts, trades, null, primaryIndicator, secondaryIndicator, [$('#detailstable')[0]]);
             if (charts.length > 0) {
                 g_chartInstance.RenderChart();
             }
@@ -49,5 +78,34 @@
                 document.getElementById('title').innerText = "No charts available";
                 document.getElementById('main').hidden = true;
             }
+        </script>
+        <script>
+            function SetTradeSignalDetails(e){
+                var i = e.originalEvent.detail;
+                SetTradeSignalDetailsHelper(i);
+            }
+
+            function SetTradeSignalDetailsHelper(i){
+                $("#symbol").html(tradesignals[i].symbol);
+                $("#title").html(tradesignals[i].symbol + ' (' + (i+1) + ' of ' + tradesignals.length + ')');
+                $("#signaldate").html(tradesignals[i].signaldate);
+                $("#score").html(tradesignals[i].score);
+                $("#direction").html(tradesignals[i].direction);
+                if (tradesignals[i].direction == "Buy")
+                {
+                     $("#symbolicon").removeClass().addClass("bi-arrow-up-circle text-success")
+                }
+                else
+                {
+                     $("#symbolicon").removeClass().addClass("bi-arrow-down-circle text-danger")
+                }
+                $("#entry_sl").html(tradesignals[i].entry_sl);
+                $("#lotsize").html(tradesignals[i].lotsize);
+                $("#entry_price").html(tradesignals[i].entry_price);
+            }
+
+            if(tradesignals.length > 0)
+                SetTradeSignalDetailsHelper(0);
+            $('#detailstable').on('cidxchanged', SetTradeSignalDetails);
         </script>
 {% endblock %}

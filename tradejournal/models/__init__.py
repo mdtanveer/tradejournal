@@ -125,7 +125,7 @@ class TradeSignal(object):
         self.signalreportdate, self.timeframe, self.strategy = entity.PartitionKey.split('_')        
         self.timeframe = entity.PartitionKey.split('_')[1]        
         self.strategy = entity.PartitionKey.split('_')[2]        
-        self.signaldatetime = entity.datetime        
+        self.signaldate = entity.datetime        
         self.score = entity.score 
         self.direction = entity.direction 
         self.entry_price  = entity.entry_price 

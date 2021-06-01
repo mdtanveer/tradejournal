@@ -396,7 +396,7 @@ def tradesignals(date, timeframe, strategy):
                 } for t in tradesignals]
     return render_template(
         'tradesignals.html',
-        tradesignals = tradesignals,
+        tradesignals = jsonpickle.encode(tradesignals, unpicklable=False),
         error_message=error_message,
         timeframe=tf,
         indicator=indicator,
