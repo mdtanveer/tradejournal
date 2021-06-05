@@ -32,7 +32,9 @@
                 <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartSwitchTF('1wk');">W</button>
             </div>
         </div>
-        <h5> Details </h5>
+        <h5> 
+            Details <span id="count"></span>
+        </h5>
         <table class="table" id="detailstable">
             <tr>
                 <td>Signal Date</td>
@@ -91,7 +93,8 @@
 
             function SetTradeSignalDetailsHelper(i){
                 $("#symbol").html(tradesignals[i].symbol);
-                $("#title").html(tradesignals[i].symbol + ' (' + (i+1) + ' of ' + tradesignals.length + ')');
+                $("#title").html(tradesignals[i].symbol);
+                $("#count").html(' (' + (i+1) + ' of ' + tradesignals.length + ')');
                 $("#signaldate").html(tradesignals[i].signaldate);
                 $("#score").html(tradesignals[i].score);
                 $("#direction").html(tradesignals[i].direction);
