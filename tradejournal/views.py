@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import render_template, make_response, redirect, request, Response
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
-from tradejournal.models import JournalEntry, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
+from tradejournal.models import JournalEntry, JournalEntryGroup, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
@@ -32,6 +32,10 @@ class ChartForm(Form):
 def home():
     """Renders the home page, with a list of all journalentrys."""
     journalentries=repository.get_journalentries_forview()
+    ALL_ENTITIES_CACHED = journalentries
+    journalentrygroups=repository.get_journalentrygroups_forview(journalentries)
+    journalentries.extend(journalentrygroups)
+    print(journalentries)
     page, per_page, offset = get_page_args()
     try:
         subpage = request.args['subpage']
@@ -128,6 +132,26 @@ def create():
         subtitle = "Create New Journal Entry"
     )
 
+@app.route('/creategroup', methods=['GET', 'POST'])
+@login_required
+def creategroup():
+    """New journal entry"""
+    if request.method == 'POST':
+        if request.get_json():
+            data = request.get_json()
+        else:
+            data = request.form
+        repository.create_journalentrygroup(data)
+        return redirect('/')
+    else:
+        journalentrygroup = JournalEntryGroup(None, {})
+        journalentrygroup.entry_time = IST_now()
+        return render_template(
+        'creategroup.html',
+        journalentrygroup = journalentrygroup,
+        pagetitle = "Create New",
+        subtitle = "Create New Journal Entry Group"
+    )
 
 @app.route('/journalentry/<key>/edit', methods=['GET', 'POST'])
 @login_required
@@ -150,6 +174,77 @@ def edit(key):
             subtitle = "Edit Journal Entry"
         )
 
+@app.route('/journalentrygroup/<key>/edit', methods=['GET', 'POST'])
+@login_required
+def editgroup(key):
+    """New journal entry"""
+    if request.method == 'POST':
+        if request.get_json():
+            data = request.get_json()
+        else:
+            data = request.form
+        repository.update_journalentrygroup(key, data)
+        return redirect('/journalentrygroup/{0}/edit'.format(key))
+    else:
+        journalentrygroup=repository.get_journalentrygroup(key)
+
+        return render_template(
+            'creategroup.html',
+            journalentrygroup = journalentrygroup,
+            pagetitle = "Edit Group Entry",
+            subtitle = "Edit Journal Entry Group"
+        )
+
+@app.route('/journalentrygroup/<key>', methods=['GET'])
+@login_required
+def viewgroup(key):
+    journalentrygroup=repository.get_journalentrygroup(key)
+    return render_template(
+        'groupview.html',
+        journalentrygroup = journalentrygroup,
+        pagetitle = "Group Entry",
+        subtitle = "View Journal Entry Group"
+    )
+
+@app.route('/journalentrygroup/<key>/delete', methods=['GET'])
+@login_required
+def delete_entrygroup(key):
+    """Deletes the journalentrygroup page."""
+    repository.delete_journalentrygroup(key)
+    return redirect('/')
+
+@app.route('/journalentrygroup/<key>/comments', methods=['GET', 'POST'])
+@login_required
+def commentsgroup(key):
+    """Renders the comments page."""
+    error_message = ''
+    if request.method == 'POST':
+        try:
+            if request.get_json():
+                data = request.get_json()
+            else:
+                data = request.form
+            linkchart = dict(data).pop('linkchart', False)
+            repository.add_comment(key, data)
+            if linkchart:
+                repository.add_chart(key, {'title':data['title']})
+            return redirect('/journalentrygroup/{0}/comments'.format(key))
+        except KeyError:
+            error_message = 'Unable to update'
+    else:
+        form = CommentForm()
+        comments=repository.get_comments(key)
+        page, per_page, offset = get_page_args()
+        pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
+        return render_template(
+            'comments.html',
+            error_message=error_message,
+            form = form,
+            comments=comments[offset:offset+per_page],
+            journalentrygroup=repository.get_journalentrygroup(key),
+            allcomments = False,
+            pagination = pagination
+        )
 @app.route('/journalentry/<key>/delete', methods=['GET'])
 @login_required
 def delete_entry(key):

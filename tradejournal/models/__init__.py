@@ -14,6 +14,57 @@ def IST_now():
 def toIST_fromtimestamp(ts):
     return pytz.UTC.localize(datetime.utcfromtimestamp(ts)).astimezone(pytz.timezone('Asia/Calcutta'))
 
+class JournalEntryGroup(object):
+    """Corresponds to one entry in trade journal"""
+    def __init__(self, key, entity): 
+        self.key = key
+        try:
+            self.entry_time = toIST_fromtimestamp(float(entity.entry_time))
+        except:
+            self.entry_time = toIST_fromtimestamp(0)
+        try:
+            self.exit_time = toIST_fromtimestamp(float(entity.exit_time))
+        except:
+            self.exit_time = toIST_fromtimestamp(0)
+        self.rating = entity.rating if 'rating' in entity.keys() else ''
+        self.strategy = entity.strategy if 'strategy' in entity.keys() and not not entity['strategy'] else 'macdhdivergence'
+        self.comment_count = 0
+        self.name = entity.name if 'name' in entity.keys() else ''
+        self.items = entity["items"] if 'items' in entity.keys() else ''
+        self.deserialized_items = []
+
+    def populate_children(self, indict, alljournalentries):
+        if not self.items:
+            return
+        keys = self.items.split(',')
+        for key in keys:
+            self.deserialized_items.append(indict[key])
+            alljournalentries.remove(indict[key])
+    
+    def is_open(self):
+        return not self.has_valid_exit_time()
+
+    def isidea(self):
+        return False
+
+    def is_group(self):
+        return True
+
+    def has_valid_entry_time(self):
+        return self.entry_time != toIST_fromtimestamp(0)
+
+    def has_valid_exit_time(self):
+        return self.exit_time != toIST_fromtimestamp(0)
+
+    def get_entry_time(self):
+        return arrow.get(self.entry_time).humanize()
+
+    def get_comment_count(self):
+        return self.comment_count
+    
+    def get_item_count(self):
+        return len(self.deserialized_items)
+
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self, key, entity): 
@@ -44,6 +95,9 @@ class JournalEntry(object):
     
     def isidea(self):
         return self.is_idea == 'Y'
+    
+    def is_group(self):
+        return False
 
     def is_open(self):
         return not self.has_valid_exit_time()

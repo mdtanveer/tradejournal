@@ -7,13 +7,14 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 from .chartmixin import ChartMixin
 from .journalentrymixin import JournalEntryMixin
+from .journalentrygroupmixin import JournalEntryGroupMixin
 from .commentmixin import CommentMixin
 from .trademixin import TradeMixin
 from .positionmixin import PositionMixin
 from .tradesignalsmixin import TradeSignalsMixin
 
 class Repository(JournalEntryMixin, ChartMixin,
-        CommentMixin, TradeMixin, PositionMixin, TradeSignalsMixin):
+        CommentMixin, TradeMixin, PositionMixin, TradeSignalsMixin, JournalEntryGroupMixin):
     """Azure Twable Storage repository."""
     def __init__(self, settings):
         """Initializes the repository with the specified settings dict.
@@ -32,7 +33,8 @@ class Repository(JournalEntryMixin, ChartMixin,
             'charts' : 'ChartsTable',
             'trades' : 'TradesTable',
             'summarypnl': 'SummaryPnLTable',
-            'tradesignals': 'TradeSignalsTable'
+            'tradesignals': 'TradeSignalsTable',
+            'journalentrygroup': 'TradeEntryGroupTable'
         }
         self.session = None
         self.svc = TableService(self.storage_name, connection_string=self.connection_string)
@@ -52,5 +54,6 @@ class Repository(JournalEntryMixin, ChartMixin,
             self.container_client = self.blob_service_client.get_container_client(self.container_name)
         except:
             self.container_client = self.blob_service_client.create_container(self.container_name)
+        self.GROUP_CACHE = {}
 
 

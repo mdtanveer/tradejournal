@@ -1,4 +1,4 @@
-from . import Chart, Comment, JournalEntry, Trade
+from . import Chart, Comment, JournalEntry, JournalEntryGroup, Trade
 import re
 import pytz
 from datetime import datetime
@@ -22,6 +22,10 @@ def key_to_partition_and_row(key):
 def journalentry_from_entity(entity):
     """Creates a journalentry object from the azure table journalentry entity."""
     return JournalEntry(partition_and_row_to_key(entity.PartitionKey, entity.RowKey), entity)
+
+def journalentrygroup_from_entity(entity):
+    """Creates a journalentrygroup object from the azure table journalentry entity."""
+    return JournalEntryGroup(partition_and_row_to_key(entity.PartitionKey, entity.RowKey), entity)
 
 def comment_from_entity(entity):
     """Creates a journalentry object from the azure table journalentry entity."""
