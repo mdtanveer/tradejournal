@@ -40,6 +40,7 @@ class JournalEntryGroup(object):
         for key in keys:
             self.deserialized_items.append(indict[key])
             alljournalentries.remove(indict[key])
+            self.deserialized_items.sort(key = lambda x: x.entry_time, reverse=True)
     
     def is_open(self):
         return not self.has_valid_exit_time()

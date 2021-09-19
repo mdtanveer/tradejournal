@@ -16,15 +16,17 @@
             <td>Instrument</td>
             <td>Entry</td>
             <td>Exit</td>
+            <td>Trade</td>
             <td>Entry Price</td>
             <td>Exit Price</td>
             <td>Quantity</td>
         </tr>
         {% for journalentry in journalentrygroup.deserialized_items %}
         <tr>
-            <td>{{journalentry.tradingsymbol}}</td>
+            <td> <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.tradingsymbol}}</a></td>
             <td>{{journalentry.entry_time|formatdatetimedisplay}}</td>
             <td>{{journalentry.exit_time | formatdatetimedisplay if not zero_exit else ''}}</td>
+            <td>{{journalentry.direction}}</td>
             <td>{{journalentry.entry_price}}</td>
             <td>{{journalentry.exit_price}}</td>
             <td>{{journalentry.quantity}}</td>
