@@ -50,16 +50,8 @@ class JournalEntryGroupMixin:
         try:
             updated_entity = dict(input_entity)
             updated_entity.pop('entry_time')
-            updated_entity.pop('symbol')
             partition, row = tju.key_to_partition_and_row(key)
             entity = self.svc.get_entity(self.TABLES['journalentrygroup'], partition, row)
-
-            trade_closure = ((tju.KEY_EXIT_TIME not in entity.keys() 
-                              or entity[tju.KEY_EXIT_TIME] == '0'
-                              or entity[tju.KEY_EXIT_TIME]  == '') 
-                             and (tju.KEY_EXIT_TIME in updated_entity.keys() 
-                                  and updated_entity[tju.KEY_EXIT_TIME] != '0' 
-                                  and updated_entity[tju.KEY_EXIT_TIME] != ''))
             entity.update(updated_entity)
             if tju.KEY_EXIT_TIME in entity.keys() and entity[tju.KEY_EXIT_TIME]:
                 entity[tju.KEY_EXIT_TIME] = tju.strtime_to_timestamp(entity[tju.KEY_EXIT_TIME])
