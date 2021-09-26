@@ -12,3 +12,6 @@ dash
 azure-keyvault-secrets
 azure-identity
 yfinance
+nsepython
+nsepy
+filecache
