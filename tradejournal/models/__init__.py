@@ -7,6 +7,7 @@ import json
 from datetime import datetime, timedelta
 import arrow
 import pytz
+from . import stockutils
 
 def IST_now():
     return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
@@ -93,7 +94,12 @@ class JournalEntry(object):
         self.position_changes = []
         self.comment_count = 0
         self.chart_count = 0
+        self.fetch_exit_price_as_ltp()
     
+    def fetch_exit_price_as_ltp(self):
+        if self.is_open() and not self.exit_price:
+            self.exit_price = stockutils.get_quote(self.tradingsymbol)
+
     def isidea(self):
         return self.is_idea == 'Y'
     
