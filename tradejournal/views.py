@@ -36,7 +36,6 @@ def home():
     journalentrygroups=repository.get_journalentrygroups_forview(journalentries)
     journalentries.extend(journalentrygroups)
     journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)
-    print(journalentries)
     page, per_page, offset = get_page_args()
     try:
         subpage = request.args['subpage']
