@@ -155,7 +155,7 @@ class JournalEntry(object):
     def profit(self):
         profit = 0
         if self.entry_price and self.quantity:
-            profit = int(self.quantity) * self.points_gain()
+            profit = float(self.quantity) * self.points_gain()
         return profit
 
     def get_entry_time(self):
