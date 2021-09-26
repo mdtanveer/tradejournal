@@ -11,27 +11,45 @@
             <i>{{journalentrygroup.strategy.lower()}}</i>
         </span>
     </h6>
-    <table class="table">
+    <table class="table table-sm table-responsive-sm">
+        <thead>
         <tr>
             <td>Instrument</td>
             <td>Entry</td>
             <td>Exit</td>
-            <td>Trade</td>
             <td>Entry Price</td>
             <td>Exit Price</td>
             <td>Quantity</td>
+            <td>Gain</td>
+            <td>Profit</td>
         </tr>
+        </thead>
+        <tbody>
         {% for journalentry in journalentrygroup.deserialized_items %}
         <tr>
             <td> <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.tradingsymbol}}</a></td>
-            <td>{{journalentry.entry_time|formatdatetimedisplay}}</td>
-            <td>{{journalentry.exit_time | formatdatetimedisplay if not zero_exit else ''}}</td>
-            <td>{{journalentry.direction}}</td>
+            <td>{{journalentry.entry_time|formatdateonly}}</td>
+            <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
             <td>{{journalentry.entry_price}}</td>
             <td>{{journalentry.exit_price}}</td>
-            <td>{{journalentry.quantity}}</td>
+            <td>{{journalentry.directionalqty()}}</td>
+            <td>{{'%0.2f' % journalentry.points_gain() | float}}</td>
+            <td>{{'%0.2f' % journalentry.profit() | float}}</td>
         </tr>
         {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{'%0.2f' % journalentrygroup.points_gain() | float}}</td>
+            <td>{{'%0.2f' % journalentrygroup.profit() | float}}</td>
+        </tr>
+        </tfoot>
     </table>
 
     <h4> Comments </h4>

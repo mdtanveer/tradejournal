@@ -531,3 +531,15 @@ def format_datetime(value, format="%Y-%m-%d %H:%M:%S"):
     if value is None:
         return ""
     return value.strftime(format)
+
+@app.template_filter('formatdateonly')
+def format_dateonly(value, format="%d-%m-%Y"):
+    if value is None:
+        return ""
+    now = IST_now()
+    if value == toIST_fromtimestamp(0):
+        return ""
+    if now.year == value.year:
+        return value.strftime("%d-%m")
+    else:
+        return value.strftime("%d-%m-%Y")

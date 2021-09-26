@@ -67,6 +67,18 @@ class JournalEntryGroup(object):
     def get_item_count(self):
         return len(self.deserialized_items)
 
+    def points_gain(self):
+        sum = 0
+        for je in self.deserialized_items:
+            sum += je.points_gain()
+        return sum
+
+    def profit(self):
+        sum = 0
+        for je in self.deserialized_items:
+            sum += je.profit()
+        return sum
+
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self, key, entity): 
@@ -125,6 +137,26 @@ class JournalEntry(object):
                     return not longprofitable
         except:
             return False
+
+    def directionalqty(self):
+        if self.direction == 'SHORT':
+            return '-'+self.quantity
+        else:
+            return self.quantity
+
+    def points_gain(self):
+        gain = 0
+        if self.entry_price:
+            gain = float(self.exit_price) - float(self.entry_price)
+            if self.direction == 'SHORT':
+                gain = -gain
+        return gain
+
+    def profit(self):
+        profit = 0
+        if self.entry_price and self.quantity:
+            profit = int(self.quantity) * self.points_gain()
+        return profit
 
     def get_entry_time(self):
         return arrow.get(self.entry_time).humanize()
