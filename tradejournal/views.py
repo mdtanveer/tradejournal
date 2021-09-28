@@ -199,6 +199,7 @@ def editgroup(key):
 @login_required
 def viewgroup(key):
     journalentrygroup=repository.get_journalentrygroup(key)
+    journalentrygroup.fetch_exit_price_as_ltp()
     return render_template(
         'groupview.html',
         journalentrygroup = journalentrygroup,

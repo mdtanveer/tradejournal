@@ -374,7 +374,7 @@ class TJChart
 
         DispatchCurrentIndexChanged() {
             const cusevent = new CustomEvent('cidxchanged', { detail : this.currentChartIndex });
-            for (var i=0; i<this.eventTargets.length; i++) {
+            for (var i=0; this.eventTargets && i<this.eventTargets.length; i++) {
                 this.eventTargets[i].dispatchEvent(cusevent)
             }
         }

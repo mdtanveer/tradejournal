@@ -39,9 +39,13 @@ class JournalEntryGroup(object):
             return
         keys = self.items.split(',')
         for key in keys:
-            self.deserialized_items.append(indict[key])
-            alljournalentries.remove(indict[key])
-            self.deserialized_items.sort(key = lambda x: x.entry_time, reverse=True)
+            try:
+                key = key.strip()
+                self.deserialized_items.append(indict[key])
+                alljournalentries.remove(indict[key])
+                self.deserialized_items.sort(key = lambda x: x.entry_time, reverse=True)
+            except:
+                continue
     
     def is_open(self):
         return not self.has_valid_exit_time()
@@ -79,6 +83,10 @@ class JournalEntryGroup(object):
             sum += je.profit()
         return sum
 
+    def fetch_exit_price_as_ltp(self):
+        for je in self.deserialized_items:
+            je.fetch_exit_price_as_ltp()
+
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self, key, entity): 
@@ -106,7 +114,6 @@ class JournalEntry(object):
         self.position_changes = []
         self.comment_count = 0
         self.chart_count = 0
-        self.fetch_exit_price_as_ltp()
     
     def fetch_exit_price_as_ltp(self):
         if self.is_open() and not self.exit_price:

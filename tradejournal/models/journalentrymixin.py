@@ -56,6 +56,8 @@ class JournalEntryMixin:
                                   and updated_entity[tju.KEY_EXIT_TIME] != ''))
             if trade_closure:
                 self.add_chart(key, {'title':'Auto exit chart'}, updated_entity['timeframe'])
+            else:
+                updated_entity.pop(tju.KEY_EXIT_PRICE)
             entity.update(updated_entity)
             if tju.KEY_EXIT_TIME in entity.keys() and entity[tju.KEY_EXIT_TIME]:
                 entity[tju.KEY_EXIT_TIME] = tju.strtime_to_timestamp(entity[tju.KEY_EXIT_TIME])
