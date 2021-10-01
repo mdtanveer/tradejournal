@@ -54,7 +54,7 @@ def get_quote(name):
     try:
         return nse.nse_quote_ltp(*args)
     except:
-        return ''
+        return 0
 
 def test():
     me = "BANKNIFTY21SEP37500PE"
