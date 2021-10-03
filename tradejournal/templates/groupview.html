@@ -103,4 +103,13 @@
         <a class="btn btn-secondary btn-success" href="/journalentrygroup/{{journalentrygroup.key}}/edit">Edit</a>
     </form>
 </div>
+<script type="text/javascript">
+    $("#postcommentbutton").click(function(event){        
+        event.preventDefault();
+        $.post("/journalentrygroup/{{journalentrygroup.key}}/comments", $("#commentform").serialize(), function(data) {
+            $("#commentform")[0].reset();
+            window.location.reload();
+        });
+        });   
+</script>
 {% endblock %}

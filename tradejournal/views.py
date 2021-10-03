@@ -200,11 +200,16 @@ def editgroup(key):
 def viewgroup(key):
     journalentrygroup=repository.get_journalentrygroup(key)
     journalentrygroup.fetch_exit_price_as_ltp()
+    comments=repository.get_comments(key)
+    page, per_page, offset = get_page_args()
+    pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
     return render_template(
         'groupview.html',
         journalentrygroup = journalentrygroup,
         pagetitle = "Group Entry",
-        subtitle = "View Journal Entry Group"
+        subtitle = "View Journal Entry Group",
+        comments = comments,
+        pagination = pagination
     )
 
 @app.route('/journalentrygroup/<key>/delete', methods=['GET'])
@@ -229,7 +234,7 @@ def commentsgroup(key):
             repository.add_comment(key, data)
             if linkchart:
                 repository.add_chart(key, {'title':data['title']})
-            return redirect('/journalentrygroup/{0}/comments'.format(key))
+            return redirect('/journalentrygroup/{0}'.format(key))
         except KeyError:
             error_message = 'Unable to update'
     else:
@@ -349,13 +354,11 @@ def charts(key):
             else:
                 data = request.form
             repository.add_chart(key, data, journalentry.get_timeframe())
-            return redirect('/journalentry/{0}/charts'.format(key))
         except KeyError:
             error_message = 'Unable to update'
-    else:
-        indicator = request.args.get('ind', journalentry.get_indicator())
-        overlay_indicator = request.args.get('oind', 'ichimoku')
-        return chartview_helper(journalentry, indicator, overlay_indicator, error_message)
+    indicator = request.args.get('ind', journalentry.get_indicator())
+    overlay_indicator = request.args.get('oind', 'ichimoku')
+    return chartview_helper(journalentry, indicator, overlay_indicator, error_message)
 
 @app.route('/journalentry/<key>/charts/<chartid>', methods=['GET'])
 @login_required
