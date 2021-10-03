@@ -27,14 +27,25 @@
         <tbody>
         {% for journalentry in journalentrygroup.deserialized_items %}
         <tr>
-            <td> <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.tradingsymbol}}</a></td>
-            <td>{{journalentry.entry_time|formatdateonly}}</td>
-            <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
-            <td>{{journalentry.entry_price}}</td>
-            <td>{{journalentry.exit_price}}</td>
-            <td>{{journalentry.directionalqty()}}</td>
-            <td>{{'%0.2f' % journalentry.points_gain() | float}}</td>
-            <td>{{'%0.2f' % journalentry.profit() | float}}</td>
+            {% if journalentry.is_group() %}
+                <td> <a href="/journalentrygroup/{{journalentry.key}}">{{journalentry.name}}</a></td>
+                <td>{{journalentry.entry_time|formatdateonly}}</td>
+                <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>{{'%0.2f' % journalentry.points_gain() | float}}</td>
+                <td>{{'%0.2f' % journalentry.profit() | float}}</td>
+            {% else %}
+                <td> <a href="/journalentry/{{journalentry.key}}/edit">{{journalentry.tradingsymbol}}</a></td>
+                <td>{{journalentry.entry_time|formatdateonly}}</td>
+                <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
+                <td>{{journalentry.entry_price}}</td>
+                <td>{{journalentry.exit_price}}</td>
+                <td>{{journalentry.directionalqty()}}</td>
+                <td>{{'%0.2f' % journalentry.points_gain() | float}}</td>
+                <td>{{'%0.2f' % journalentry.profit() | float}}</td>
+            {% endif %}
         </tr>
         {% endfor %}
         </tbody>

@@ -22,10 +22,9 @@ class JournalEntryGroupMixin:
 
     def get_journalentrygroups_forview(self, alljournalentries):
         """Returns all the journalentrygroups from the repository."""
-        indict = {str(e.key):e for e in alljournalentries}
         journalentrygroups = self.get_journalentrygroups()
+        indict = {str(e.key):e for e in alljournalentries+journalentrygroups}
         comments = self.get_all_comments_for_count()
-        charts = self.get_all_charts_for_count()
         for entry in journalentrygroups:
             entry.comment_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, comments)))
             entry.populate_children(indict, alljournalentries)

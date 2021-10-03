@@ -51,6 +51,7 @@ def convert_from_zerodha_convention(name):
 @filecache(900)
 def get_quote(name):
     args = convert_from_zerodha_convention(name)
+    print(args)
     try:
         return nse.nse_quote_ltp(*args)
     except:
@@ -66,9 +67,9 @@ def test():
     print(convert_from_zerodha_convention(mf))
 
 def test2():
-    me = "BANKNIFTY21SEP37500PE"
+    me = "BANKNIFTY21OCT37600CE"
     we = "BANKNIFTY21O0736700PE"
-    mf = "KOTAKBANK21SEPFUT"
+    mf = "KOTAKBANK21OCTFUT"
 
     print(get_quote(me))
     print(get_quote(we))

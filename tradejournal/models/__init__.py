@@ -42,9 +42,11 @@ class JournalEntryGroup(object):
             try:
                 key = key.strip()
                 self.deserialized_items.append(indict[key])
-                alljournalentries.remove(indict[key])
+                if indict[key] in alljournalentries:
+                    alljournalentries.remove(indict[key])
                 self.deserialized_items.sort(key = lambda x: x.entry_time, reverse=True)
             except:
+                print(key, "not found")
                 continue
     
     def is_open(self):
