@@ -92,13 +92,13 @@ class JournalEntryGroup(object):
 
     def get_category(self):
         category = set()
-        now = IST_now()
+        now = IST_now().strftime("%b%y")
         if self.is_open():
-            category = category.union({'month', 'year'})
-        elif self.entry_time.month == now.month and self.entry_time.year == now.year:
-            category = category.union({'month', 'year'})
-        elif self.entry_time in fiscalyear.FiscalYear.current():
-            category.add('year')
+            category = {'month'}
+        if self.name.find(now) != -1:
+            category = {'month'}
+        if self.name.find(str(fiscalyear.FiscalYear.current())) != -1:
+            category = {'year'}
         return category
 
 class JournalEntry(object):
@@ -111,7 +111,7 @@ class JournalEntry(object):
         except:
             self.entry_time = toIST_fromtimestamp(0)
         try:
-            self.exit_time = toIST_fromtimestamp(float(entity.exit_time))
+            self.exit_time = toIST_fromtimestamp(float(entity.exit_time)) 
         except:
             self.exit_time = toIST_fromtimestamp(0)
         self.entry_price = entity.entry_price if 'entry_price' in entity.keys() else ''
