@@ -1,8 +1,10 @@
-import nsepython as nse
+import nsepython
 import re
 from nsepy.derivatives import get_expiry_date
 import calendar
 from filecache import filecache
+import urllib
+import jmespath
 
 #examples
 # monthly expiry PE BANKNIFTY21SEP37500PE
@@ -49,11 +51,38 @@ def convert_from_zerodha_convention(name):
     return None
 
 @filecache(900)
+def get_derivative_data(symbol):
+    symbol = nsepython.nsesymbolpurify(symbol)
+    payload = nsepython.nsefetch('https://www.nseindia.com/api/quote-derivative?symbol='+symbol)
+    return payload
+
 def get_quote(name):
+    try:
+        args = convert_from_zerodha_convention(name)
+        if len(args) == 3:
+            return get_quote_future(*args)
+        elif len(args) == 4:
+            return get_quote_option(*args)
+    except:
+        return 0
+
+def get_quote_future(symbol, expiry, optiontype):
+    derivative_data = get_derivative_data(symbol)
+    query_string = f'stocks[?metadata.expiryDate == `{expiry}` && metadata.optionType==`-`].metadata.lastPrice'
+    return jmespath.search(query_string, derivative_data)[0]
+
+def get_quote_option(symbol, expiry, optiontype, strike):
+    derivative_data = get_derivative_data(symbol)
+    optiontype = {'CE':'Call', 'PE':'Put'}[optiontype]
+    query_string = f'stocks[?metadata.strikePrice == `{strike}` && metadata.expiryDate == `{expiry}` && metadata.optionType==`{optiontype}`].metadata.lastPrice'
+    return jmespath.search(query_string, derivative_data)[0]
+
+@filecache(900)
+def get_quote_old(name):
     args = convert_from_zerodha_convention(name)
     print(args)
     try:
-        return nse.nse_quote_ltp(*args)
+        return nsepython.nse_quote_ltp(*args)
     except:
         return 0
 
@@ -68,12 +97,16 @@ def test():
 
 def test2():
     me = "BANKNIFTY21OCT37600CE"
-    we = "BANKNIFTY21O0736700PE"
+    we = "BANKNIFTY21O1436700PE"
     mf = "KOTAKBANK21OCTFUT"
 
     print(get_quote(me))
     print(get_quote(we))
     print(get_quote(mf))
+
+def test3():
+    o = "M&M21OCT880CE"
+    print(get_quote(o))
 
 if __name__ == "__main__":
     test2()
