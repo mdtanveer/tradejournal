@@ -9,9 +9,11 @@
     <li id="close" class="nav-item">
         <a class="nav-link {{"active" if subpage=="closed" else ""}}" href="home?subpage=closed">Closed</a>
     </li>
-    <li id="idea" class="nav-item">
-        <a class="nav-link {{"active" if subpage=="idea" else ""}}" href="home?subpage=idea">Ideas</a>
+    {% for cat in categories %}
+    <li id="{{ cat }}" class="nav-item">
+        <a class="nav-link {{"active" if subpage=="{{ cat }}" else ""}}" href="home?subpage={{ cat }}">{{ cat.title() }}</a>
     </li>
+    {% endfor %}
 </ul>
 {% if journalentries %}
         {% for journalentry in journalentries %}

@@ -36,22 +36,33 @@ def home():
     journalentrygroups=repository.get_journalentrygroups_forview(journalentries)
     journalentries.extend(journalentrygroups)
     journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)
+
+    categories = {}
+    for je in journalentries:
+        for category in je.get_category():
+            if category not in categories.keys():
+                categories[category] = []
+            categories[category].append(je)
+    
     page, per_page, offset = get_page_args()
     try:
         subpage = request.args['subpage']
     except:
         subpage = request.cookies.get('subpage', 'open')
 
+    entries = []
     if subpage != request.cookies.get('subpage', 'open'):
         page = int(request.cookies.get('page_'+subpage, "1"))
         offset = per_page*(page-1)
 
-    if subpage == 'idea':
-        entries = list(filter(lambda x: x.isidea(), journalentries))
-    elif subpage == 'open':
+    if subpage == 'open':
         entries = list(filter(lambda x: x.is_open() and not x.isidea(), journalentries))
     elif subpage == 'closed':
         entries = list(filter(lambda x: not x.is_open() and not x.isidea(), journalentries))
+    elif subpage in categories.keys():
+        entries = categories[subpage]
+
+    print(page)
     pagination = Pagination(page=page, total=len(entries), search=False, record_name='journalentries',css_framework='bootstrap4')
     response = make_response(render_template(
         'index.html',
@@ -60,6 +71,7 @@ def home():
         journalentries=entries[offset:offset+per_page],
         pagination=pagination,
         subpage=subpage,
+        categories = categories.keys()
     ))
     response.set_cookie('subpage', subpage)
     response.set_cookie('page_'+subpage, str(page))

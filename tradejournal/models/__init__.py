@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import arrow
 import pytz
 from . import stockutils
+import fiscalyear
 
 def IST_now():
     return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
@@ -88,6 +89,17 @@ class JournalEntryGroup(object):
     def fetch_exit_price_as_ltp(self):
         for je in self.deserialized_items:
             je.fetch_exit_price_as_ltp()
+
+    def get_category(self):
+        category = set()
+        now = IST_now()
+        if self.is_open():
+            category = category.union({'month', 'year'})
+        elif self.entry_time.month == now.month and self.entry_time.year == now.year:
+            category = category.union({'month', 'year'})
+        elif self.entry_time in fiscalyear.FiscalYear.current():
+            category.add('year')
+        return category
 
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
@@ -189,6 +201,12 @@ class JournalEntry(object):
     
     def get_chart_count(self):
         return self.chart_count
+
+    def get_category(self):
+        category = set()
+        if self.isidea():
+            category.add('idea')
+        return category
 
 
 class JournalEntryNotFound(Exception):
