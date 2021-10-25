@@ -9,6 +9,7 @@ import arrow
 import pytz
 from . import stockutils
 import fiscalyear
+import itertools, functools
 
 def IST_now():
     return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
@@ -101,6 +102,27 @@ class JournalEntryGroup(object):
             category = {'year'}
         return category
 
+    def groupby(self, grouptype):
+        if grouptype == 'symbol':
+            group_func = lambda x: x.symbol
+        elif grouptype == 'instrument':
+            group_func = lambda x: x.tradingsymbol
+        else:
+            return self
+
+        entry_items = filter(lambda x: not x.is_group(), self.deserialized_items)
+        group_items = filter(lambda x: x.is_group(), self.deserialized_items)
+        jgnew = JournalEntryGroup(None, {})
+        jgnew.name = self.name
+        jgnew.deserialized_items.extend(group_items)
+        for k,group in itertools.groupby(entry_items, group_func):
+            jenew = functools.reduce(lambda a,b: a.reduce(b), group)
+            jenew.tradingsymbol = k
+            jenew.key = ''
+            jgnew.deserialized_items.append(jenew)
+        return jgnew
+
+
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self, key, entity): 
@@ -128,7 +150,19 @@ class JournalEntry(object):
         self.position_changes = []
         self.comment_count = 0
         self.chart_count = 0
+        self.points_gain_prop = None
+        self.profit_prop = None
+        self.quantity_prop = None
     
+    def reduce(self, other):
+        jenew = JournalEntry(None, {})
+        jenew.entry_time = min(self.entry_time, other.entry_time)
+        jenew.exit_time = toIST_fromtimestamp(0) if self.is_open() or other.is_open() else max(self.exit_time, other.exit_time)
+        jenew.points_gain_prop = self.points_gain() + other.points_gain()
+        jenew.profit_prop = self.profit()+ other.profit()
+        jenew.quantity_prop = float(self.directionalqty()) + float(other.directionalqty())
+        return jenew
+
     def fetch_exit_price_as_ltp(self):
         if self.is_open() and not self.exit_price:
             self.exit_price = stockutils.get_quote(self.tradingsymbol)
@@ -160,12 +194,16 @@ class JournalEntry(object):
             return False
 
     def directionalqty(self):
+        if self.quantity_prop:
+            return str(self.quantity_prop)
         if self.direction == 'SHORT':
             return '-'+self.quantity
         else:
             return self.quantity
 
     def points_gain(self):
+        if self.points_gain_prop:
+            return self.points_gain_prop
         gain = 0
         if self.entry_price:
             gain = float(self.exit_price) - float(self.entry_price)
@@ -174,6 +212,8 @@ class JournalEntry(object):
         return gain
 
     def profit(self):
+        if self.profit_prop:
+            return self.profit_prop
         profit = 0
         if self.entry_price and self.quantity:
             profit = float(self.quantity) * self.points_gain()

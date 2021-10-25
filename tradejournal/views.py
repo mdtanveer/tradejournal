@@ -210,6 +210,7 @@ def editgroup(key):
 @app.route('/journalentrygroup/<key>', methods=['GET'])
 @login_required
 def viewgroup(key):
+    groupby = request.args.get('groupby', 'none')
     journalentrygroup=repository.get_journalentrygroup(key)
     journalentrygroup.fetch_exit_price_as_ltp()
     comments=repository.get_comments(key)
@@ -217,7 +218,7 @@ def viewgroup(key):
     pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
     return render_template(
         'groupview.html',
-        journalentrygroup = journalentrygroup,
+        journalentrygroup = journalentrygroup.groupby(groupby),
         pagetitle = "Group Entry",
         subtitle = "View Journal Entry Group",
         comments = comments,

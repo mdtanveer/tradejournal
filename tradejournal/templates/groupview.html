@@ -11,6 +11,16 @@
             <i>{{journalentrygroup.strategy.lower()}}</i>
         </span>
     </h6>
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle btn-light" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        Group By
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" href="?groupby=none">None</a></li>
+          <li><a class="dropdown-item" href="?groupby=symbol">Symbol</a></li>
+          <li><a class="dropdown-item" href="?groupby=instrument">Instrument</a></li>
+      </ul>
+    </div>
     <table class="table table-sm table-responsive-sm">
         <thead>
         <tr>
