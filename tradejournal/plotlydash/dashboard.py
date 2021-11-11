@@ -44,10 +44,12 @@ def layout_func():
     
     df_nfo = df[df['PartitionKey']=='NFO']
     df_mcx = df[df['PartitionKey']=='MCX']
+    df_hsec = df[df['PartitionKey']=='HDFCSEC']
     df_tot = df.groupby('RowKey', as_index=False).agg({'FY':'first', 'NetRealizedPnL':'sum'})
 
     df_nfo_yearly = df_nfo[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
     df_mcx_yearly = df_mcx[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
+    df_hsec_yearly = df_hsec[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
     df_tot_yearly = df_tot[["FY", "NetRealizedPnL"]].groupby('FY', as_index=False).agg('sum')
 
     return  html.Div(
@@ -80,6 +82,13 @@ def layout_func():
                         textposition='auto',
                     ),
                     go.Bar(
+                        name="HSec",
+                        x = df_hsec['RowKey'],
+                        y = df_hsec['NetRealizedPnL'],
+                        text=df_hsec['NetRealizedPnL'].apply(toLakhs),
+                        textposition='auto',
+                    ),
+                    go.Bar(
                         name="NFO",
                         x = df_nfo['RowKey'],
                         y = df_nfo['NetRealizedPnL'],
@@ -108,6 +117,13 @@ def layout_func():
                         x = df_mcx_yearly['FY'],
                         y = df_mcx_yearly['NetRealizedPnL'],
                         text=df_mcx_yearly['NetRealizedPnL'].apply(toLakhs),
+                        textposition='auto',
+                        ),
+                    go.Bar(
+                        name="HSec",
+                        x = df_hsec_yearly['FY'],
+                        y = df_hsec_yearly['NetRealizedPnL'],
+                        text=df_hsec_yearly['NetRealizedPnL'].apply(toLakhs),
                         textposition='auto',
                         ),
                     go.Bar(
