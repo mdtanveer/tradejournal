@@ -29,9 +29,9 @@ def create_dashboard(server):
 def getFY(date):
     year, month = date.year, date.month
     if month <= 3:
-        return year - 1
-    else: 
         return year
+    else: 
+        return year + 1
 
 def toLakhs(amount):
     return  "%0.2fL"%(amount/100000.0)
@@ -58,7 +58,7 @@ def layout_func():
     groups =  df_tot_yearly.groupby("PartitionKey")
     for groupid in groups.groups:
         dfg = groups.get_group(groupid)
-        yearly_chart.append_trace(
+        yearly_chart.add_trace (
             go.Bar( x = dfg['FY'],
                         y = dfg['NetRealizedPnL'],
                         text=dfg['NetRealizedPnL'].apply(toLakhs),
@@ -67,17 +67,23 @@ def layout_func():
             row=1, col=2
         )
 
-    tab = pd.pivot_table(df_tot_yearly, values='NetRealizedPnL', index='FY',
-            columns=['PartitionKey'], aggfunc=np.sum).fillna(0).applymap(toLakhs).reset_index()
+    yearly_pnl_table = pd.pivot_table(df_tot_yearly, values='NetRealizedPnL', index='FY',
+            columns=['PartitionKey'], aggfunc=np.sum).fillna(0).applymap(toLakhs).reset_index().sort_values("FY", ascending=False)
+
+    monthly_pnl_table = pd.pivot_table(df, values='NetRealizedPnL', index='RowKey',
+            columns=['PartitionKey'], aggfunc=np.sum).fillna(0).applymap(toLakhs).reset_index().sort_values("RowKey", ascending=False)
+    monthly_pnl_table["RowKey"] = monthly_pnl_table["RowKey"].apply(lambda x: x.strftime("%b-%Y"))
+    monthly_pnl_table = monthly_pnl_table.rename(columns={"RowKey":"Month"})
+
     yearly_chart.add_trace(
         go.Table(
             header=dict(
-                values=list(tab.columns), 
+                values=list(monthly_pnl_table.columns), 
                 font=dict(size=10),
                 align="left"
             ),
             cells=dict(
-                values=[tab[k].tolist() for k in tab.columns[:]],
+                values=[monthly_pnl_table[k].tolist() for k in monthly_pnl_table.columns[:]],
                 align = "left")
         ),
         row=1, col=1
@@ -100,36 +106,55 @@ def layout_func():
     return  html.Div(
         children=[
             dcc.Graph(
-            id='yearly-chart',
-            figure = yearly_chart),
+                id='yearly-chart',
+                figure = yearly_chart
+                ),
             dcc.Graph(
-            id='line-chart',
-            figure={
-                'data': [
-                    go.Line(
-                        name="Total",
-                        x = df_tot['RowKey'],
-                        y = df_tot['NetRealizedPnL'].cumsum(),
-                        text=df_tot['NetRealizedPnL'].cumsum().apply(toLakhs),
-                        textposition='auto',
-                        markers=True,
-                    ),
-                    go.Bar(
-                        name="Total",
-                        x = df_tot['RowKey'],
-                        y = df_tot['NetRealizedPnL'],
-                        text=df_tot['NetRealizedPnL'].apply(toLakhs),
-                        textposition='auto',
-                    )
-                    ],
-                'layout': {
-                    'title': 'Cumulative profit/loss',
-                    'plot_bgcolor': '#f8f8f8'
-                }
-            }),
+                id = 'yearly-table',
+                figure = go.Figure(
+                    data = [
+                        go.Table(
+                        header=dict(
+                            values=list(yearly_pnl_table.columns), 
+                            font=dict(size=10),
+                            align="left"
+                        ),
+                        cells=dict(
+                            values=[yearly_pnl_table[k].tolist() for k in yearly_pnl_table.columns[:]],
+                            align = "left")
+                        )],
+                    layout = {
+                        'title': 'Yearly profit/loss table',
+                        'plot_bgcolor': '#f8f8f8',
+                        'height' : 310
+                        }
+                    )),
             dcc.Graph(
-            id='monthly-chart',
-            figure = monthly_chart,
+                id='line-chart',
+                figure = go.Figure(
+                    data = [
+                        go.Scatter(
+                            name = "Cumulative P&L",
+                            x = df_tot['RowKey'],
+                            y = df_tot['NetRealizedPnL'].cumsum(),
+                            text = df_tot['NetRealizedPnL'].cumsum().apply(toLakhs),
+                            mode = 'lines+markers',
+                        ),
+                        go.Bar(
+                            name = "Monthly P&L",
+                            x = df_tot['RowKey'],
+                            y = df_tot['NetRealizedPnL'],
+                            text=df_tot['NetRealizedPnL'].apply(toLakhs),
+                        )
+                        ],
+                    layout = {
+                        'title': 'Cumulative profit/loss',
+                        'plot_bgcolor': '#f8f8f8'
+                    }
+            )),
+            dcc.Graph(
+                id='monthly-chart',
+                figure = monthly_chart,
             ),
         ],
         id='dash-container'
