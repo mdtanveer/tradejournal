@@ -9,6 +9,7 @@ class TJChart
         this.resampleType = 'original';
         this.secondaryIndicator = secondaryIndicator;
         this.primaryIndicator = primaryIndicator;
+        this.trades = trades;
         if(symbol)
             this.currentChartIndex = charts.length - 1;
         else
@@ -23,7 +24,7 @@ class TJChart
 
         var dim = {
             width: windowW, height: windowH,
-            margin: { top: 10, right: 0, bottom: 40, left: 0 },
+            margin: { top: 10, right: 10, bottom: 40, left: 40 },
             ohlc: { height: 305 },
             indicator: { height: 65, padding: 5 }
         };
@@ -165,6 +166,36 @@ class TJChart
             this.bollingerIndicator = techan.indicator.bollinger();
         }
 
+        if (this.timeFrame == "2h" || this.timeframe == "1h") {
+            var annotationFormat = d3.timeFormat('%m-%d %H:%M')
+        } else {
+            var annotationFormat = d3.timeFormat('%m-%d')
+        }
+
+        var timeAnnotation = techan.plot.axisannotation()
+            .axis(this.xAxis)
+            .orient('bottom')
+            .format(annotationFormat)
+            .width(65)
+            .translate([0, dim.indicator.bottom]);
+
+        var ohlcAnnotation = techan.plot.axisannotation()
+            .axis(this.yAxis)
+            .orient('left')
+            .format(d3.format('.4s'))
+            .translate([this.x(0), 0]);
+
+        this.ohlcCrosshair = techan.plot.crosshair()
+            .xScale(timeAnnotation.axis().scale())
+            .yScale(ohlcAnnotation.axis().scale())
+            .xAnnotation(timeAnnotation)
+            .yAnnotation([ohlcAnnotation])
+            .verticalWireRange([0, dim.plot.height]);
+
+        this.supstance = techan.plot.supstance()
+            .xScale(this.x)
+            .yScale(this.y);
+
         this.volume = techan.plot.volume()
                 .accessor(this.candlestick.accessor())   // Set the accessor to a ohlc accessor so we get highlighted bars
                 .xScale(this.x)
@@ -203,6 +234,13 @@ class TJChart
         this.svg.append("g")
                   .attr("class", "tradearrow")
                     .attr("clip-path", "url(#ohlcClip)");
+
+        this.svg.append('g')
+            .attr("class", "crosshair ohlc");
+
+        this.svg.append("g")
+            .attr("class", "supstances analysis")
+            .attr("clip-path", "url(#ohlcClip)");    
     }
 
     draw(data) {
@@ -258,10 +296,17 @@ class TJChart
             }
             else {
                 var chartTrades = this.trades;
+                var supstanceData = [
+                    { start: this.trades[0].date, end: this.trades[1].date, value: this.trades[0].price },
+                    { start: this.trades[0].date, end: this.trades[1].date, value: this.trades[1].price },
+                ];
+                //this.svg.select("g.supstances").datum(supstanceData).call(this.supstance)
             }
             this.svg.selectAll("g.tradearrow").selectAll("*").remove();
             this.svg.selectAll("g.tradearrow").datum(chartTrades).call(this.tradearrow);
         }
+
+        this.svg.select("g.crosshair.ohlc").call(this.ohlcCrosshair);
     }
 
 
