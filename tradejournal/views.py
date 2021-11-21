@@ -32,7 +32,6 @@ class ChartForm(Form):
 def home():
     """Renders the home page, with a list of all journalentrys."""
     journalentries=repository.get_journalentries_forview()
-    ALL_ENTITIES_CACHED = journalentries
     journalentrygroups=repository.get_journalentrygroups_forview(journalentries)
     journalentries.extend(journalentrygroups)
     journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)

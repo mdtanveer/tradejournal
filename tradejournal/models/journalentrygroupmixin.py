@@ -23,14 +23,23 @@ class JournalEntryGroupMixin:
     def get_journalentrygroups_forview(self, alljournalentries):
         """Returns all the journalentrygroups from the repository."""
         journalentrygroups = self.get_journalentrygroups()
-        indict = {str(e.key):e for e in alljournalentries+journalentrygroups}
+        self.GROUP_CACHE = {str(e.key):e for e in journalentrygroups}
         comments = self.get_all_comments_for_count()
+        indict = dict(self.ENTRY_CACHE)
+        indict.update(self.GROUP_CACHE)
+        
         for entry in journalentrygroups:
             entry.comment_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, comments)))
             entry.populate_children(indict, alljournalentries)
             self.GROUP_CACHE[entry.key] = entry
         return journalentrygroups
-    
+
+    def invalidate_journalentrygroupcache(self, journalentrygroup_key):
+        try:
+            del self.GROUP_CACHE[journalentrygroup_key]
+        except:
+            pass
+
     def get_journalentrygroup(self, journalentrygroup_key):
         """Returns a journalentrygroup from the repository."""
         try:
@@ -55,6 +64,7 @@ class JournalEntryGroupMixin:
             if tju.KEY_EXIT_TIME in entity.keys() and entity[tju.KEY_EXIT_TIME]:
                 entity[tju.KEY_EXIT_TIME] = tju.strtime_to_timestamp(entity[tju.KEY_EXIT_TIME])
             self.svc.update_entity(self.TABLES["journalentrygroup"], entity)
+            self.invalidate_journalentrygroupcache(key)
 
         except AzureMissingResourceHttpError:
             raise JournalEntrygroupNotFound()

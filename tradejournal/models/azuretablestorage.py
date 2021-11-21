@@ -55,5 +55,6 @@ class Repository(JournalEntryMixin, ChartMixin,
         except:
             self.container_client = self.blob_service_client.create_container(self.container_name)
         self.GROUP_CACHE = {}
+        self.ENTRY_CACHE = {}
 
 

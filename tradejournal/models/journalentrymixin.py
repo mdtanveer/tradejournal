@@ -27,6 +27,7 @@ class JournalEntryMixin:
         for entry in journalentries:
             entry.comment_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, comments)))
             entry.chart_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, charts)))
+        self.ENTRY_CACHE = {str(e.key):e for e in journalentries}
         return journalentries
     
     def get_journalentry(self, journalentry_key):
@@ -68,6 +69,8 @@ class JournalEntryMixin:
             if tju.KEY_EXIT_TIME in entity.keys() and entity[tju.KEY_EXIT_TIME]:
                 entity[tju.KEY_EXIT_TIME] = tju.strtime_to_timestamp(entity[tju.KEY_EXIT_TIME])
             self.svc.update_entity(self.TABLES["journalentry"], entity)
+
+            self.ENTRY_CACHE[key] = self.get_journalentry(key)
 
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
