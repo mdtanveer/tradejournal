@@ -248,6 +248,14 @@ class JournalEntry(object):
             category.add('idea')
         return category
 
+    def get_tradingsymbol_forview(self):
+        attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
+        if attrib[2] == "Fut":
+            html = "%s %s %s" % (attrib[0], attrib[1].split('-')[1].upper(), attrib[2].upper())
+        else:
+            html = "%s %s<br/>%s" % (attrib[0], str(attrib[3])+attrib[2], attrib[1]) 
+        return html
+
 
 class JournalEntryNotFound(Exception):
     """Exception raised when a trade entry object couldn't be retrieved from
