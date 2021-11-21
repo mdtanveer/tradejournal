@@ -107,6 +107,10 @@ class JournalEntryGroup(object):
             group_func = lambda x: x.symbol
         elif grouptype == 'instrument':
             group_func = lambda x: x.tradingsymbol
+        elif grouptype == 'strike':
+            group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol)[3]
+        elif grouptype == 'expiry':
+            group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol)[1]
         else:
             return self
 
@@ -250,10 +254,13 @@ class JournalEntry(object):
 
     def get_tradingsymbol_forview(self):
         attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
-        if attrib[2] == "Fut":
-            html = "%s %s %s" % (attrib[0], attrib[1].split('-')[1].upper(), attrib[2].upper())
+        if len(attrib) > 1:
+            if attrib[2] == "Fut":
+                html = "%s %s %s" % (attrib[0], attrib[1].split('-')[1].upper(), attrib[2].upper())
+            else:
+                html = "%s %s<br/><small>%s</small>" % (attrib[0], str(attrib[3])+attrib[2], attrib[1]) 
         else:
-            html = "%s %s<br/>%s" % (attrib[0], str(attrib[3])+attrib[2], attrib[1]) 
+            html = self.tradingsymbol
         return html
 
 
