@@ -4,7 +4,7 @@ Routes and views for the flask application.
 import json
 from datetime import datetime
 
-from flask import render_template, make_response, redirect, request, Response
+from flask import render_template, make_response, redirect, request, Response, session
 from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
 from tradejournal.models import JournalEntry, JournalEntryGroup, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
@@ -165,6 +165,12 @@ def creategroup():
         subtitle = "Create New Journal Entry Group"
     )
 
+def lastget_url(default):
+    try:
+        return session['lastget']
+    except:
+        return default
+
 @app.route('/journalentry/<key>/edit', methods=['GET', 'POST'])
 @login_required
 def edit(key):
@@ -175,9 +181,10 @@ def edit(key):
         else:
             data = request.form
         repository.update_journalentry(key, data)
-        return redirect('/journalentry/{0}/edit'.format(key))
+        return redirect(lastget_url('/journalentry/{0}/charts'.format(key)))
     else:
         journalentry=repository.get_journalentry(key)
+        session['lastget'] = request.referrer
 
         return render_template(
             'create.html',
@@ -185,6 +192,27 @@ def edit(key):
             pagetitle = "Edit Entry",
             subtitle = "Edit Journal Entry"
         )
+
+@app.route('/journalentry/<key>/duplicate', methods=['GET', 'POST'])
+@login_required
+def duplicate(key):
+    """Duplicate journal entry"""
+    if request.method == 'POST':
+        if request.get_json():
+            data = request.get_json()
+        else:
+            data = request.form
+        repository.create_journalentries(data)
+        return redirect('/')
+    journalentry=repository.get_journalentry(key)
+    journalentry.entry_time = IST_now()
+
+    return render_template(
+        'create.html',
+        journalentry = journalentry,
+        pagetitle = "Duplicate Entry",
+        subtitle = "Duplicate Journal Entry"
+    )
 
 @app.route('/journalentrygroup/<key>/edit', methods=['GET', 'POST'])
 @login_required
@@ -196,9 +224,10 @@ def editgroup(key):
         else:
             data = request.form
         repository.update_journalentrygroup(key, data)
-        return redirect('/journalentrygroup/{0}/edit'.format(key))
+        return redirect(lastget_url('/journalentrygroup/{0}'.format(key)))
     else:
         journalentrygroup=repository.get_journalentrygroup(key)
+        session['lastget'] = request.referrer
 
         return render_template(
             'creategroup.html',

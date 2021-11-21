@@ -27,8 +27,10 @@
             <ul class="dropdown-menu dropdown-menu-right">
                 <li>
                     <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/edit">Edit</a>
+                    <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/duplicate">Duplicate</a>
                     <a class="dropdown-item" href="/journalentry/monthlyreview/{{journalentry.entry_time.year}}/{{journalentry.entry_time.month}}/1">Monthly Review</a>
-                    <a class="dropdown-item" href="javascript:g_chartInstance.DeleteCurrentChart();"> Delete </a>
+                    <a class="dropdown-item" href="javascript:g_chartInstance.DeleteCurrentChart();"> Delete Chart</a>
+                    <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/delete">Delete Entry</a>
                 </li>
             </ul>
         </div>
