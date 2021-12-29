@@ -8,7 +8,8 @@
     </h5>
     <h6>
         <span class="text-muted panel-text">
-            <i>{{journalentrygroup.strategy.lower()}}</i>
+            <span>Points: {{'%0.2f' % journalentrygroup.points_gain() | float}}</span>
+            <span>P&L: {{'%0.2f' % journalentrygroup.profit() | float}}</span>
         </span>
     </h6>
     <div class="dropdown">

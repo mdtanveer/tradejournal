@@ -48,6 +48,7 @@ def convert_from_zerodha_convention(name):
             expiry_day = list(get_expiry_date(year=int("20"+year), month=list(calendar.month_abbr).index(month_abbr), index=False, stock=True))[0].day
             expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
             return (symbol, expiry, "Fut")
+        return (name,)
     except:
         return (name,)
 

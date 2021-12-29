@@ -18,7 +18,8 @@ class TJChart
         this.DispatchCurrentIndexChanged();
 
         this.dataWindowSize = 250;
-        var windowW = Math.round(window.innerWidth*0.81);
+        var windowW = document.getElementById("main").clientWidth;
+        //var windowW = Math.round(window.innerWidth*0.81);
         var windowH = Math.round(window.innerHeight*0.60);
         var currentScrip = "";
 
