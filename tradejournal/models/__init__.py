@@ -209,10 +209,13 @@ class JournalEntry(object):
         if self.points_gain_prop:
             return self.points_gain_prop
         gain = 0
-        if self.entry_price:
-            gain = float(self.exit_price) - float(self.entry_price)
-            if self.direction == 'SHORT':
-                gain = -gain
+        try:
+            if self.entry_price:
+                gain = float(self.exit_price) - float(self.entry_price)
+                if self.direction == 'SHORT':
+                    gain = -gain
+        except:
+            pass
         return gain
 
     def profit(self):
