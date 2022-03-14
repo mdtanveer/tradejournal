@@ -5,7 +5,6 @@ import json
 from datetime import datetime
 
 from flask import render_template, make_response, redirect, request, Response, session
-from wtforms import Form, validators, StringField, SubmitField, FloatField, DateTimeField, IntegerField, TextAreaField, BooleanField
 
 from tradejournal.models import JournalEntry, JournalEntryGroup, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
 from tradejournal.models.factory import create_repository
@@ -17,14 +16,6 @@ from flask import current_app as app
 import sys, traceback
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
-
-class CommentForm(Form):
-    title = StringField('Title:')
-    text = TextAreaField('Text', validators=[validators.required()])
-    linkchart = BooleanField()
-
-class ChartForm(Form):
-    title = StringField('Title:')
 
 @app.route('/')
 @app.route('/home')
@@ -279,14 +270,12 @@ def commentsgroup(key):
         except KeyError:
             error_message = 'Unable to update'
     else:
-        form = CommentForm()
         comments=repository.get_comments(key)
         page, per_page, offset = get_page_args()
         pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
         return render_template(
             'comments.html',
             error_message=error_message,
-            form = form,
             comments=comments[offset:offset+per_page],
             journalentrygroup=repository.get_journalentrygroup(key),
             allcomments = False,
@@ -318,14 +307,12 @@ def comments(key):
         except KeyError:
             error_message = 'Unable to update'
     else:
-        form = CommentForm()
         comments=repository.get_comments(key)
         page, per_page, offset = get_page_args()
         pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
         return render_template(
             'comments.html',
             error_message=error_message,
-            form = form,
             comments=comments[offset:offset+per_page],
             journalentry=repository.get_journalentry(key),
             allcomments = False,
@@ -348,7 +335,6 @@ def allcomments():
         except KeyError:
             error_message = 'Unable to update'
     else:
-        form = CommentForm()
         page, per_page, offset = get_page_args()
         comments=repository.get_all_comments()
         pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
@@ -356,13 +342,11 @@ def allcomments():
             'comments.html',
             comments=comments[offset:offset+per_page],
             error_message=error_message,
-            form = form,
             allcomments=True,
             pagination = pagination
         )
 
 def chartview_helper(journalentry, indicator, overlay_indicator, error_message):
-    form = CommentForm()
     key = journalentry.key
     comments=repository.get_comments(key)
     page, per_page, offset = get_page_args()
@@ -371,7 +355,6 @@ def chartview_helper(journalentry, indicator, overlay_indicator, error_message):
         'chart.html',
         charts=jsonpickle.encode(repository.get_charts(key), unpicklable=False),
         error_message=error_message,
-        form = form,
         journalentry=journalentry,
         timeframe=journalentry.get_timeframe(),
         indicator=indicator,

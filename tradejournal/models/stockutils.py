@@ -50,7 +50,7 @@ def convert_from_zerodha_convention(name):
             return (symbol, expiry, "Fut")
         return (name,)
     except:
-        return (name,)
+        raise
 
 @filecache(900)
 def get_derivative_data(symbol):

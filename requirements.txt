@@ -2,7 +2,6 @@ Flask
 pandas
 arrow
 azure-storage-blob
-wtforms
 flask_login
 authlib
 flask-paginate
