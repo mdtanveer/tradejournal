@@ -35,7 +35,7 @@ def login():
 @app.route('/authorize')
 def authorize():
     token = oauth.microsoft.authorize_access_token()
-    userinfo = oauth.microsoft.parse_id_token(token)
+    userinfo = token.get('userinfo')
     user = User(userinfo)
     session['userinfo'] = userinfo
     login_user(user)
