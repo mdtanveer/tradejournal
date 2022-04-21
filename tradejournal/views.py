@@ -118,7 +118,7 @@ def results(key):
 def create():
     """New journal entry"""
     if request.method == 'POST':
-        if request.get_json():
+        if request.get_json(silent=True):
             data = request.get_json()
         else:
             data = request.form
@@ -139,7 +139,7 @@ def create():
 def creategroup():
     """New journal entry"""
     if request.method == 'POST':
-        if request.get_json():
+        if request.get_json(silent=True):
             data = request.get_json()
         else:
             data = request.form
@@ -166,7 +166,7 @@ def lastget_url(default):
 def edit(key):
     """New journal entry"""
     if request.method == 'POST':
-        if request.get_json():
+        if request.get_json(silent=True):
             data = request.get_json()
         else:
             data = request.form
@@ -188,7 +188,7 @@ def edit(key):
 def duplicate(key):
     """Duplicate journal entry"""
     if request.method == 'POST':
-        if request.get_json():
+        if request.get_json(silent=True):
             data = request.get_json()
         else:
             data = request.form
@@ -209,7 +209,7 @@ def duplicate(key):
 def editgroup(key):
     """New journal entry"""
     if request.method == 'POST':
-        if request.get_json():
+        if request.get_json(silent=True):
             data = request.get_json()
         else:
             data = request.form
@@ -258,7 +258,7 @@ def commentsgroup(key):
     error_message = ''
     if request.method == 'POST':
         try:
-            if request.get_json():
+            if request.get_json(silent=True):
                 data = request.get_json()
             else:
                 data = request.form
@@ -295,7 +295,7 @@ def comments(key):
     error_message = ''
     if request.method == 'POST':
         try:
-            if request.get_json():
+            if request.get_json(silent=True):
                 data = request.get_json()
             else:
                 data = request.form
@@ -326,7 +326,7 @@ def allcomments():
     error_message = ''
     if request.method == 'POST':
         try:
-            if request.get_json():
+            if request.get_json(silent=True):
                 data = request.get_json()
             else:
                 data = request.form
@@ -373,7 +373,7 @@ def charts(key):
 
     if request.method == 'POST':
         try:
-            if request.get_json():
+            if request.get_json(silent=True):
                 data = request.get_json()
             else:
                 data = request.form

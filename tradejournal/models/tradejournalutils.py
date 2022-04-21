@@ -6,7 +6,7 @@ from datetime import datetime
 KEY_ENTRY_TIME = 'entry_time'
 KEY_EXIT_TIME = 'exit_time'
 KEY_EXIT_PRICE = 'exit_price'
-ROLLING_AGE=180
+ROLLING_AGE=720
 RANGES = {'1h': '6mo', '1d':'2y', '1wk': '5y'}
 FWD_BUFFER = {'1h': 2, '2h': 2, '1d':5, '1wk': 15}
 
