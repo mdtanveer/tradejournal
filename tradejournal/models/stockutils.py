@@ -11,6 +11,16 @@ import jmespath
 # weekly expiry PE BANKNIFTY2192336700PE
 # future KOTAKBANK21SEPFUT
 
+def get_expiry_day(year, month_abbr):
+    try:
+        expiry_day = list(get_expiry_date(year=year, 
+            month=list(calendar.month_abbr).index(month_abbr), 
+            index=False, stock=True))[0].day
+    except:
+        current_expiry = nsepython.expiry_list('RELIANCE')[0]
+        expiry_day = current_expiry.split('-')[0]
+    return expiry_day
+
 def convert_from_zerodha_convention(name):
     try:
         res = re.match("([A-Z\-&]+)(\d{2})([A-Z]{3})(\d+)([CP]E)", name)
@@ -20,7 +30,7 @@ def convert_from_zerodha_convention(name):
             month_abbr = res.group(3).title()
             strike = res.group(4)
             optionytype = res.group(5)
-            expiry_day = list(get_expiry_date(year=int("20"+year), month=list(calendar.month_abbr).index(month_abbr), index=False, stock=True))[0].day
+            expiry_day = get_expiry_day(int("20"+year), month_abbr)
             expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
             return (symbol, expiry, optionytype, int(strike))
         
@@ -45,7 +55,7 @@ def convert_from_zerodha_convention(name):
             symbol = res.group(1)
             year = res.group(2)
             month_abbr = res.group(3).title()
-            expiry_day = list(get_expiry_date(year=int("20"+year), month=list(calendar.month_abbr).index(month_abbr), index=False, stock=True))[0].day
+            expiry_day = get_expiry_day(int("20"+year), month_abbr)
             expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
             return (symbol, expiry, "Fut")
         return (name,)
