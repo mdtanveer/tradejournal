@@ -32,7 +32,7 @@ def login():
     redirect_uri = url_for('authorize', _external=True, _scheme=settings.HTTP_SCHEME)
     return oauth.microsoft.authorize_redirect(redirect_uri)
 
-@app.route('/authorize')
+@app.route('/.auth/login/aad/callback')
 def authorize():
     redirect_uri = url_for('authorize', _external=True, _scheme=settings.HTTP_SCHEME)
     token = oauth.microsoft.authorize_access_token(redirect_uri=redirect_uri)
