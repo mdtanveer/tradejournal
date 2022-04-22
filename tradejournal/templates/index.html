@@ -30,7 +30,7 @@
                         </span>
                     </div>
                     <div class="card-footer">
-                        <a href="/journalentry/{{journalentry.key}}/comments"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
+                        <a href="/journalentrygroup/{{journalentry.key}}/comments"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
                         <i>{{ journalentry.get_item_count() }} trades </i>
                         <button class="btn-light" onclick="appendToClipboard('{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
                     </div>

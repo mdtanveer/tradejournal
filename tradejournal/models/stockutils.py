@@ -11,6 +11,7 @@ import jmespath
 # weekly expiry PE BANKNIFTY2192336700PE
 # future KOTAKBANK21SEPFUT
 
+@filecache(900)
 def get_expiry_day(year, month_abbr):
     try:
         expiry_day = list(get_expiry_date(year=year, 
@@ -22,8 +23,9 @@ def get_expiry_day(year, month_abbr):
     return expiry_day
 
 def convert_from_zerodha_convention(name):
+    name = str(name)
     try:
-        res = re.match("([A-Z\-&]+)(\d{2})([A-Z]{3})(\d+)([CP]E)", name)
+        res = re.match(r"([A-Z\-&]+)(\d{2})([A-Z]{3})(\d+)([CP]E)", name)
         if res:
             symbol = res.group(1)
             year = res.group(2)
@@ -34,7 +36,7 @@ def convert_from_zerodha_convention(name):
             expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
             return (symbol, expiry, optionytype, int(strike))
         
-        res = re.match("([A-Z\-&]+)(\d{2})([\dOND])(\d{2})(\d+)([CP]E)", name)
+        res = re.match(r"([A-Z\-&]+)(\d{2})([\dOND])(\d{2})(\d+)([CP]E)", name)
         if res:
             symbol = res.group(1)
             year = res.group(2)
@@ -50,7 +52,7 @@ def convert_from_zerodha_convention(name):
             expiry = weekdate + '-' + month_abbr + '-20' + year
             return (symbol, expiry, optionytype, int(strike))
 
-        res = re.match("([A-Z\-&]+)(\d{2})([A-Z]{3})FUT", name)
+        res = re.match(r"([A-Z\-&]+)(\d{2})([A-Z]{3})FUT", name)
         if res:
             symbol = res.group(1)
             year = res.group(2)
