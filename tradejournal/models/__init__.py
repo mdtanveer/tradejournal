@@ -9,6 +9,7 @@ import arrow
 import pytz
 from . import stockutils
 import itertools, functools
+import re
 
 def IST_now():
     return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
