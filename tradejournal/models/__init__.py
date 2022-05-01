@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 import arrow
 import pytz
 from . import stockutils
-import fiscalyear
 import itertools, functools
 
 def IST_now():
@@ -98,7 +97,7 @@ class JournalEntryGroup(object):
             category = {'month'}
         if self.name.find(now) != -1:
             category = {'month'}
-        if self.name.find(str(fiscalyear.FiscalYear.current())) != -1:
+        if re.search(r"\bFY20\d\d\b", self.name):
             category = {'year'}
         return category
 
