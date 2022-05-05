@@ -22,11 +22,11 @@ class JournalEntryMixin:
     def get_journalentries_forview(self):
         """Returns all the journalentries from the repository."""
         journalentries = self.get_journalentries()
-        comments = self.get_all_comments_for_count()
-        charts = self.get_all_charts_for_count()
+        #comments = self.get_all_comments_for_count()
+        #charts = self.get_all_charts_for_count()
         for entry in journalentries:
-            entry.comment_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, comments)))
-            entry.chart_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, charts)))
+            entry.comment_count = 0
+            entry.chart_count = 0
         self.ENTRY_CACHE = {str(e.key):e for e in journalentries}
         return journalentries
     

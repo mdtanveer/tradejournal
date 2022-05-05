@@ -52,7 +52,10 @@ class JournalEntryGroup(object):
                 continue
     
     def is_open(self):
-        return not self.has_valid_exit_time()
+        isopen = False
+        for je in self.deserialized_items:
+            isopen |= je.is_open()
+        return isopen
 
     def isidea(self):
         return False
