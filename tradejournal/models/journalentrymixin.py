@@ -20,6 +20,10 @@ class JournalEntryMixin:
         return journalentries
 
     def get_journalentries_forview(self):
+        if self.ENTRY_CACHE:
+            journalentries = list(self.ENTRY_CACHE.values())
+            journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)
+            return journalentries
         """Returns all the journalentries from the repository."""
         journalentries = self.get_journalentries()
         #comments = self.get_all_comments_for_count()
@@ -30,8 +34,7 @@ class JournalEntryMixin:
         self.ENTRY_CACHE = {str(e.key):e for e in journalentries}
         return journalentries
     
-    def get_journalentry(self, journalentry_key):
-        """Returns a journalentry from the repository."""
+    def get_journalentry_nocache(self, journalentry_key):
         try:
             partition, row = tju.key_to_partition_and_row(journalentry_key)
             journalentry_entity = self.svc.get_entity(self.TABLES['journalentry'], partition, row)
@@ -39,6 +42,15 @@ class JournalEntryMixin:
             return journalentry
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
+    
+    def get_journalentry(self, journalentry_key, bypass_cache=False):
+        """Returns a journalentry from the repository."""
+        try:
+            if not bypass_cache:
+                return self.ENTRY_CACHE[journalentry_key]
+            return self.get_journalentry_nocache(journalentry_key)
+        except:
+            return self.get_journalentry_nocache(journalentry_key)
 
     def update_journalentry(self, key, input_entity):
         """Update the specified journalentry."""
@@ -70,7 +82,7 @@ class JournalEntryMixin:
                 entity[tju.KEY_EXIT_TIME] = tju.strtime_to_timestamp(entity[tju.KEY_EXIT_TIME])
             self.svc.update_entity(self.TABLES["journalentry"], entity)
 
-            self.ENTRY_CACHE[key] = self.get_journalentry(key)
+            self.ENTRY_CACHE[key] = self.get_journalentry(key, True)
 
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()

@@ -24,12 +24,12 @@ class JournalEntryGroupMixin:
         """Returns all the journalentrygroups from the repository."""
         journalentrygroups = self.get_journalentrygroups()
         self.GROUP_CACHE = {str(e.key):e for e in journalentrygroups}
-        comments = self.get_all_comments_for_count()
+        #comments = self.get_all_comments_for_count()
         indict = dict(self.ENTRY_CACHE)
         indict.update(self.GROUP_CACHE)
         
         for entry in journalentrygroups:
-            entry.comment_count = len(list(filter(lambda x: x['PartitionKey']==entry.key, comments)))
+            entry.comment_count = 0
             entry.populate_children(indict, alljournalentries)
             self.GROUP_CACHE[entry.key] = entry
         return journalentrygroups
@@ -49,6 +49,9 @@ class JournalEntryGroupMixin:
                 partition, row = tju.key_to_partition_and_row(journalentrygroup_key)
                 journalentrygroup_entity = self.svc.get_entity(self.TABLES['journalentrygroup'], partition, row)
                 journalentrygroup = tju.journalentrygroup_from_entity(journalentrygroup_entity)
+                indict = dict(self.ENTRY_CACHE)
+                indict.update(self.GROUP_CACHE)
+                journalentrygroup.populate_children(indict, [])
                 return journalentrygroup
             except AzureMissingResourceHttpError:
                 raise JournalEntrygroupNotFound()
