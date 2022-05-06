@@ -25,7 +25,7 @@
                             <a href="/journalentrygroup/{{journalentry.key}}">{{journalentry.name}}</a>
                             <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
                         </h6>
-                        <span class="text-muted panel-text">
+                        <span class="text-muted panel-text" oncopy="clearLocalStorage()">
                             <i>entered {{journalentry.get_entry_time()}}</i><br />
                             <i>{{ journalentry.strategy.lower()}}</i><br/>
                         </span>
@@ -55,7 +55,7 @@
                             <a href="/journalentry/{{journalentry.key}}/charts">{{journalentry.symbol}}</a>
                             <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
                         </h6>
-                        <span class="text-muted panel-text">
+                        <span class="text-muted panel-text" oncopy="clearLocalStorage()">
                             <i>entered {{journalentry.get_entry_time()}}</i><br />
                             <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i><br/>
                             <small> <i>{{ journalentry.tradingsymbol}}</i><br/> </small>
@@ -69,12 +69,16 @@
 </div>
     <script>
         function appendToClipboard(event, text){
-            if (!event.shiftKey) {
-                groupItems = localStorage.getItem("groupItems");
+            groupItems = localStorage.getItem("groupItems");
+            if (!event.shiftKey && groupItems != "") {
                 localStorage.setItem("groupItems", groupItems+ ',' + text);
             } else {
                 localStorage.setItem("groupItems", text);
             }
+        }
+        
+        function clearLocalStorage(){
+            localStorage.setItem("groupItems", "");
         }
     </script>
 {% else %}
