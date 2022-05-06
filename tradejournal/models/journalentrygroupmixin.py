@@ -84,6 +84,7 @@ class JournalEntryGroupMixin:
             #delete journal entry
             partition, row = tju.key_to_partition_and_row(key)
             self.svc.delete_entity(self.TABLES["journalentrygroup"], partition, row)
+            self.invalidate_journalentrygroupcache(key)
         except AzureMissingResourceHttpError:
             raise JournalEntrygroupNotFound()
 
@@ -100,6 +101,8 @@ class JournalEntryGroupMixin:
             if key in entity.keys():
                 entity[key] = tju.strtime_to_timestamp(entity[key])
         self.svc.insert_entity(self.TABLES["journalentrygroup"], entity)
+        journalentrygroup = tju.journalentrygroup_from_entity(entity)
+        self.GROUP_CACHE[journalentrygroup.key] = journalentrygroup
 
     def get_journalentrygroup_for_monthly_review(self, year, month, serial):
         lower_timestamp = pytz.UTC.localize(datetime(year, month, 1))

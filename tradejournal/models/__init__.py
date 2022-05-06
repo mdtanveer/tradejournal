@@ -22,17 +22,17 @@ class JournalEntryGroup(object):
     def __init__(self, key, entity): 
         self.key = key
         try:
-            self.entry_time = toIST_fromtimestamp(float(entity.entry_time))
+            self.entry_time = toIST_fromtimestamp(float(entity['entry_time']))
         except:
             self.entry_time = toIST_fromtimestamp(0)
         try:
-            self.exit_time = toIST_fromtimestamp(float(entity.exit_time))
+            self.exit_time = toIST_fromtimestamp(float(entity['exit_time']))
         except:
             self.exit_time = toIST_fromtimestamp(0)
-        self.rating = entity.rating if 'rating' in entity.keys() else ''
-        self.strategy = entity.strategy if 'strategy' in entity.keys() and not not entity['strategy'] else 'macdhdivergence'
+        self.rating = entity['rating'] if 'rating' in entity.keys() else ''
+        self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'macdhdivergence'
         self.comment_count = 0
-        self.name = entity.name if 'name' in entity.keys() else ''
+        self.name = entity['name'] if 'name' in entity.keys() else ''
         self.items = entity["items"] if 'items' in entity.keys() else ''
         self.deserialized_items = []
 
@@ -47,12 +47,17 @@ class JournalEntryGroup(object):
                 if indict[key] in alljournalentries:
                     alljournalentries.remove(indict[key])
                 self.deserialized_items.sort(key = lambda x: x.entry_time, reverse=True)
+                self.entry_time = self.deserialized_items[-1].entry_time
+                if not self.is_open():
+                    self.exit_time = max(self.deserialized_items, key = lambda x: x.exit_time).exit_time
             except:
                 print(key, "not found")
                 continue
     
     def is_open(self):
         isopen = False
+        if len(self.items) == 0:
+            return True
         for je in self.deserialized_items:
             isopen |= je.is_open()
         return isopen
@@ -134,26 +139,26 @@ class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
     def __init__(self, key, entity): 
         self.key = key
-        self.symbol = entity.symbol if 'symbol' in entity.keys() else ''
+        self.symbol = entity['symbol'] if 'symbol' in entity.keys() else ''
         try:
-            self.entry_time = toIST_fromtimestamp(float(entity.entry_time))
+            self.entry_time = toIST_fromtimestamp(float(entity['entry_time']))
         except:
             self.entry_time = toIST_fromtimestamp(0)
         try:
-            self.exit_time = toIST_fromtimestamp(float(entity.exit_time)) 
+            self.exit_time = toIST_fromtimestamp(float(entity['exit_time'])) 
         except:
             self.exit_time = toIST_fromtimestamp(0)
-        self.entry_price = entity.entry_price if 'entry_price' in entity.keys() else ''
-        self.exit_price = entity.exit_price if 'exit_price' in entity.keys() else '' 
-        self.quantity = entity.quantity if 'quantity' in entity.keys() else ''
-        self.entry_sl = entity.entry_sl if 'entry_sl' in entity.keys() else ''
-        self.entry_target = entity.entry_target if 'entry_target' in entity.keys() else ''
-        self.direction = entity.direction if 'direction' in entity.keys() else ''
-        self.rating = entity.rating if 'rating' in entity.keys() else ''
-        self.strategy = entity.strategy if 'strategy' in entity.keys() and not not entity['strategy'] else 'macdhdivergence'
-        self.timeframe = entity.timeframe if 'timeframe' in entity.keys() and not not entity['timeframe'] else '1d'
-        self.is_idea = entity.is_idea if 'is_idea' in entity.keys() else ''
-        self.tradingsymbol = entity.tradingsymbol if 'tradingsymbol' in entity.keys() and not not entity['tradingsymbol'] else ''
+        self.entry_price = entity['entry_price'] if 'entry_price' in entity.keys() else ''
+        self.exit_price = entity['exit_price'] if 'exit_price' in entity.keys() else '' 
+        self.quantity = entity['quantity'] if 'quantity' in entity.keys() else ''
+        self.entry_sl = entity['entry_sl'] if 'entry_sl' in entity.keys() else ''
+        self.entry_target = entity['entry_target'] if 'entry_target' in entity.keys() else ''
+        self.direction = entity['direction'] if 'direction' in entity.keys() else ''
+        self.rating = entity['rating'] if 'rating' in entity.keys() else ''
+        self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'macdhdivergence'
+        self.timeframe = entity['timeframe'] if 'timeframe' in entity.keys() and not not entity['timeframe'] else '1d'
+        self.is_idea = entity['is_idea'] if 'is_idea' in entity.keys() else ''
+        self.tradingsymbol = entity['tradingsymbol'] if 'tradingsymbol' in entity.keys() and not not entity['tradingsymbol'] else ''
         self.position_changes = []
         self.comment_count = 0
         self.chart_count = 0
@@ -278,41 +283,41 @@ class JournalEntryNotFound(Exception):
 class Comment(object):
     def __init__(self, key, entity): 
         self.key = key
-        self.add_time = toIST_fromtimestamp(float(entity.add_time))
-        self.title = entity.title if 'title' in entity.keys() else ''
-        self.text = entity.text if 'text' in entity.keys() else ''
+        self.add_time = toIST_fromtimestamp(float(entity['add_time']))
+        self.title = entity['title'] if 'title' in entity.keys() else ''
+        self.text = entity['text'] if 'text' in entity.keys() else ''
         self.symbol = key.split('_')[0]
 
 class Chart(object):
     def __init__(self, key, entity): 
         self.key = key
-        self.add_time = toIST_fromtimestamp(float(entity.add_time))
-        self.title = entity.title if 'title' in entity.keys() else ''
-        self.data = entity.data
-        self.relativeUrl = 'charts/' + entity.data
+        self.add_time = toIST_fromtimestamp(float(entity['add_time']))
+        self.title = entity['title'] if 'title' in entity.keys() else ''
+        self.data = entity['data']
+        self.relativeUrl = 'charts/' + entity['data']
 
 class Trade(object):
     def __init__(self, key, entity): 
         self.key = key
-        self.date = toIST_fromtimestamp(float(entity.RowKey))
-        self.type = entity.trade_type
-        self.price = entity.price
-        self.quantity = entity.quantity
-        self.tradingsymbol = entity.tradingsymbol
+        self.date = toIST_fromtimestamp(float(entity['RowKey']))
+        self.type = entity['trade_type']
+        self.price = entity['price']
+        self.quantity = entity['quantity']
+        self.tradingsymbol = entity['tradingsymbol']
 
 class TradeSignal(object):
     def __init__(self, entity): 
-        self.symbol = entity.symbol
-        self.signalreportdate, self.timeframe, self.strategy = entity.PartitionKey.split('_')        
-        self.timeframe = entity.PartitionKey.split('_')[1]        
-        self.strategy = entity.PartitionKey.split('_')[2]        
-        self.signaldate = entity.datetime        
-        self.score = entity.score 
-        self.direction = entity.direction 
-        self.entry_price  = entity.entry_price 
-        self.entry_sl  = entity.entry_sl 
-        self.entry_target  = entity.entry_target 
-        self.lotsize = entity.lotsize
+        self.symbol = entity['symbol']
+        self.signalreportdate, self.timeframe, self.strategy = entity['PartitionKey'].split('_')        
+        self.timeframe = entity['PartitionKey'].split('_')[1]        
+        self.strategy = entity['PartitionKey'].split('_')[2]        
+        self.signaldate = entity['datetime']        
+        self.score = entity['score'] 
+        self.direction = entity['direction'] 
+        self.entry_price  = entity['entry_price'] 
+        self.entry_sl  = entity['entry_sl'] 
+        self.entry_target  = entity['entry_target'] 
+        self.lotsize = entity['lotsize']
         TF = {'daily':'1d', 'weekly':'1wk', 'intraday':'2h'}
         self.relativeUrl = '/charts/%s?tf=%s'%(self.symbol, TF[self.timeframe])
 
