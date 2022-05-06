@@ -104,6 +104,7 @@ class JournalEntryMixin:
             #delete journal entry
             partition, row = tju.key_to_partition_and_row(key)
             self.svc.delete_entity(self.TABLES["journalentry"], partition, row)
+            del self.ENTRY_CACHE[key]
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
@@ -127,6 +128,8 @@ class JournalEntryMixin:
                 entity[key] = tju.strtime_to_timestamp(entity[key])
         self.svc.insert_entity(self.TABLES["journalentry"], entity)
         self.add_chart(tju.partition_and_row_to_key(entity['symbol'], entry_time), {'title':'Auto entry chart'}, entity['timeframe'])
+        journalentry = tju.journalentry_from_entity(entity)
+        self.ENTRY_CACHE[journalentry.key] = journalentry
 
     def get_journalentry_for_monthly_review(self, year, month, serial):
         lower_timestamp = pytz.UTC.localize(datetime(year, month, 1))
