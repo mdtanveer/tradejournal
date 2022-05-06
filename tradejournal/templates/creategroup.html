@@ -31,8 +31,8 @@
             <input class="form-control" id="rating" name="rating" type="text" value="{{journalentrygroup.rating}}">
         </div>
         <div class="form-group">
-            <label class="control-label" for="rating">Items:</label>
-            <input class="form-control" id="items" name="items" type="text" value="{{journalentrygroup.items}}">
+            <label class="control-label" for="items">Items:</label>
+            <input class="form-control disablepaste" id="items" name="items" type="text" value="{{journalentrygroup.items}}" onpaste="on_paste(this)">
         </div>
     </form>
     <div class="btn-group" role="group" aria-label="Second group">
@@ -51,4 +51,21 @@
         {% endif %}
     </div>
 </div>
+<script>
+   function on_paste(elem) {
+            if (elem.value == "") {
+                elem.value = localStorage.getItem("groupItems");
+            } else {
+                elem.value = elem.value + ',' + localStorage.getItem("groupItems");
+            }
+            elem.focus();
+            elem.selectionStart = elem.selectionEnd = elem.value.length;
+        }
+
+    $(document).ready(function () {
+        $('input.disablepaste').bind('paste', function (e) {
+           e.preventDefault();
+        });
+      });
+</script>
 {% endblock %}

@@ -23,6 +23,7 @@
                         <h6>
                             <i class="bi-basket" style="font-size: 1rem;"></i>
                             <a href="/journalentrygroup/{{journalentry.key}}">{{journalentry.name}}</a>
+                            <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
                         </h6>
                         <span class="text-muted panel-text">
                             <i>entered {{journalentry.get_entry_time()}}</i><br />
@@ -32,7 +33,6 @@
                     <div class="card-footer">
                         <a href="/journalentrygroup/{{journalentry.key}}/edit"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
                         <i>{{ journalentry.get_item_count() }} trades </i>
-                        <button class="btn-light" onclick="appendToClipboard('{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
                     </div>
                 </div>
              {% else %}
@@ -53,17 +53,13 @@
                                 {%endif%}
                             {%endif%}
                             <a href="/journalentry/{{journalentry.key}}/charts">{{journalentry.symbol}}</a>
+                            <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
                         </h6>
                         <span class="text-muted panel-text">
                             <i>entered {{journalentry.get_entry_time()}}</i><br />
                             <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i><br/>
                             <small> <i>{{ journalentry.tradingsymbol}}</i><br/> </small>
                         </span>
-                    </div>
-                    <div class="card-footer">
-                        <a href="/journalentry/{{journalentry.key}}/comments"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
-                        <a href="/journalentry/{{journalentry.key}}/charts"><i>{{ journalentry.get_chart_count()}} charts</i></a>
-                        <button class="btn-light" onclick="appendToClipboard('{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
                     </div>
                 </div>
              {% endif %}
@@ -72,9 +68,13 @@
         {{ pagination.links }}
 </div>
     <script>
-        function appendToClipboard(text){
-            clipText = navigator.clipboard.readText();
-            clipText.then(x => navigator.clipboard.writeText(x + ',' + text));
+        function appendToClipboard(event, text){
+            if (!event.shiftKey) {
+                groupItems = localStorage.getItem("groupItems");
+                localStorage.setItem("groupItems", groupItems+ ',' + text);
+            } else {
+                localStorage.setItem("groupItems", text);
+            }
         }
     </script>
 {% else %}
