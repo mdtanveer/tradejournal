@@ -1,7 +1,7 @@
 from . import tradejournalutils as tju
 import pytz
 from datetime import datetime, timedelta
-from . import JournalEntry, JournalEntryNotFound
+from . import JournalEntry, JournalEntryNotFound, IST_now
 from azure.common import AzureMissingResourceHttpError
 import calendar
 
@@ -20,7 +20,7 @@ class JournalEntryMixin:
         return journalentries
 
     def get_journalentries_forview(self):
-        if self.ENTRY_CACHE:
+        if self.ENTRY_CACHE and not self.has_cache_expired():
             journalentries = list(self.ENTRY_CACHE.values())
             journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)
             return journalentries
@@ -32,6 +32,7 @@ class JournalEntryMixin:
             entry.comment_count = 0
             entry.chart_count = 0
         self.ENTRY_CACHE = {str(e.key):e for e in journalentries}
+        self.last_cache_time = IST_now()
         return journalentries
     
     def get_journalentry_nocache(self, journalentry_key):

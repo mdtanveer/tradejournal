@@ -12,6 +12,7 @@ from .commentmixin import CommentMixin
 from .trademixin import TradeMixin
 from .positionmixin import PositionMixin
 from .tradesignalsmixin import TradeSignalsMixin
+from . import IST_now 
 
 class Repository(JournalEntryMixin, ChartMixin,
         CommentMixin, TradeMixin, PositionMixin, TradeSignalsMixin, JournalEntryGroupMixin):
@@ -56,5 +57,7 @@ class Repository(JournalEntryMixin, ChartMixin,
             self.container_client = self.blob_service_client.create_container(self.container_name)
         self.GROUP_CACHE = {}
         self.ENTRY_CACHE = {}
+        self.last_cache_time = None
 
-
+    def has_cache_expired(self):
+        return self.last_cache_time.day != IST_now().day
