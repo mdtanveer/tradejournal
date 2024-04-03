@@ -39,6 +39,8 @@ def toLakhs(amount):
 def layout_func():
     # Load DataFrame
     df_orig = create_dataframe()
+    if df_orig.empty:
+        return html.Div(children=[])
     df_orig["FY"] = df_orig['RowKey'].apply(getFY)
     #df_orig["NetRealizedPnL"] = df_orig['NetRealizedPnL'].apply(lambda x: "%0.2fL"%(x/100000.0))
     df = df_orig

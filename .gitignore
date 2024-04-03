@@ -5,3 +5,4 @@ __pycache__/
 obj/*
 .vs/*
 *.cache.*
+*.bat
