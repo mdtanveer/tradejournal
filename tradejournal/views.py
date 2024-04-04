@@ -468,7 +468,7 @@ def all_trades():
 @app.route('/positions', methods=['GET'])
 @login_required
 def positions():
-    groupby = request.args.get('groupby', 'strategy')
+    groupby = request.args.get('groupby', 'symbol')
     """Renders the positions page."""
     error = None
     position_data = None

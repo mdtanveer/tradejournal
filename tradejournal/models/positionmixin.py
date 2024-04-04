@@ -1,8 +1,19 @@
 from . import azurekeyvault
 import requests
+import pandas as pd
+from jugaad_trader import Zerodha
+from . import tradejournalutils as tju
 
 class PositionMixin:
-    def get_position_data(self, groupby='itype'):
+    def get_position_data_response(self, groupby):
+        kite = Zerodha()
+         
+        # Set access token loads the stored session.
+        kite.set_access_token()
+        data = kite.positions()['net']
+        return data
+
+    def get_position_data_response_old(self, groupby):
         TIMEOUT=3
         if not self.kvclient:
             self.kvclient = azurekeyvault.AzureKeyVaultClient()
@@ -25,19 +36,28 @@ class PositionMixin:
             y = self.session.post("https://kite.zerodha.com/api/twofa", data = tfd, timeout=TIMEOUT)
             self.session.headers.update({'Authorization': 'enctoken '+y.cookies['enctoken']})
             z = self.session.get("https://kite.zerodha.com/oms/portfolio/positions", timeout=TIMEOUT)
-        data = z.json()['data']['net']
+            data = z.json()['data']['net']
+            return data
+
+    def get_position_data(self, groupby='itype'):
+        data = self.get_position_data_response(groupby)
         df = pd.DataFrame(data)
         COLUMNS = ['tradingsymbol', 'unrealised', 'quantity', 'average_price', 'last_price', ]
         df = df[COLUMNS]
-        df['symbol'] = df['tradingsymbol'].apply(get_symbol)
-        df['itype'] = df['tradingsymbol'].apply(get_inst_type)
+        df['symbol'] = df['tradingsymbol'].apply(tju.get_symbol)
+        df['itype'] = df['tradingsymbol'].apply(tju.get_inst_type)
 
         trades = self.get_journalentries_helper(lambda x:x, 60)
         tdf = pd.DataFrame(trades)
-        tdf = tdf.query('(exit_time =="0" | exit_time == "") & is_idea !="Y"')
-        tdf = tdf[['symbol','strategy', 'timeframe', 'tradingsymbol']]
+        if not tdf.empty:
+            tdf = tdf.query('(Vexit_time =="0" | exit_time == "") & is_idea !="Y"')
+            tdf = tdf[['symbol','strategy', 'timeframe', 'tradingsymbol']]
 
-        out = df.merge(tdf, left_on=['symbol', 'tradingsymbol'], right_on=['symbol', 'tradingsymbol'], how='left')
+            out = df.merge(tdf, left_on=['symbol', 'tradingsymbol'], right_on=['symbol', 'tradingsymbol'], how='left')
+        else:
+            out = df
+            out["strategy"] = ""
+            out["timeframe"] = ""
         out['strategy'] = out['strategy'].fillna('default')
         groupby = groupby if groupby in out.columns else 'itype'
         grp = out.groupby(groupby)

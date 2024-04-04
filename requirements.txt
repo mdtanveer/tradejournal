@@ -16,3 +16,4 @@ nsepy
 filecache
 jmespath
 fiscalyear
+jugaad-trader
