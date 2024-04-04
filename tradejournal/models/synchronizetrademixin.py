@@ -159,9 +159,7 @@ class SynchronizeTradeMixin:
             trades['entry_date'] = trades['entry_time'].apply(todate)
         else:
             trades = pd.DataFrame()
-        print("Trades", trades)
         jdf = atsClient.fetch_data_from_ats('TradeEntryTable', age)
-        print("Journal entries", jdf)
         if not jdf.empty and not trades.empty:
             jdf['entry_date'] = jdf['entry_time'].apply(todate)
             df = pd.merge(trades, jdf[['PartitionKey', 'RowKey', 'entry_date', 'tradingsymbol']], left_on=['PartitionKey','entry_date','tradingsymbol'],
@@ -207,8 +205,6 @@ class SynchronizeTradeMixin:
         self.atsClient = self.AtsClient(self.svc)
         df, _, _ = SynchronizeTradeMixin.get_trades_and_journalentries(self.atsClient, age)
         update_df, insert_df = SynchronizeTradeMixin.get_sync_delta(df)
-        print(update_df)
-        print(insert_df)
 
         if not insert_df.empty:
             insert_df['RowKey'] = insert_df['entry_time']
