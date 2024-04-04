@@ -532,6 +532,16 @@ def post_tradesignals(date, timeframe):
     repository.create_tradesignals(date, timeframe, request.get_json())
     return redirect('/')
 
+@app.route('/tradesync', methods=['GET', 'POST'])
+def uploadFile():
+    if request.method == 'POST':
+        f = request.files.get('file')
+        repository.process_tradesync(f)
+        repository.sync_journal_with_trades()
+        
+        return render_template('tradesync.html', message="Processed successfully")
+    return render_template("tradesync.html", message=None)
+
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):
     if value is None:

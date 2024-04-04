@@ -1,6 +1,7 @@
 from . import tradejournalutils as tju
 from datetime import datetime, timedelta
 import pytz
+import pandas as pd
 
 class TradeMixin:
     def get_trades(self, journalentry_key):
@@ -31,4 +32,34 @@ class TradeMixin:
         """Returns all the summary pnl from the repository."""
         summaries = self.svc.query_entities(self.TABLES["summarypnl"])
         return summaries
+
+    def process_tradesync(self, fin):
+        self.upload_from_csv_to_ats(fin)
+
+    def upload_to_ats(self, df):
+        tablename = 'TradesTable'
+        json_rows = df.apply(lambda x: x.to_dict(), axis=1)
+        for i in range(0, json_rows.size):
+            row = json_rows.iloc[i]
+            self.svc.insert_or_replace_entity(tablename,row)
+   
+    def strtime_to_timestamp(self, input):
+        if not input:
+            return '0'
+        else:
+            return str(pytz.timezone('Asia/Calcutta').localize(datetime.strptime(input, '%Y-%m-%dT%H:%M:%S')).timestamp())
+
+    def upload_from_csv_to_ats(self, csvfile, exchange="NFO"):
+        df = pd.read_csv(csvfile)
+        df.rename(columns={'symbol':'tradingsymbol'}, inplace=True)
+
+        dfg = df.groupby('order_id').agg({'tradingsymbol':'first','price':'mean', 'order_execution_time':'last', 'quantity':'sum', 'trade_type':'first'})
+        dfg2=dfg.sort_values(['tradingsymbol', 'order_execution_time'])
+        dfg2['PartitionKey'] = dfg2['tradingsymbol'].apply(tju.get_symbol)
+        dfg2['RowKey'] = dfg2['order_execution_time'].apply(self.strtime_to_timestamp)
+        dfg2['exchange'] = exchange
+        dfg2 = dfg2.drop(columns=['order_execution_time']).round(2)
+
+        self.upload_to_ats(dfg2)
+
 

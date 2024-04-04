@@ -12,10 +12,11 @@ from .commentmixin import CommentMixin
 from .trademixin import TradeMixin
 from .positionmixin import PositionMixin
 from .tradesignalsmixin import TradeSignalsMixin
+from .synchronizetrademixin import SynchronizeTradeMixin
 from . import IST_now 
 
 class Repository(JournalEntryMixin, ChartMixin,
-        CommentMixin, TradeMixin, PositionMixin, TradeSignalsMixin, JournalEntryGroupMixin):
+        CommentMixin, TradeMixin, PositionMixin, TradeSignalsMixin, JournalEntryGroupMixin, SynchronizeTradeMixin):
     """Azure Twable Storage repository."""
     def __init__(self, settings):
         """Initializes the repository with the specified settings dict.
