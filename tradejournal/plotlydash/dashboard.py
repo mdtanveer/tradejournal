@@ -47,7 +47,7 @@ def layout_func():
     
     df_tot = df.groupby('RowKey', as_index=False).agg({'FY':'first', 'NetRealizedPnL':'sum'}).reset_index()
     df_tot["PartitionKey"] = "Total"
-    df = df[['PartitionKey', 'RowKey', 'NetRealizedPnL', 'FY']].append(df_tot)
+    df = pd.concat([df[['PartitionKey', 'RowKey', 'NetRealizedPnL', 'FY']],df_tot], ignore_index=True)
 
     df_tot_yearly = df[["PartitionKey", "FY", "NetRealizedPnL"]].groupby(["PartitionKey", 'FY'], as_index=False).agg('sum').reset_index()
     yearly_chart = make_subplots(
