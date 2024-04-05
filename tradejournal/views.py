@@ -51,6 +51,8 @@ def home():
         entries = list(filter(lambda x: not x.is_open() and not x.isidea(), journalentries))
     elif subpage in categories.keys():
         entries = categories[subpage]
+    elif subpage == 'all':
+        entries = journalentries
 
     print(page)
     pagination = Pagination(page=page, total=len(entries), search=False, record_name='journalentries',css_framework='bootstrap4')
@@ -146,13 +148,15 @@ def creategroup():
         repository.create_journalentrygroup(data)
         return redirect('/')
     else:
+        members_param = request.args.get('createwith')  # Get the value of the 'members' parameter from the URL
         journalentrygroup = JournalEntryGroup(None, {})
         journalentrygroup.entry_time = IST_now()
         return render_template(
         'creategroup.html',
         journalentrygroup = journalentrygroup,
         pagetitle = "Create New",
-        subtitle = "Create New Journal Entry Group"
+        subtitle = "Create New Journal Entry Group",
+        members = members_param
     )
 
 def lastget_url(default):

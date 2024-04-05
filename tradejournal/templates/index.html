@@ -2,7 +2,13 @@
 
 {% block content %}
 <div class="container">
+    <button onclick="postCheckedItems()">Create</button>
+    <button>Merge</button>
+    <button onclick="clearCheckedItems()">Clear</button>
 <ul class="nav nav-tabs justify-content-center">
+    <li id="all" class="nav-item">
+        <a class="nav-link {{"active" if subpage=="all" else ""}}" href="home?subpage=all">All</a>
+    </li>
     <li id="open" class="nav-item">
         <a class="nav-link {{"active" if subpage=="open" else ""}}" href="home?subpage=open">Open</a>
     </li>
@@ -16,54 +22,54 @@
     {% endfor %}
 </ul>
 {% if journalentries %}
+    <ul class="list-group checked-list-box">
         {% for journalentry in journalentries %}
             {% if journalentry.is_group() %}
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <h6>
-                            <i class="bi-basket" style="font-size: 1rem;"></i>
-                            <a href="/journalentrygroup/{{journalentry.key}}">{{journalentry.name}}</a>
-                            <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
-                        </h6>
-                        <span class="text-muted panel-text" oncopy="clearLocalStorage()">
-                            <i>entered {{journalentry.get_entry_time()}}</i><br />
-                            <i>{{ journalentry.strategy.lower()}}</i><br/>
-                        </span>
-                    </div>
-                    <div class="card-footer">
+            <li class="list-group-item">
+                    <span>
+                        <input class="form-check-input me-1" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
+                        <i class="bi-basket" style="font-size: 1rem;"></i>
+                        <a href="/journalentrygroup/{{journalentry.key}}">{{journalentry.name}}</a>
+                        <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
+                    </span>
+                    <span class="text-muted panel-text" oncopy="clearLocalStorage()">
+                        <i>entered {{journalentry.get_entry_time()}}</i><br />
+                        <i>{{ journalentry.strategy.lower()}}</i><br/>
+                    </span>
+                    <div class="mb-2">
                         <a href="/journalentrygroup/{{journalentry.key}}/edit"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
                         <i>{{ journalentry.get_item_count() }} trades </i>
                     </div>
-                </div>
+            </li>
              {% else %}
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <h6>
-                            {%if not not journalentry.is_idea%}
-                                <i class="bi-lightbulb text-warning" style="font-size: 1rem;"></i>
+             <li class="list-group-item">
+                 <input class="form-check-input" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
+                <span class="">
+                    {%if not not journalentry.is_idea%}
+                        <i class="bi-lightbulb text-warning" style="font-size: 1rem;"></i>
+                    {%else%}
+                        {%if journalentry.is_open()%}
+                            <i class="bi-play-circle" style="font-size: 1rem;"></i>
+                        {%else%}
+                            {%if journalentry.is_profitable()%}
+                                <i class="bi-arrow-up-circle text-success" style="font-size: 1rem;"></i>
                             {%else%}
-                                {%if journalentry.is_open()%}
-                                    <i class="bi-play-circle" style="font-size: 1rem;"></i>
-                                {%else%}
-                                    {%if journalentry.is_profitable()%}
-                                        <i class="bi-arrow-up-circle text-success" style="font-size: 1rem;"></i>
-                                    {%else%}
-                                        <i class="bi-arrow-down-circle text-danger" style="font-size: 1rem;"></i>
-                                    {%endif%}
-                                {%endif%}
+                                <i class="bi-arrow-down-circle text-danger" style="font-size: 1rem;"></i>
                             {%endif%}
-                            <a href="/journalentry/{{journalentry.key}}/charts">{{journalentry.symbol}}</a>
-                            <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
-                        </h6>
-                        <span class="text-muted panel-text" oncopy="clearLocalStorage()">
-                            <i>entered {{journalentry.get_entry_time()}}</i><br />
-                            <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i><br/>
-                            <small> <i>{{ journalentry.tradingsymbol}}</i><br/> </small>
-                        </span>
-                    </div>
+                        {%endif%}
+                    {%endif%}
+                    <a href="/journalentry/{{journalentry.key}}/charts">{{journalentry.symbol}}</a>
+                    <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
+                </span>
+                <div class="text-muted panel-text ms-4" oncopy="clearLocalStorage()">
+                    <div><i>entered {{journalentry.get_entry_time()}}</i></div>
+                    <div><i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i></div>
+                    <div><small> <i>{{ journalentry.tradingsymbol}}</i></small></div>
                 </div>
+             </li>
              {% endif %}
         {% endfor %}
+</ul>
 <div class="d-flex pagination-sm flex-sm-wrap">
         {{ pagination.links }}
 </div>
@@ -80,6 +86,32 @@
         function clearLocalStorage(){
             localStorage.setItem("groupItems", "");
         }
+    </script>
+    <script>
+    function postCheckedItems() {
+        var checkedItems = [];
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                checkedItems.push(checkbox.id);
+            }
+        });
+        
+        // Convert the checkedItems array to a URL query string
+        var queryString = checkedItems.map(item => encodeURIComponent(item)).join(',');
+
+        // Navigate to the URL with the checked items as parameters
+        window.location.href = "creategroup?createwith=" + queryString;
+    }
+
+    function clearCheckboxes() {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = false;
+        });
+    }
     </script>
 {% else %}
 <p>No journalentries available.</p>

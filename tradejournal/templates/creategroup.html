@@ -32,7 +32,7 @@
         </div>
         <div class="form-group">
             <label class="control-label" for="items">Items:</label>
-            <input class="form-control disablepaste" id="items" name="items" type="text" value="{{journalentrygroup.items}}" onpaste="on_paste(this)">
+            <input class="form-control disablepaste" id="items" name="items" type="text" value="{{members if members else journalentrygroup.items}}" onpaste="on_paste(this)">
         </div>
     </form>
     <div class="btn-group" role="group" aria-label="Second group">
