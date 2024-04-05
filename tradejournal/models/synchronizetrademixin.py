@@ -49,24 +49,23 @@ class SynchronizeTradeMixin:
     def split_trades(df):
         cumsum = 0
         group = 0
-        ndf = pd.DataFrame()
+        ndf_lst = []
         result = []
         for i in range(0, df.shape[0]):
             prev = cumsum
             cumsum += df.iloc[i]['quantity1']
-            ndf = ndf._append(df.iloc[i], ignore_index=True)
+            ndf_lst.append(df.iloc[i])
             if cumsum == 0:
-                result.append(ndf)
-                ndf = pd.DataFrame()
+                result.append(pd.concat(ndf_lst, axis=1).transpose())
+                ndf_lst=[]
             elif np.sign(prev)*np.sign(cumsum) < 0:
-                ndf.loc[len(ndf.index)-1,'quantity1'] = -prev       
-                result._append(ndf)
+                ndf_lst[-1].loc['quantity1'] = -prev
+                result.append(pd.concat(ndf_lst, axis=1).transpose())
                 
-                ndf = pd.DataFrame()
-                ndf = ndf._append(df.iloc[i], ignore_index=True)
-                ndf.loc[len(ndf.index)-1,'quantity1'] = df.iloc[i]['quantity1']+prev
-        if not ndf.empty:
-            result.append(ndf)
+                ndf_lst = [df.iloc[i]]
+                ndf_lst[-1].loc['quantity1'] = df.iloc[i]['quantity1']+prev
+        if len(ndf_lst) > 0:
+            result.append(pd.concat(ndf_lst, axis=1).transpose())
 
         return result
 
