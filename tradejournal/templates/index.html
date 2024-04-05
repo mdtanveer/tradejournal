@@ -2,9 +2,11 @@
 
 {% block content %}
 <div class="container">
-    <button onclick="postCheckedItems()">Create</button>
-    <button>Merge</button>
-    <button onclick="clearCheckedItems()">Clear</button>
+    <div>
+        <button onclick="postCheckedItems()">Create</button>
+        <button>Merge</button>
+        <button onclick="clearCheckboxes()">Clear</button>
+    </div>
 <ul class="nav nav-tabs justify-content-center">
     <li id="all" class="nav-item">
         <a class="nav-link {{"active" if subpage=="all" else ""}}" href="home?subpage=all">All</a>
@@ -27,16 +29,16 @@
             {% if journalentry.is_group() %}
             <li class="list-group-item">
                     <span>
-                        <input class="form-check-input me-1" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
+                        <input class="form-check-input" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
                         <i class="bi-basket" style="font-size: 1rem;"></i>
                         <a href="/journalentrygroup/{{journalentry.key}}">{{journalentry.name}}</a>
                         <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
                     </span>
-                    <span class="text-muted panel-text" oncopy="clearLocalStorage()">
-                        <i>entered {{journalentry.get_entry_time()}}</i><br />
-                        <i>{{ journalentry.strategy.lower()}}</i><br/>
-                    </span>
-                    <div class="mb-2">
+                    <div class="text-muted panel-text ms-4" oncopy="clearLocalStorage()">
+                        <div><i>entered {{journalentry.get_entry_time()}}</i></div>
+                        <div><i>{{ journalentry.strategy.lower()}}</i></div>
+                    </div>
+                    <div class="ms-4">
                         <a href="/journalentrygroup/{{journalentry.key}}/edit"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
                         <i>{{ journalentry.get_item_count() }} trades </i>
                     </div>

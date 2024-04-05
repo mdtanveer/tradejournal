@@ -30,7 +30,7 @@ class JournalEntryGroup(object):
         except:
             self.exit_time = toIST_fromtimestamp(0)
         self.rating = entity['rating'] if 'rating' in entity.keys() else ''
-        self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'macdhdivergence'
+        self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'default'
         self.comment_count = 0
         self.name = entity['name'] if 'name' in entity.keys() else ''
         self.items = entity["items"] if 'items' in entity.keys() else ''
@@ -155,7 +155,7 @@ class JournalEntry(object):
         self.entry_target = entity['entry_target'] if 'entry_target' in entity.keys() else ''
         self.direction = entity['direction'] if 'direction' in entity.keys() else ''
         self.rating = entity['rating'] if 'rating' in entity.keys() else ''
-        self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'macdhdivergence'
+        self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'default'
         self.timeframe = entity['timeframe'] if 'timeframe' in entity.keys() and not not entity['timeframe'] else '1d'
         self.is_idea = entity['is_idea'] if 'is_idea' in entity.keys() else ''
         self.tradingsymbol = entity['tradingsymbol'] if 'tradingsymbol' in entity.keys() and not not entity['tradingsymbol'] else ''
