@@ -10,7 +10,7 @@ from tradejournal.models import JournalEntry, JournalEntryGroup, JournalEntryNot
 from tradejournal.models.factory import create_repository
 from tradejournal.settings import REPOSITORY_NAME, REPOSITORY_SETTINGS
 from flask_login import login_required
-from flask_paginate import Pagination, get_page_parameter, get_page_args
+from flask_paginate import Pagination, get_per_page_parameter, get_page_args
 import jsonpickle
 from flask import current_app as app
 import sys, traceback
@@ -54,8 +54,7 @@ def home():
     elif subpage == 'all':
         entries = journalentries
 
-    print(page)
-    pagination = Pagination(page=page, total=len(entries), search=False, record_name='journalentries',css_framework='bootstrap4')
+    pagination = Pagination(page=page, per_page=per_page, total=len(entries), search=False, record_name='journalentries',css_framework='bootstrap4')
     response = make_response(render_template(
         'index.html',
         title='Journal Entries',

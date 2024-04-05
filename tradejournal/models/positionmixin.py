@@ -1,7 +1,10 @@
 from . import azurekeyvault
 import requests
 import pandas as pd
-from jugaad_trader import Zerodha
+try:
+    from jugaad_trader import Zerodha
+except:
+    pass
 from . import tradejournalutils as tju
 
 class PositionMixin:
