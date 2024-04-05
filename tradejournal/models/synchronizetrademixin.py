@@ -54,19 +54,19 @@ class SynchronizeTradeMixin:
         for i in range(0, df.shape[0]):
             prev = cumsum
             cumsum += df.iloc[i]['quantity1']
-            ndf = ndf.append(df.iloc[i], ignore_index=True)
+            ndf = ndf._append(df.iloc[i], ignore_index=True)
             if cumsum == 0:
-                result.append(ndf)
+                result._append(ndf)
                 ndf = pd.DataFrame()
             elif np.sign(prev)*np.sign(cumsum) < 0:
                 ndf.loc[len(ndf.index)-1,'quantity1'] = -prev       
-                result.append(ndf)
+                result._append(ndf)
                 
                 ndf = pd.DataFrame()
-                ndf = ndf.append(df.iloc[i], ignore_index=True)
+                ndf = ndf._append(df.iloc[i], ignore_index=True)
                 ndf.loc[len(ndf.index)-1,'quantity1'] = df.iloc[i]['quantity1']+prev
         if not ndf.empty:
-            result.append(ndf)
+            result._append(ndf)
 
         return result
 
@@ -154,7 +154,7 @@ class SynchronizeTradeMixin:
                 splits = SynchronizeTradeMixin.split_trades(df)
                 for d in splits:
                     closed = d['quantity1'].sum() == 0
-                    trades.append(SynchronizeTradeMixin.distill_dataframe_into_trade(d, closed))
+                    trades._append(SynchronizeTradeMixin.distill_dataframe_into_trade(d, closed))
             trades = pd.DataFrame(trades)
             trades['entry_date'] = trades['entry_time'].apply(todate)
         else:
