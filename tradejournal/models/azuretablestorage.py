@@ -26,6 +26,7 @@ class Repository(JournalEntryMixin, ChartMixin,
          - STORAGE_TABLE_POLL
          - STORAGE_TABLE_CHOICE
         """
+        PositionMixin.__init__(self)
         self.name = 'Azure Table Storage'
         self.storage_name = settings['STORAGE_NAME']
         self.connection_string = settings['CONNECTION_STRING']
@@ -59,6 +60,7 @@ class Repository(JournalEntryMixin, ChartMixin,
         self.GROUP_CACHE = {}
         self.ENTRY_CACHE = {}
         self.last_cache_time = None
+
 
     def has_cache_expired(self):
         return self.last_cache_time.day != IST_now().day

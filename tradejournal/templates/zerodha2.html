@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>  
+<head>  
+    <title>Zerodha login step 2</title>  
+</head>  
+<body>  
+    <div class="form">
+      <form action="" method="post">
+        <input type="text" placeholder="twofa" name="twofa">
+        <input class="btn btn-default" type="submit" value="Login">
+      </form>
+      {% if error %}
+        <p class="error">Error: {{ error }}
+      {% endif %}
+    </div>
+</body>  
+</html>
+

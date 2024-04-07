@@ -468,27 +468,46 @@ def all_trades():
         trades = repository.get_all_trades(),
     )
 
-@app.route('/positions', methods=['GET'])
+
+@app.route('/positions', methods=['GET', 'POST'])
 @login_required
 def positions():
-    groupby = request.args.get('groupby', 'symbol')
+    groupby = request.args.get('groupby', 'strategy')
     """Renders the positions page."""
     error = None
     position_data = None
     grand_total = 0
     try:
-        position_data, grand_total = repository.get_position_data(groupby)
+        repository.try_login_zerodha()
     except Exception:
-        exc_type, exc_value, exc_tb = sys.exc_info()
-        error = traceback.format_exception(exc_type, exc_value, exc_tb)
+        return redirect('/zerodha1')
+    
+    position_data, grand_total = repository.get_position_data(groupby)
     if position_data:
         position_data.sort(key=lambda x: x[0]['name'], reverse=True)
+
     return render_template(
         'positions.html',
         data = position_data,
-        error=error,
+        error=None,
         grand_total = grand_total
     )
+
+@app.route('/zerodha1', methods=['GET', 'POST'])
+@login_required
+def zerodha1():
+    if request.method == "POST":
+        session["zerodha_step1"] = repository.login_zerodha_step1(request.form["username"], request.form["password"])
+        return redirect("/zerodha2")
+    return render_template('zerodha1.html', error=None)
+
+@app.route('/zerodha2', methods=['GET', 'POST'])
+@login_required
+def zerodha2():
+    if request.method == "POST":
+        session["zerodha_step2"] = repository.login_zerodha_step2(request.form["twofa"], session["zerodha_step1"])
+        return redirect("/positions")
+    return render_template('zerodha2.html', error=None)
 
 @app.route('/journalentry/monthlyreview/<year>/<month>/<serial>', methods=['GET'])
 @login_required

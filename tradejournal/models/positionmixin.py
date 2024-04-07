@@ -1,6 +1,7 @@
 from . import azurekeyvault
 import requests
 import pandas as pd
+import tempfile, os, pickle
 try:
     from jugaad_trader import Zerodha
 except:
@@ -8,12 +9,41 @@ except:
 from . import tradejournalutils as tju
 
 class PositionMixin:
+    def __init__(self):
+        self.kite = Zerodha()
+        self.session_file_dir = tempfile.gettempdir()
+        self.session_file_path = os.path.join(tempfile.gettempdir(), ".zsession")
+
+    def try_login_zerodha(self):
+        self.kite.load_session(self.session_file_path)
+        p = self.kite.profile()
+        return p
+
+    def login_zerodha_step1(self, user_id, password):
+        self.kite.user_id = user_id
+        self.kite.password = password
+        j = self.kite.login_step1()
+        if j['status'] == 'error':
+            raise Exception("Error: {}".format(j['message']))
+        return j
+        
+    def login_zerodha_step2(self, twofa, prevstep):
+        self.kite.twofa = twofa
+        j = self.kite.login_step2(prevstep)
+        if j['status'] == 'error':
+            raise Exception("Error: {}".format(j['message']))
+
+        self.kite.enc_token = self.kite.r.cookies['enctoken']
+        p = self.kite.profile()
+
+        with open(self.session_file_path, "wb") as fp:
+            pickle.dump(self.kite.reqsession, fp)
+        return p['user_name']
+        
+
     def get_position_data_response(self, groupby):
-        kite = Zerodha()
-         
         # Set access token loads the stored session.
-        kite.set_access_token()
-        data = kite.positions()['net']
+        data = self.kite.positions()['net']
         return data
 
     def get_position_data_response_old(self, groupby):
@@ -53,7 +83,7 @@ class PositionMixin:
         trades = self.get_journalentries_helper(lambda x:x, 60)
         tdf = pd.DataFrame(trades)
         if not tdf.empty:
-            tdf = tdf.query('(Vexit_time =="0" | exit_time == "") & is_idea !="Y"')
+            tdf = tdf.query('(exit_time =="0" | exit_time == "") & is_idea !="Y"')
             tdf = tdf[['symbol','strategy', 'timeframe', 'tradingsymbol']]
 
             out = df.merge(tdf, left_on=['symbol', 'tradingsymbol'], right_on=['symbol', 'tradingsymbol'], how='left')
