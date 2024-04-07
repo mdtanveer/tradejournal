@@ -11,16 +11,21 @@ import jmespath
 # weekly expiry PE BANKNIFTY2192336700PE
 # future KOTAKBANK21SEPFUT
 
-@filecache(900)
-def get_expiry_day(year, month_abbr):
-    try:
-        expiry_day = list(get_expiry_date(year=year, 
-            month=list(calendar.month_abbr).index(month_abbr), 
-            index=False, stock=True))[0].day
-    except:
-        current_expiry = nsepython.expiry_list('RELIANCE')[0]
-        expiry_day = current_expiry.split('-')[0]
-    return expiry_day
+@filecache(7*24*3600)
+def get_expiry_day(symbol, year, month_abbr):
+    if symbol != "BANKNIFTY":
+        try:
+            expiry_day = list(get_expiry_date(year=year, 
+                month=list(calendar.month_abbr).index(month_abbr), 
+                index=False, stock=True))[0].day
+        except:
+            current_expiry = nsepython.expiry_list('RELIANCE')[0]
+            expiry_day = current_expiry.split('-')[0]
+        return expiry_day
+    else:
+        weekly_expiries = nsepython.expiry_list("BANKNIFTY")
+        weekly_expiries = list(filter(lambda x: x.find(month_abbr) != -1, weekly_expiries))
+        return weekly_expiries[-1].split('-')[0]
 
 def convert_from_zerodha_convention(name):
     name = str(name)
@@ -32,7 +37,7 @@ def convert_from_zerodha_convention(name):
             month_abbr = res.group(3).title()
             strike = res.group(4)
             optionytype = res.group(5)
-            expiry_day = get_expiry_day(int("20"+year), month_abbr)
+            expiry_day = get_expiry_day(symbol, int("20"+year), month_abbr)
             expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
             return (symbol, expiry, optionytype, int(strike))
         
@@ -94,10 +99,10 @@ def get_quote_option(symbol, expiry, optiontype, strike):
 @filecache(900)
 def get_quote_old(name):
     args = convert_from_zerodha_convention(name)
-    print(args)
     try:
         return nsepython.nse_quote_ltp(*args)
     except:
+        print("Error fetching:", args)
         return 0
 
 def test():

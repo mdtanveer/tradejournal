@@ -51,7 +51,7 @@ class JournalEntryGroup(object):
                 if not self.is_open():
                     self.exit_time = max(self.deserialized_items, key = lambda x: x.exit_time).exit_time
             except:
-                print(key, "not found")
+                print("Error populating children:", key, "not found")
                 continue
     
     def is_open(self):
