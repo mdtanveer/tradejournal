@@ -62,7 +62,7 @@ def convert_from_zerodha_convention(name):
             symbol = res.group(1)
             year = res.group(2)
             month_abbr = res.group(3).title()
-            expiry_day = get_expiry_day(int("20"+year), month_abbr)
+            expiry_day = get_expiry_day(symbol, int("20"+year), month_abbr)
             expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
             return (symbol, expiry, "Fut")
         return (name,)

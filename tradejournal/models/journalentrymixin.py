@@ -57,8 +57,10 @@ class JournalEntryMixin:
         """Update the specified journalentry."""
         try:
             updated_entity = dict(input_entity)
-            updated_entity.pop('entry_time')
-            updated_entity.pop('symbol')
+            if 'entry_time' in updated_entity.keys():
+                updated_entity.pop('entry_time')
+            if 'symbol' in updated_entity.keys():
+                updated_entity.pop('symbol')
             partition, row = tju.key_to_partition_and_row(key)
             entity = self.svc.get_entity(self.TABLES['journalentry'], partition, row)
 
@@ -75,7 +77,7 @@ class JournalEntryMixin:
             if trade_closure:
                 self.add_chart(key, {'title':'Auto exit chart'}, updated_entity['timeframe'])
 
-            if trade_open and not trade_closed_in_update:
+            if tju.KEY_EXIT_PRICE in updated_entity.keys() and trade_open and not trade_closed_in_update:
                 updated_entity.pop(tju.KEY_EXIT_PRICE)
 
             entity.update(updated_entity)

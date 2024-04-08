@@ -33,7 +33,7 @@ class JournalEntryGroupMixin:
             entry.populate_children(indict, alljournalentries)
             self.GROUP_CACHE[entry.key] = entry
         return journalentrygroups
-
+ 
     def invalidate_journalentrygroupcache(self, journalentrygroup_key):
         try:
             del self.GROUP_CACHE[journalentrygroup_key]
@@ -114,3 +114,16 @@ class JournalEntryGroupMixin:
         if serial >= count or serial < 0:
             serial = 1
         return tju.journalentrygroup_from_entity(journalentrygroups[serial-1])
+
+    def copyattributestochildren(self, parententity):
+        for je in parententity.deserialized_items:
+            if not je.is_group():
+                update = {
+                        'strategy' : parententity.strategy
+                }
+                print(update)
+                self.update_journalentry(je.key, update)
+            else:
+                self.copyattributestochildren(je)
+
+

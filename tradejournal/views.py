@@ -229,6 +229,14 @@ def editgroup(key):
             subtitle = "Edit Journal Entry Group"
         )
 
+@app.route('/journalentrygroup/<key>/copyattributestochildren', methods=['POST'])
+@login_required
+def copyattributestochildren(key):
+    if request.method == 'POST':
+        journalentrygroup=repository.get_journalentrygroup(key)
+        repository.copyattributestochildren(journalentrygroup)
+        return redirect(lastget_url('/journalentrygroup/{0}'.format(key)))
+
 @app.route('/journalentrygroup/<key>', methods=['GET'])
 @login_required
 def viewgroup(key):
