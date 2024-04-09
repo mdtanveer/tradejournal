@@ -134,6 +134,15 @@ class JournalEntryGroup(object):
             jgnew.deserialized_items.append(jenew)
         return jgnew
 
+    def option_premium(self):
+        premium = 0
+        for je in self.deserialized_items:
+            if not je.is_group():
+                try:
+                    premium += je.option_premium()
+                except TypeError as err:
+                    continue
+        return premium
 
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
@@ -273,6 +282,14 @@ class JournalEntry(object):
         else:
             html = self.tradingsymbol
         return html
+
+    def option_premium(self):
+        if not self.is_open() or not (self.tradingsymbol.endswith("CE") or self.tradingsymbol.endswith("PE")):
+            raise TypeError("Premium is not defined for non-options")
+        premium = float(self.entry_price) * float(self.quantity)
+        if self.direction == 'LONG':
+            premium = -premium
+        return premium
 
 
 class JournalEntryNotFound(Exception):
