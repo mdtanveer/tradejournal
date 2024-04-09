@@ -239,10 +239,10 @@ def copyattributestochildren(key):
 
 @app.route('/journalentrygroup/<key>', methods=['GET'])
 @login_required
-def viewgroup(key):
+async def viewgroup(key):
     groupby = request.args.get('groupby', 'none')
     journalentrygroup=repository.get_journalentrygroup(key)
-    journalentrygroup.fetch_exit_price_as_ltp()
+    await journalentrygroup.fetch_exit_price_as_ltp()
     comments=repository.get_comments(key)
     page, per_page, offset = get_page_args()
     pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')

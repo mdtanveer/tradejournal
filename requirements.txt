@@ -1,4 +1,5 @@
 Flask
+flask[async]
 pandas
 arrow
 azure-storage-blob
