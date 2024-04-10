@@ -53,8 +53,8 @@ class ChartMixin:
                 'add_time' : add_time
             })
             self.svc.insert_entity(self.TABLES["charts"], entity)
-        except AzureMissingResourceHttpError:
-            raise JournalEntryNotFound()
+        except Exception as e:
+            print("Unable to add chart", e)
 
     def delete_chart(self, key):
         try:

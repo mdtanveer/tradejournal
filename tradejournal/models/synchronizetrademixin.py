@@ -73,7 +73,9 @@ class SynchronizeTradeMixin:
     def distill_dataframe_into_trade(df, closed=True):
         #expecting a series of trades with first row as initiating trade and last row as closing trade
         prices = df.groupby("trade_type").apply(lambda x: np.average(x.price, weights=x.quantity))
-        entry_price = prices[df['trade_type'].iloc[0]]
+        quantities = df.groupby("trade_type").apply(lambda x: np.sum(x.quantity))
+        entry_price = round(prices[df['trade_type'].iloc[0]], 2)
+        quantity = quantities[df['trade_type'].iloc[0]]
         tradingsymbol = df['tradingsymbol'].iloc[0]
         timeframe = '2h' if tradingsymbol.endswith('FUT') else '1d'
         row = {
@@ -86,7 +88,7 @@ class SynchronizeTradeMixin:
              'exit_price' : '',
              'exit_time' : '',
              'is_idea' : '',
-             'quantity' : df['quantity'].iloc[0],
+             'quantity' : quantity,
              'rating' : '',
              'strategy' : 'default',
              'symbol' : df['PartitionKey'].iloc[0],
