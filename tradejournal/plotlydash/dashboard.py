@@ -59,15 +59,16 @@ def layout_func():
 
     groups =  df_tot_yearly.groupby("PartitionKey")
     for groupid in groups.groups:
-        dfg = groups.get_group(groupid)
-        yearly_chart.add_trace (
-            go.Bar( x = dfg['FY'],
-                        y = dfg['NetRealizedPnL'],
-                        text=dfg['NetRealizedPnL'].apply(toLakhs),
-                        name=groupid
-                    ),
-            row=1, col=2
-        )
+        if groupid == 'Total':
+            dfg = groups.get_group(groupid)
+            yearly_chart.add_trace (
+                go.Bar( x = dfg['FY'],
+                            y = dfg['NetRealizedPnL'],
+                            text=dfg['NetRealizedPnL'].apply(toLakhs),
+                            name=groupid
+                        ),
+                row=1, col=2
+            )
 
     yearly_pnl_table = pd.pivot_table(df_tot_yearly, values='NetRealizedPnL', index='FY',
             columns=['PartitionKey'], aggfunc=np.sum).fillna(0).applymap(toLakhs).reset_index().sort_values("FY", ascending=False)
