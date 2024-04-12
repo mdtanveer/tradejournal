@@ -48,7 +48,6 @@ def get_quote_data(symbol='RELIANCE', data_range='1d', data_interval='1h', prefe
     else:
         df['date'] = df['Datetime'].astype(str)
         df['time'] = '09:15:00'
-    df=df.reset_index()
     df = df.loc[:, ('date', 'time', 'open', 'high', 'low', 'close', 'volume')]
     
     return df
