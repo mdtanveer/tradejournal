@@ -14,8 +14,8 @@ azure-identity
 yfinance
 nsepython
 nsepy
-filecache
 jmespath
 fiscalyear
 jugaad-trader
-gunicorn[gevent]
+gunicorn[gthread]
+memoization

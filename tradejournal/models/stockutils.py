@@ -2,7 +2,7 @@ import nsepython
 import re
 from nsepy.derivatives import get_expiry_date
 import calendar
-from filecache import filecache
+from memoization import cached
 import urllib
 import jmespath
 
@@ -11,7 +11,7 @@ import jmespath
 # weekly expiry PE BANKNIFTY2192336700PE
 # future KOTAKBANK21SEPFUT
 
-@filecache(7*24*3600)
+@cached(ttl=7*24*3600)
 def get_expiry_day(symbol, year, month_abbr):
     if symbol != "BANKNIFTY":
         try:
@@ -69,7 +69,7 @@ def convert_from_zerodha_convention(name):
     except:
         raise
 
-@filecache(900)
+@cached(ttl=900)
 def get_derivative_data(symbol):
     symbol = nsepython.nsesymbolpurify(symbol)
     payload = nsepython.nsefetch('https://www.nseindia.com/api/quote-derivative?symbol='+symbol)
@@ -96,7 +96,7 @@ def get_quote_option(symbol, expiry, optiontype, strike):
     query_string = f'stocks[?metadata.strikePrice == `{strike}` && metadata.expiryDate == `{expiry}` && metadata.optionType==`{optiontype}`].metadata.lastPrice'
     return jmespath.search(query_string, derivative_data)[0]
 
-@filecache(900)
+@cached(ttl=900)
 def get_quote_old(name):
     args = convert_from_zerodha_convention(name)
     try:
