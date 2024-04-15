@@ -57,10 +57,14 @@ class Repository(JournalEntryMixin, ChartMixin,
             self.container_client = self.blob_service_client.get_container_client(self.container_name)
         except:
             self.container_client = self.blob_service_client.create_container(self.container_name)
+
+        self.invalidate_cache()
+
+    def has_cache_expired(self):
+        return self.last_cache_time.day != IST_now().day
+
+    def invalidate_cache(self):
         self.GROUP_CACHE = {}
         self.ENTRY_CACHE = {}
         self.last_cache_time = None
 
-
-    def has_cache_expired(self):
-        return self.last_cache_time.day != IST_now().day

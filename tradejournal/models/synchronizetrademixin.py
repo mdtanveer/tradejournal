@@ -217,4 +217,6 @@ class SynchronizeTradeMixin:
             update_df = update_df.astype(str)
 
             self.atsClient.update_to_ats(update_df, 'TradeEntryTable')
+        
+        self.invalidate_cache()
 

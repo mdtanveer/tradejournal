@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>  
-<head>  
-    <title>Zerodha login step 2</title>  
-</head>  
-<body>  
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
     <div class="form">
       <form action="" method="post">
         <input type="text" placeholder="twofa" name="twofa">
@@ -13,6 +11,6 @@
         <p class="error">Error: {{ error }}
       {% endif %}
     </div>
-</body>  
-</html>
+</div>  
+{% endblock %}
 

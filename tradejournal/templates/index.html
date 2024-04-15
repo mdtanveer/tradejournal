@@ -3,8 +3,8 @@
 {% block content %}
 <div class="container">
     <div>
-        <button onclick="postCheckedItems()">Create</button>
-        <button>Merge</button>
+        <button onclick="postCheckedItems()">Create Group</button>
+        <button>Merge..</button>
         <button onclick="clearCheckboxes()">Clear</button>
     </div>
 <ul class="nav nav-tabs justify-content-center">
@@ -88,32 +88,32 @@
         function clearLocalStorage(){
             localStorage.setItem("groupItems", "");
         }
-    </script>
-    <script>
-    function postCheckedItems() {
-        var checkedItems = [];
-        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        
-        checkboxes.forEach(function(checkbox) {
-            if (checkbox.checked) {
-                checkedItems.push(checkbox.id);
-            }
-        });
-        
-        // Convert the checkedItems array to a URL query string
-        var queryString = checkedItems.map(item => encodeURIComponent(item)).join(',');
+        function postCheckedItems() {
+            var checkedItems = [];
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            
+            checkboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    checkedItems.push(checkbox.id);
+                }
+            });
+            
+            // Convert the checkedItems array to a URL query string
+            var queryString = checkedItems.map(item => encodeURIComponent(item)).join(',');
 
-        // Navigate to the URL with the checked items as parameters
-        window.location.href = "creategroup?createwith=" + queryString;
-    }
+            // Navigate to the URL with the checked items as parameters
+            window.location.href = "creategroup?createwith=" + queryString;
+        }
 
-    function clearCheckboxes() {
-        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        
-        checkboxes.forEach(function(checkbox) {
-            checkbox.checked = false;
-        });
-    }
+        function clearCheckboxes() {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
+
+            clearLocalStorage();
+        }
     </script>
 {% else %}
 <p>No journalentries available.</p>
