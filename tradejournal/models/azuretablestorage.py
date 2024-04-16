@@ -61,7 +61,7 @@ class Repository(JournalEntryMixin, ChartMixin,
         self.invalidate_cache()
 
     def has_cache_expired(self):
-        return self.last_cache_time.day != IST_now().day
+        return self.last_cache_time == None or self.last_cache_time.day != IST_now().day
 
     def invalidate_cache(self):
         self.GROUP_CACHE = {}

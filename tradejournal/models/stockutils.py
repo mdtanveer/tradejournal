@@ -12,7 +12,7 @@ import jmespath
 
 @cached(ttl=7*24*3600)
 def get_expiry_day(symbol, year, month_abbr):
-    payload = get_derivative_data(symbol)
+    payload = get_nse_quote(symbol)
     monthly_expiries = jmespath.search('stocks[?ends_with(metadata.instrumentType, `Futures`)].metadata.expiryDate', payload)
     for exp in monthly_expiries:
             if exp.endswith(f"{month_abbr}-{year}"):
@@ -20,8 +20,6 @@ def get_expiry_day(symbol, year, month_abbr):
                 return expiry_day
     raise Exception(f"Couldn't find a valid expiry day for {year}-{month_abbr}, {symbol}")
         
-        
-
 def convert_from_zerodha_convention(name):
     name = str(name)
     try:
@@ -65,11 +63,11 @@ def convert_from_zerodha_convention(name):
         raise
 
 @cached(ttl=900)
-def get_derivative_data(symbol):
+def get_nse_quote(symbol):
     return nsepython.nse_quote(symbol)
 
 def cache_clear():
-    get_derivative_data.cache_clear()
+    get_nse_quote.cache_clear()
 
 async def get_quote(name):
     try:
@@ -78,19 +76,25 @@ async def get_quote(name):
             return get_quote_future(*args)
         elif len(args) == 4:
             return get_quote_option(*args)
+        elif len(args) == 1:
+            return get_quote_spot(*args)
     except:
         return 0
 
 def get_quote_future(symbol, expiry, optiontype):
-    derivative_data = get_derivative_data(symbol)
+    derivative_data = get_nse_quote(symbol)
     query_string = f'stocks[?metadata.expiryDate == `{expiry}` && metadata.optionType==`-`].metadata.lastPrice'
     return jmespath.search(query_string, derivative_data)[0]
 
 def get_quote_option(symbol, expiry, optiontype, strike):
-    derivative_data = get_derivative_data(symbol)
+    derivative_data = get_nse_quote(symbol)
     optiontype = {'CE':'Call', 'PE':'Put'}[optiontype]
     query_string = f'stocks[?metadata.strikePrice == `{strike}` && metadata.expiryDate == `{expiry}` && metadata.optionType==`{optiontype}`].metadata.lastPrice'
     return jmespath.search(query_string, derivative_data)[0]
+
+def get_quote_spot(symbol):
+    payload = get_nse_quote(symbol)
+    return payload["underlyingValue"]
 
 @cached(ttl=900)
 def get_quote_old(name):
