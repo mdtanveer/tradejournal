@@ -1,6 +1,5 @@
 import nsepython
 import re
-from nsepy.derivatives import get_expiry_date
 import calendar
 from memoization import cached
 import urllib
@@ -13,23 +12,12 @@ import jmespath
 
 @cached(ttl=7*24*3600)
 def get_expiry_day(symbol, year, month_abbr):
-    if symbol != "BANKNIFTY":
-        try:
-            expiry_day = list(get_expiry_date(year=year, 
-                month=list(calendar.month_abbr).index(month_abbr), 
-                index=False, stock=True))[0].day
-        except:
-            current_expiry = nsepython.expiry_list('RELIANCE')[0]
-            expiry_day = current_expiry.split('-')[0]
-        return expiry_day
-    else:
-        payload = get_derivative_data('BANKNIFTY')
-        meta = "Futures"
-        for i in payload['stocks']:
-            if meta in i['metadata']['instrumentType']:
-                if i['metadata']['expiryDate'].endswith(f"{month_abbr}-{year}"):
-                    expiry_day = i['metadata']['expiryDate'].split('-')[0]
-                    return expiry_day
+    payload = get_derivative_data(symbol)
+    monthly_expiries = jmespath.search('stocks[?ends_with(metadata.instrumentType, `Futures`)].metadata.expiryDate', payload)
+    for exp in monthly_expiries:
+            if exp.endswith(f"{month_abbr}-{year}"):
+                expiry_day = exp.split('-')[0]
+                return expiry_day
     raise Exception(f"Couldn't find a valid expiry day for {year}-{month_abbr}, {symbol}")
         
         
