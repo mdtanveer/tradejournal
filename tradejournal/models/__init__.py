@@ -187,8 +187,7 @@ class JournalEntry(object):
     async def fetch_exit_price_as_ltp(self, force_refresh):
         if force_refresh == 1:
             stockutils.cache_clear()
-            self.exit_price = None
-        if self.is_open() and not self.exit_price:
+        if self.is_open():
             self.exit_price = await stockutils.get_quote(self.tradingsymbol)
 
     def isidea(self):
