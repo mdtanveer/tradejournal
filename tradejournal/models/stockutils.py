@@ -23,9 +23,16 @@ def get_expiry_day(symbol, year, month_abbr):
             expiry_day = current_expiry.split('-')[0]
         return expiry_day
     else:
-        weekly_expiries = nsepython.expiry_list("BANKNIFTY")
-        weekly_expiries = list(filter(lambda x: x.find(month_abbr) != -1, weekly_expiries))
-        return weekly_expiries[-1].split('-')[0]
+        payload = get_derivative_data('BANKNIFTY')
+        meta = "Futures"
+        for i in payload['stocks']:
+            if meta in i['metadata']['instrumentType']:
+                if i['metadata']['expiryDate'].endswith(f"{month_abbr}-{year}"):
+                    expiry_day = i['metadata']['expiryDate'].split('-')[0]
+                    return expiry_day
+    raise Exception(f"Couldn't find a valid expiry day for {year}-{month_abbr}, {symbol}")
+        
+        
 
 def convert_from_zerodha_convention(name):
     name = str(name)
@@ -71,13 +78,10 @@ def convert_from_zerodha_convention(name):
 
 @cached(ttl=900)
 def get_derivative_data(symbol):
-    symbol = nsepython.nsesymbolpurify(symbol)
-    payload = nsepython.nsefetch('https://www.nseindia.com/api/quote-derivative?symbol='+symbol)
-    return payload
+    return nsepython.nse_quote(symbol)
 
 def cache_clear():
     get_derivative_data.cache_clear()
-    get_expiry_day.cache_clear()
 
 async def get_quote(name):
     try:
