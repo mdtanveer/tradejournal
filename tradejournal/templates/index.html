@@ -2,11 +2,6 @@
 
 {% block content %}
 <div class="container">
-    <div>
-        <button onclick="postCheckedItems()">Create Group</button>
-        <button>Merge..</button>
-        <button onclick="clearCheckboxes()">Clear</button>
-    </div>
 <ul class="nav nav-tabs justify-content-center">
     <li id="all" class="nav-item">
         <a class="nav-link {{"active" if subpage=="all" else ""}}" href="home?subpage=all&per_page=100">All</a>
@@ -119,5 +114,10 @@
 <p>No journalentries available.</p>
 <br />
 {% endif %}
+<br/>
+    <div>
+        <button class="btn btn-light btn-secondary" onclick="postCheckedItems()">Create Group</button>
+        <button class="btn btn-light btn-secondary" onclick="clearCheckboxes()">Clear</button>
+    </div>
 </div>
 {% endblock %}

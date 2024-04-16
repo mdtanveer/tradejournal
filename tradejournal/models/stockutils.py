@@ -75,6 +75,10 @@ def get_derivative_data(symbol):
     payload = nsepython.nsefetch('https://www.nseindia.com/api/quote-derivative?symbol='+symbol)
     return payload
 
+def cache_clear():
+    get_derivative_data.cache_clear()
+    get_expiry_day.cache_clear()
+
 async def get_quote(name):
     try:
         args = convert_from_zerodha_convention(name)

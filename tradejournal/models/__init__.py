@@ -95,9 +95,9 @@ class JournalEntryGroup(object):
             sum += je.profit()
         return sum
 
-    async def fetch_exit_price_as_ltp(self):
+    async def fetch_exit_price_as_ltp(self, force_refresh):
         for je in self.deserialized_items:
-            await je.fetch_exit_price_as_ltp()
+            await je.fetch_exit_price_as_ltp(force_refresh)
 
     def get_category(self):
         category = set()
@@ -184,7 +184,10 @@ class JournalEntry(object):
         jenew.quantity_prop = float(self.directionalqty()) + float(other.directionalqty())
         return jenew
 
-    async def fetch_exit_price_as_ltp(self):
+    async def fetch_exit_price_as_ltp(self, force_refresh):
+        if force_refresh == 1:
+            stockutils.cache_clear()
+            self.exit_price = None
         if self.is_open() and not self.exit_price:
             self.exit_price = await stockutils.get_quote(self.tradingsymbol)
 

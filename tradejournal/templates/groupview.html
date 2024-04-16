@@ -24,6 +24,7 @@
           <li><a class="dropdown-item" href="?groupby=strike">Strike</a></li>
           <li><a class="dropdown-item" href="?groupby=expiry">Expiry</a></li>
       </ul>
+      <button class="btn btn-secondary btn-light" type="button" id="forceRefreshBtn" href="" aria-expanded="false" onclick="force_refresh()">Refresh</button>
     </div>
     <table class="table table-sm table-responsive-sm">
         <thead>
@@ -124,6 +125,12 @@
             $("#commentform")[0].reset();
             window.location.reload();
         });
-        });   
+        });
+
+    function force_refresh(){
+        const parser = new URL(window.location);
+        parser.searchParams.set("nocache", 1);
+        window.location = parser.href;
+    }
 </script>
 {% endblock %}
