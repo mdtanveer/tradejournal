@@ -14,6 +14,9 @@ from flask_paginate import Pagination, get_per_page_parameter, get_page_args
 import jsonpickle
 from flask import current_app as app
 import sys, traceback
+import plotly
+import plotly.express as px
+
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 
@@ -247,13 +250,47 @@ async def viewgroup(key):
     comments=repository.get_comments(key)
     page, per_page, offset = get_page_args()
     pagination = Pagination(page=page, total=len(comments), search=False, record_name='comments',css_framework='bootstrap4')
+
     return render_template(
         'groupview.html',
         journalentrygroup = journalentrygroup.groupby(groupby),
         pagetitle = "Group Entry",
         subtitle = "View Journal Entry Group",
         comments = comments,
-        pagination = pagination
+        pagination = pagination,
+    )
+
+@app.route('/journalentrygroup/<key>/analysis', methods=['GET'])
+@login_required
+async def viewgroupanalysis(key):
+    journalentrygroup=repository.get_journalentrygroup(key)
+    profit_ranges = ""
+    extrema_profits = ""
+    optionlab_result = None
+    graph = None
+    try:
+        optionlab_result = await journalentrygroup.get_optionlab_result_async()
+        size = len(optionlab_result.data.stock_price_array)
+        k = int(size/500)
+        fig = px.line(x=optionlab_result.data.stock_price_array[:-k:k], y=optionlab_result.data.strategy_profit[:-k:k])
+        graph = fig.to_html(full_html = False, include_plotlyjs ='cdn')
+        for low, high in optionlab_result.profit_ranges:
+            profit_ranges += "%.1f-%.1f " % (low, high)
+        extrema_profits = "%.2f / %.2f"%(optionlab_result.data.strategy_profit[0], optionlab_result.data.strategy_profit[-1]) 
+        print(profit_ranges)
+        print(extrema_profits)
+    except Exception as err:
+        print("Unable to do optionlab analysis:", err)
+
+    return render_template(
+        'groupanalysis.html',
+        journalentrygroup = journalentrygroup,
+        pagetitle = "Group Analysis",
+        subtitle = "View Journal Entry Group Analysis",
+        optionlab_result = optionlab_result,
+        graph = graph,
+        profit_ranges = profit_ranges,
+        extrema_profits = extrema_profits
     )
 
 @app.route('/journalentrygroup/<key>/delete', methods=['GET'])
@@ -611,3 +648,7 @@ def format_dateonly(value, format="%d-%m-%Y"):
         return value.strftime("%d-%m")
     else:
         return value.strftime("%d-%m-%Y")
+
+@app.template_filter('formatfloat')
+def format_float(value):
+    return round(value, 2)

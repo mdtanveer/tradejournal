@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h5>
+    <i class="bi-basket"></i>
+    {{journalentrygroup.name}} 
+    </h5>
+    {% if graph %}
+    <div>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+        {{graph | safe }}
+    </div>
+    {% endif %}
+    
+    {% if optionlab_result %}
+    <table class="table table-sm table-responsive-sm">
+        <thead>
+        <tr>
+            <td>Heading</td>
+            <td>Value</td>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Max Risk</td> 
+                <td>{{ optionlab_result.minimum_return_in_the_domain | formatfloat }}</td> 
+            </tr>
+            <tr>
+                <td>Max Gain</td> 
+                <td>{{ optionlab_result.maximum_return_in_the_domain | formatfloat }}</td> 
+            </tr>
+            <tr>
+                <td>Profit Probability</td> 
+                <td>{{ optionlab_result.probability_of_profit*100.0 | formatfloat }}%</td> 
+            </tr>
+            <tr>
+                <td>Profit Ranges</td> 
+                <td>{{ profit_ranges }}</td> 
+            </tr>
+            <tr>
+                <td>Extrema profits</td> 
+                <td>{{ extrema_profits }}</td> 
+            </tr>
+        </tbody>
+    </table>
+    {% else %}
+    <p>Analysis view is not supported for this group</p>
+    {% endif %}
+</div>
+{% endblock %}

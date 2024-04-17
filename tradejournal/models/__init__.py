@@ -10,6 +10,8 @@ import pytz
 from . import stockutils
 import itertools, functools
 import re
+from optionlab import Inputs, StrategyEngine
+from memoization import cached
 
 def IST_now():
     return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
@@ -143,6 +145,63 @@ class JournalEntryGroup(object):
                 except TypeError as err:
                     continue
         return premium
+
+    def get_optionlab_strategy(self):
+        legs = []
+        underlying = None
+        expiry = None
+        entry_date = None
+        for je in self.deserialized_items:
+            if not je.is_group():
+                leg = je.get_optionlab_strategy()
+                if not underlying:
+                    underlying = leg['symbol']
+                else:
+                    if leg['symbol'] != underlying:
+                        raise TypeError("Non-homogeneous symbol found")
+                if not expiry:
+                    expiry = leg['expiry']
+                else:
+                    if leg['expiry'] != expiry:
+                        raise TypeError("Non-homogeneous expiry found")
+                if not entry_date:
+                    entry_date = leg['entry_date']
+                else:
+                    if leg['entry_date'] != entry_date:
+                        raise TypeError("Non-homogeneous entry found")
+                legs.append(leg['strategy'])
+
+        if underlying == None:
+            raise Exception("Invalid symbol")
+
+        model =  {'symbol': underlying, 'expiry': expiry, 'entry_date': entry_date, 'legs': legs}
+        print(model)
+        return model
+
+    async def get_optionlab_result_async(self):
+        return self.get_optionlab_result()
+
+    @cached(ttl=3600)
+    def get_optionlab_result(self):
+        model = self.get_optionlab_strategy()
+        spot_price = stockutils.get_quote_spot(model['symbol'])
+        inputs_data = {
+            "stock_price": spot_price, 
+            "start_date": model['entry_date'],
+            "target_date": model['expiry'],
+            "volatility": 0.272,
+            "interest_rate": 0.0002,
+            "min_stock": spot_price * 0.95,
+            "max_stock": spot_price * 1.05,
+            "strategy": model['legs'],
+            "mc_prices_number": 100
+            }
+
+        inputs = Inputs.model_validate(inputs_data)
+        st = StrategyEngine(inputs)
+        out = st.run()
+        return out
+
 
 class JournalEntry(object):
     """Corresponds to one entry in trade journal"""
@@ -285,13 +344,35 @@ class JournalEntry(object):
             html = self.tradingsymbol
         return html
 
+    def is_option(self):
+        attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
+        return len(attrib) == 4
+
     def option_premium(self):
-        if not self.is_open() or not (self.tradingsymbol.endswith("CE") or self.tradingsymbol.endswith("PE")):
+        if not self.is_option():
             raise TypeError("Premium is not defined for non-options")
         premium = float(self.entry_price) * float(self.quantity)
         if self.direction == 'LONG':
             premium = -premium
         return premium
+
+    def get_optionlab_strategy(self):
+        if self.is_open() and self.is_option():
+            symbol, expiry, optionytype, strike = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
+            result =  {
+                    'expiry' : datetime.strptime(expiry, "%d-%b-%Y").date(),
+                    'symbol' : symbol,
+                    'entry_date' : self.entry_time.date(),
+                    'strategy': {
+                        "type": "put" if optionytype == "PE" else "call",
+                        "strike": strike,
+                        "premium": float(self.entry_price),
+                        "n": float(self.quantity),
+                        "action":"buy" if self.direction == 'LONG' else "sell"
+                        }
+                    }
+            return result
+        raise TypeError("Not an option or trade is closed")
 
 
 class JournalEntryNotFound(Exception):

@@ -25,6 +25,7 @@
           <li><a class="dropdown-item" href="?groupby=expiry">Expiry</a></li>
       </ul>
       <button class="btn btn-secondary btn-light" type="button" id="forceRefreshBtn" href="" aria-expanded="false" onclick="force_refresh()">Refresh</button>
+      <a class="btn btn-secondary btn-light" type="button" id="analysisBtn" href="{{journalentrygroup.key}}/analysis" aria-expanded="false">Analysis</a>
     </div>
     <table class="table table-sm table-responsive-sm">
         <thead>
@@ -77,7 +78,6 @@
         </tr>
         </tfoot>
     </table>
-
     <h4> Comments </h4>
     <br />
     {% if comments %}
