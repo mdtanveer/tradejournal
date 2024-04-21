@@ -386,7 +386,8 @@ class Comment(object):
         self.add_time = toIST_fromtimestamp(float(entity['add_time']))
         self.title = entity['title'] if 'title' in entity.keys() else ''
         self.text = entity['text'] if 'text' in entity.keys() else ''
-        self.symbol = key.split('_')[0]
+        self.symbol = key.rsplit('_', 1)[0]
+        self.badge = ""
 
 class Chart(object):
     def __init__(self, key, entity): 

@@ -1,4 +1,6 @@
-<h4> Comments </h4>
+<h4> 
+    Comments 
+</h4>
 <br />
 {% if comments %}
 <ul class="list-group list-group-flush">
@@ -6,12 +8,17 @@
     <li class="list-group-item">
         <div>
             {{ comment.add_time | formatdatetimedisplay }}
-            <button type="button" class="btn btn-light" id="editcommentbtn" onclick="initiateeditcomment('{{comment.key}}')">
+            <div class="position-absolute top-0 end-0">
+                <button type="button" class="btn btn-light" id="editcommentbtn" onclick="initiateeditcomment('{{comment.key}}')">
                 <i class="bi-pen"></i>
-            </button>
-            <button type="button" class="btn btn-light"  id="deletecommentbtn" onclick="deletecomment('{{comment.key}}')">
+                </button>
+                <button type="button" class="btn btn-light"  id="deletecommentbtn" onclick="deletecomment('{{comment.key}}')">
                 <i class="bi-trash"></i>
             </button>
+            </div>
+            {% if allcomments %}
+                <span class="badge bg-light text-dark">{{comment.badge}}</span>
+            {% endif %}
         </div>
         <div>
             {%if comment.title %}
@@ -36,6 +43,10 @@
 <p>No comments available.</p>
 <br />
 {% endif %}
+<h5 class="d-print-none"> 
+<br />
+Post a comment 
+</h5>
 <form class="d-print-none" action="" method="post" role="form" id="commentform">
     <div class="form-group">
         <div class="input text">

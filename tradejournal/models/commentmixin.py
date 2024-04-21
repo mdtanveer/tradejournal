@@ -56,6 +56,14 @@ class CommentMixin:
         else:
             comment_entities = self.svc.query_entities(self.TABLES["comments"], select="PartitionKey")
         comments = [tju.comment_from_entity(entity) for entity in comment_entities]
+        for comment in comments:
+            try:
+                comment.badge = self.GROUP_CACHE[comment.symbol].name
+            except:
+                try:
+                    comment.badge = self.ENTRY_CACHE[comment.symbol].tradingsymbol
+                except:
+                    comment.badge = comment.symbol
         comments.sort(key = lambda x: x.add_time, reverse=True)
         return comments
 

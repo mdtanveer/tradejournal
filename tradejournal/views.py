@@ -333,8 +333,9 @@ def commentsgroup(key):
 
 @app.route('/journalentry/<key>/comments/<commentid>', methods=['POST', 'DELETE'])
 @app.route('/journalentrygroup/<key>/comments/<commentid>', methods=['POST', 'DELETE'])
+@app.route('/comments/<commentid>', methods=['POST', 'DELETE'])
 @login_required
-def update_or_delete_comment(key, commentid):
+def update_or_delete_comment(commentid, key="GLOBAL_1"):
     """Renders the comments page."""
     error_message = ''
     if request.method == 'POST':
@@ -393,7 +394,7 @@ def comments(key):
             pagination = pagination
         )
 
-@app.route('/journalentry/comments', methods=['GET', 'POST'])
+@app.route('/comments', methods=['GET', 'POST'])
 @login_required
 def allcomments():
     """Renders the all comments page."""
@@ -405,7 +406,7 @@ def allcomments():
             else:
                 data = request.form
             repository.add_comment("GLOBAL_1", data)
-            return redirect('/journalentry/comments')
+            return jsonify(success=True)
         except KeyError:
             error_message = 'Unable to update'
     else:

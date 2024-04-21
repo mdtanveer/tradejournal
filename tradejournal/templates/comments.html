@@ -2,62 +2,7 @@
 
 {% block content %}
 
-<h4>
-    Comments
-    {% if not allcomments %}
-    <span class="badge bg-secondary">
-        {{journalentry.symbol}}
-    </span>
-    {% endif %}
-</h4>
-<br />
-{% if comments %}
-<table class="table table-hover">
-    {% for comment in comments %}
-    <tr>
-        <th>
-            {{ comment.add_time | formatdatetimedisplay }}
-            {% if allcomments %}
-            <br /><span class="badge bg-secondary">{{comment.symbol}}</span>
-            {% endif %}
-        </th>
-        <td>
-            {%if comment.title %}
-            <b>
-                {{ comment.title }}
-            </b><br />
-            {% endif %}
-            <div>
-                {{ comment.text | safe}}
-            </div>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-<div class="pagination-sm" 
-        {{ pagination.links }}
-</div>
-{% else %}
-<p>No comments available.</p>
-<br />
-{% endif %}
-<form action="" method="post" role="form">
-    <div class="form-group">
-        <div class="input text">
-            <label for="title">Title:</label>
-            <input class="form-control" id="title" name="title" type="text" value="">
-        </div>
-        <div class="input text">
-            <label for="text">Text:</label>
-            <textarea class="form-control" id="text" name="text" required></textarea>
-        </div>
-        <div class="input">
-            <input id="linkchart" name="linkchart" type="checkbox">
-            <label for="linkchart">Link a chart</label>
-        </div>
-    </div>
-    <button type="submit" class="btn btn-success">Post Comment</button>
-</form>
+{%include "chart.inc"%}
 
 {% if error_message %}
 <p class="text-danger">{{error_message}}</p>
