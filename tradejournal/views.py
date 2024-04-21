@@ -4,7 +4,7 @@ Routes and views for the flask application.
 import json
 from datetime import datetime
 
-from flask import render_template, make_response, redirect, request, Response, session
+from flask import render_template, make_response, redirect, request, Response, session, url_for
 
 from tradejournal.models import JournalEntry, JournalEntryGroup, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
 from tradejournal.models.factory import create_repository
@@ -609,6 +609,21 @@ def uploadFile():
         
         return render_template('tradesync.html', message="Processed successfully")
     return render_template("tradesync.html", message=None)
+
+@app.route('/crawl', methods=['GET'])
+def crawl():
+    query = request.args.get('q', None)
+    urls = []
+    if query:
+        journalentries=repository.get_journalentries_forview()
+        journalentrygroups=repository.get_journalentrygroups_forview(journalentries)
+        tocrawl = filter(lambda x: x.name.find(query) != -1, journalentrygroups)
+        for jg in tocrawl:
+            urls.append(url_for('viewgroup', key=jg.key))
+            for je in jg.deserialized_items:
+                if not je.is_group() and not je.is_option():
+                    urls.append(url_for('charts', key=je.key))
+    return render_template("crawlurls.html", urls=urls)
 
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):

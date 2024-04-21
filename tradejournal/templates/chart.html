@@ -2,11 +2,32 @@
 
 {% block content %}
 <div class="container">
+    <h5>
+        {%if not not journalentry.is_idea%}
+            <i class="bi-lightbulb text-warning"></i>
+        {%else%}
+            {%if journalentry.is_open()%}
+                <i class="bi-play-circle"></i>
+            {%else%}
+                {%if journalentry.is_profitable()%}
+                    <i class="bi-arrow-up-circle text-success"></i>
+                {%else%}
+                    <i class="bi-arrow-down-circle text-danger"></i>
+                {%endif%}
+            {%endif%}
+        {%endif%}
+        {{journalentry.symbol}} 
+    </h5>
+    <h6>
+        <span class="text-muted panel-text">
+            <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i>
+        </span>
+    </h6>
     <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
     <div id="main">
         <div id="chart"></div>
     </div>
-    <div class="text-center mb-1" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="d-print-none text-center mb-1" role="toolbar" aria-label="Toolbar with button groups">
         <div class="btn-group mr-2" role="group" aria-label="First group">
             <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderPreviousChart();">
                 <i class="bi-chevron-left"></i>
@@ -43,27 +64,6 @@
             <i class="bi-chevron-right"></i>
         </button>
     </div>
-    <h5>
-        {%if not not journalentry.is_idea%}
-            <i class="bi-lightbulb text-warning"></i>
-        {%else%}
-            {%if journalentry.is_open()%}
-                <i class="bi-play-circle"></i>
-            {%else%}
-                {%if journalentry.is_profitable()%}
-                    <i class="bi-arrow-up-circle text-success"></i>
-                {%else%}
-                    <i class="bi-arrow-down-circle text-danger"></i>
-                {%endif%}
-            {%endif%}
-        {%endif%}
-        {{journalentry.symbol}} 
-    </h5>
-    <h6>
-        <span class="text-muted panel-text">
-            <i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i>
-        </span>
-    </h6>
     <table class="table">
         <tr>
             <td>Instrument</td>
@@ -120,7 +120,7 @@
     <p>No comments available.</p>
     <br />
     {% endif %}
-    <form action="" method="post" role="form" id="commentform">
+    <form class="d-print-none" action="" method="post" role="form" id="commentform">
         <div class="form-group">
             <div class="input text">
                 <label for="title">Title:</label>

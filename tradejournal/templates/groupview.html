@@ -13,7 +13,7 @@
             <span>Premium: {{'%0.2f' % journalentrygroup.option_premium() | float}}</span>
         </span>
     </h6>
-    <div class="dropdown">
+    <div class="dropdown d-print-none">
       <button class="btn btn-secondary dropdown-toggle btn-light" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
         Group By
       </button>
@@ -103,7 +103,7 @@
     <p>No comments available.</p>
     <br />
     {% endif %}
-    <form action="" method="post" role="form" id="commentform">
+    <form class="d-print-none" action="" method="post" role="form" id="commentform">
         <div class="form-group">
             <div class="input text">
                 <label for="title">Title:</label>

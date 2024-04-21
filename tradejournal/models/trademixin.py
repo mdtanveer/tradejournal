@@ -41,6 +41,8 @@ class TradeMixin:
         json_rows = df.apply(lambda x: x.to_dict(), axis=1)
         for i in range(0, json_rows.size):
             row = json_rows.iloc[i]
+            # azurite bug workaround for roundtriping whole number as Int32
+            row["price@odata.type"] = "Edm.Double"
             self.svc.insert_or_replace_entity(tablename,row)
    
     def strtime_to_timestamp(self, input):
@@ -50,7 +52,7 @@ class TradeMixin:
             return str(pytz.timezone('Asia/Calcutta').localize(datetime.strptime(input, '%Y-%m-%dT%H:%M:%S')).timestamp())
 
     def upload_from_csv_to_ats(self, csvfile, exchange="NFO"):
-        df = pd.read_csv(csvfile)
+        df = pd.read_csv(csvfile, dtype={'quantity':'int64', 'price':'float64'})
         df.rename(columns={'symbol':'tradingsymbol'}, inplace=True)
 
         dfg = df.groupby('order_id').agg({'tradingsymbol':'first','price':'mean', 'order_execution_time':'last', 'quantity':'sum', 'trade_type':'first'})

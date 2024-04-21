@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-dark bg-dark navbar-expand-sm mb-2">
+    <nav class="d-print-none navbar navbar-dark bg-dark navbar-expand-sm mb-2">
         <div class="container">
             <a href="/" class="navbar-brand">Trade Journal</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@
     <div class="container body-content">
         {% block content %}{% endblock %}
         <hr />
-        <footer>
+        <footer class="d-print-none">
             <p>&copy; {{year}} - Trade Journal</p>
         </footer>
     </div>
