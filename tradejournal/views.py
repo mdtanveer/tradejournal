@@ -4,7 +4,7 @@ Routes and views for the flask application.
 import json
 from datetime import datetime
 
-from flask import render_template, make_response, redirect, request, Response, session, url_for
+from flask import render_template, make_response, redirect, request, Response, session, url_for, jsonify
 
 from tradejournal.models import JournalEntry, JournalEntryGroup, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
 from tradejournal.models.factory import create_repository
@@ -315,7 +315,7 @@ def commentsgroup(key):
             repository.add_comment(key, data)
             if linkchart:
                 repository.add_chart(key, {'title':data['title']})
-            return redirect('/journalentrygroup/{0}/view'.format(key))
+            return jsonify(success=True)
         except KeyError:
             error_message = 'Unable to add comment'
     else:
@@ -332,6 +332,7 @@ def commentsgroup(key):
         )
 
 @app.route('/journalentry/<key>/comments/<commentid>', methods=['POST', 'DELETE'])
+@app.route('/journalentrygroup/<key>/comments/<commentid>', methods=['POST', 'DELETE'])
 @login_required
 def update_or_delete_comment(key, commentid):
     """Renders the comments page."""
@@ -343,15 +344,16 @@ def update_or_delete_comment(key, commentid):
             else:
                 data = request.form
             repository.update_comment(commentid, data)
-            return redirect('/journalentry/{0}'.format(key))
+            return jsonify(success=True)
         except KeyError:
             error_message = 'Unable to update comment'
     elif request.method == "DELETE":
         try:
             repository.delete_comment(commentid)
-            return redirect('/journalentry/{0}'.format(key))
+            return jsonify(success=True)
         except KeyError:
             error_message = 'Unable to delete comment'
+    return jsonify(success=False)
 
 @app.route('/journalentry/<key>/delete', methods=['GET'])
 @login_required
@@ -375,7 +377,7 @@ def comments(key):
             repository.add_comment(key, data)
             if linkchart:
                 repository.add_chart(key, {'title':data['title']})
-            return redirect('/journalentry/{0}/comments'.format(key))
+            return jsonify(success=True)
         except KeyError:
             error_message = 'Unable to update'
     else:

@@ -1,7 +1,7 @@
 <h4> Comments </h4>
 <br />
 {% if comments %}
-<ul class="list-group">
+<ul class="list-group list-group-flush">
     {% for comment in comments %}
     <li class="list-group-item">
         <div>
@@ -24,7 +24,7 @@
             <div id="{{comment.key}}">
                 {{ comment.text | safe}}
             </div>
-            <button type="button" class="btn btn-light" id="editcommentbtn" onclick="editcomment('{{comment.key}}') hidden>
+            <button type="button" class="btn btn-light d-none" id="editcommentbtn" onclick="editcomment('{{comment.key}}') hidden>
                 <i class="bi-truck"></i>
             </button>
         </div>
