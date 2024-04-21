@@ -20,6 +20,28 @@ class CommentMixin:
         except AzureMissingResourceHttpError:
             raise JournalEntryNotFound()
 
+    def update_comment(self, comment_id, comment_entity):
+        """Add comments"""
+        try:
+            partition, row = tju.key_to_partition_and_row(comment_id)
+            comment_entity = dict(comment_entity)
+            comment_entity.update(
+            {
+                'PartitionKey': partition,
+                'RowKey': row,
+            })
+            self.svc.update_entity(self.TABLES["comments"], comment_entity)
+        except AzureMissingResourceHttpError:
+            raise JournalEntryNotFound()
+    
+    def delete_comment(self, comment_id):
+        """Add comments"""
+        try:
+            partition, row = tju.key_to_partition_and_row(comment_id)
+            self.svc.delete_entity(self.TABLES["comments"], partition, row)
+        except AzureMissingResourceHttpError:
+            raise JournalEntryNotFound()
+
     def get_comments(self, key):
         """Returns all the comments from the repository."""
         partition, row = tju.key_to_partition_and_row(key)

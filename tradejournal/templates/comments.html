@@ -27,7 +27,9 @@
                 {{ comment.title }}
             </b><br />
             {% endif %}
-            {{ comment.text }}
+            <div>
+                {{ comment.text | safe}}
+            </div>
         </td>
     </tr>
     {% endfor %}

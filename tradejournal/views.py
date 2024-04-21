@@ -220,7 +220,7 @@ def editgroup(key):
         else:
             data = request.form
         repository.update_journalentrygroup(key, data)
-        return redirect(lastget_url('/journalentrygroup/{0}'.format(key)))
+        return redirect(lastget_url('/journalentrygroup/{0}/view'.format(key)))
     else:
         journalentrygroup=repository.get_journalentrygroup(key)
         session['lastget'] = request.referrer
@@ -238,9 +238,9 @@ def copyattributestochildren(key):
     if request.method == 'POST':
         journalentrygroup=repository.get_journalentrygroup(key)
         repository.copyattributestochildren(journalentrygroup)
-        return redirect(lastget_url('/journalentrygroup/{0}'.format(key)))
+        return redirect(lastget_url('/journalentrygroup/{0}/view'.format(key)))
 
-@app.route('/journalentrygroup/<key>', methods=['GET'])
+@app.route('/journalentrygroup/<key>/view', methods=['GET'])
 @login_required
 async def viewgroup(key):
     groupby = request.args.get('groupby', 'none')
@@ -315,9 +315,9 @@ def commentsgroup(key):
             repository.add_comment(key, data)
             if linkchart:
                 repository.add_chart(key, {'title':data['title']})
-            return redirect('/journalentrygroup/{0}'.format(key))
+            return redirect('/journalentrygroup/{0}/view'.format(key))
         except KeyError:
-            error_message = 'Unable to update'
+            error_message = 'Unable to add comment'
     else:
         comments=repository.get_comments(key)
         page, per_page, offset = get_page_args()
@@ -330,6 +330,29 @@ def commentsgroup(key):
             allcomments = False,
             pagination = pagination
         )
+
+@app.route('/journalentry/<key>/comments/<commentid>', methods=['POST', 'DELETE'])
+@login_required
+def update_or_delete_comment(key, commentid):
+    """Renders the comments page."""
+    error_message = ''
+    if request.method == 'POST':
+        try:
+            if request.get_json(silent=True):
+                data = request.get_json()
+            else:
+                data = request.form
+            repository.update_comment(commentid, data)
+            return redirect('/journalentry/{0}'.format(key))
+        except KeyError:
+            error_message = 'Unable to update comment'
+    elif request.method == "DELETE":
+        try:
+            repository.delete_comment(commentid)
+            return redirect('/journalentry/{0}'.format(key))
+        except KeyError:
+            error_message = 'Unable to delete comment'
+
 @app.route('/journalentry/<key>/delete', methods=['GET'])
 @login_required
 def delete_entry(key):
