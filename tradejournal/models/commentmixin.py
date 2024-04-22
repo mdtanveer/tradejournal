@@ -27,10 +27,12 @@ class CommentMixin:
         try:
             partition, row = tju.key_to_partition_and_row(comment_id)
             comment_entity = dict(comment_entity)
+            add_time = str(pytz.UTC.localize(datetime.utcnow()).timestamp())
             comment_entity.update(
             {
                 'PartitionKey': partition,
                 'RowKey': row,
+                'add_time' : add_time
             })
             self.svc.update_entity(self.TABLES["comments"], comment_entity)
         except AzureMissingResourceHttpError:

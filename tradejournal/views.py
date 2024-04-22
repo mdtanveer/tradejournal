@@ -600,6 +600,7 @@ def chart_delete(key, chartkey):
     return Response("{}", status=200, mimetype='application/json')
 
 @app.route('/tradesignals/<date>/<timeframe>/<strategy>', methods=['GET'])
+@login_required
 def tradesignals(date, timeframe, strategy):
     """Renders the charts page."""
     error_message = ''
@@ -623,11 +624,13 @@ def tradesignals(date, timeframe, strategy):
     )
 
 @app.route('/tradesignals/<date>/<timeframe>', methods=['POST'])
+@login_required
 def post_tradesignals(date, timeframe):
     repository.create_tradesignals(date, timeframe, request.get_json())
     return redirect('/')
 
 @app.route('/tradesync', methods=['GET', 'POST'])
+@login_required
 def uploadFile():
     if request.method == 'POST':
         f = request.files.get('file')
@@ -638,6 +641,7 @@ def uploadFile():
     return render_template("tradesync.html", message=None)
 
 @app.route('/crawl', methods=['GET'])
+@login_required
 def crawl():
     query = request.args.get('q', None)
     urls = []
@@ -661,6 +665,7 @@ def format_datetime(value, format="%Y-%m-%dT%H:%M"):
     return value.strftime(format)
 
 @app.route('/images', methods=['POST'])
+@login_required
 def upload_image():
     if 'upload' in request.files:
         upload = request.files['upload']
@@ -671,6 +676,7 @@ def upload_image():
     return jsonify(success=False, error="No file uploaded")
 
 @app.route('/images/<filename>', methods=['GET'])
+@login_required
 def get_image(filename):
     image_binary = repository.get_image(filename)
     return send_file(
@@ -679,6 +685,7 @@ def get_image(filename):
         )
 
 @app.route('/images/<filename>', methods=['DELETE'])
+@login_required
 def delete_image(filename):
     blob_client = container_client.get_blob_client(filename)
     if blob_client.exists():

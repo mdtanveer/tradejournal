@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/static/content/ckeditor-styles.css" type="text/css">
 <h4> 
     Comments 
 </h4>
@@ -21,19 +22,14 @@
             {% endif %}
         </div>
         <div>
-            {%if comment.title %}
-            <div>
-                <b>
-                    {{ comment.title }}
-                </b>
+            <div id="{{comment.key}}" class="ck-content">
+                <div>
+                    {{ comment.text | safe}}
+                </div>
+                <button type="button" class="btn btn-light" style="display:none" id="editcommentbtn" onclick="editcomment('{{comment.key}}')">
+                    Save
+                </button>
             </div>
-            {% endif %}
-            <div id="{{comment.key}}">
-                {{ comment.text | safe}}
-            </div>
-            <button type="button" class="btn btn-light d-none" id="editcommentbtn" onclick="editcomment('{{comment.key}}')" hidden>
-                <i class="bi-truck"></i>
-            </button>
         </div>
     </li>
     {% endfor %}
@@ -51,11 +47,6 @@ Post a comment
 <form class="d-print-none" action="" method="post" role="form" id="commentform">
     <div class="form-group">
         <div class="input text">
-            <label for="title">Title:</label>
-            <input id="commenttitlebox" class="form-control" name="title" type="text" value="">
-        </div>
-        <div class="input text">
-            <label for="text">Text:</label>
             <textarea id="commentbox" class="form-control" name="text" required></textarea>
         </div>
     </div>
@@ -79,18 +70,45 @@ Post a comment
             } );
         $("#postcommentbutton").click(function(event){        
                 event.preventDefault();
-                $.post("comments", {"title":$("#commenttitlebox").val(), "text":editor.getData()}, function(data) {
+                $.post("comments", {"text":editor.getData()}, function(data) {
                 $("#commentform")[0].reset();
                 window.location.reload();
             }, "json");
             });   
 
+        window.save_editor = null;
+        window.prev_save_button = null;
         function initiateeditcomment(commentid){
-            ClassicEditor.replace(commentid);
+            if(window.save_editor){
+                window.save_editor.destroy()
+                .then(editor => {
+                    })
+                .catch( error => {
+                console.log( error );
+                });
+                window.prev_save_button.style.display="none";
+                window.save_editor = null;
+            }
+            var targetDiv =  document.getElementById(commentid);
+            ClassicEditor.create( targetDiv.children[0], {
+                simpleUpload: {
+                    // The URL that the images are uploaded to.
+                    uploadUrl: '/images',
+                },
+                updateSourceElementOnDestroy: true
+            })
+            .then( newEditor => {
+                window.save_editor = newEditor;
+                window.prev_save_button = targetDiv.children[1];
+            } )
+            .catch( error => {
+                console.error( error );
+            });
+            targetDiv.children[1].style.display="block";
         }
         function editcomment(commentid){
                 $.post("comments/" + commentid, 
-                                {"title":$("#commenttitlebox").val(), "text":editor.getData()}, 
+                                {"text":window.save_editor.getData()}, 
                                 function(data) {
                                     window.location.reload();
                                 }, "json");
