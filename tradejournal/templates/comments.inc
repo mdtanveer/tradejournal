@@ -90,6 +90,7 @@ Post a comment
                 window.save_editor = null;
             }
             var targetDiv =  document.getElementById(commentid);
+            window.prev_save_button = targetDiv.children[1];
             ClassicEditor.create( targetDiv.children[0], {
                 simpleUpload: {
                     // The URL that the images are uploaded to.
@@ -99,7 +100,6 @@ Post a comment
             })
             .then( newEditor => {
                 window.save_editor = newEditor;
-                window.prev_save_button = targetDiv.children[1];
             } )
             .catch( error => {
                 console.error( error );
