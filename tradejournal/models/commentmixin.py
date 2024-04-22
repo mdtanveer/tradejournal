@@ -2,6 +2,8 @@ from . import tradejournalutils as tju
 import pytz
 from datetime import datetime, timedelta
 from azure.common import AzureMissingResourceHttpError
+from werkzeug.utils import secure_filename
+import uuid
 
 class CommentMixin:
     def add_comment(self, key, comment_entity):
@@ -73,3 +75,18 @@ class CommentMixin:
         query = "RowKey ge '%s'"%(str(lower_timestamp.timestamp()))
         comment_entities = self.svc.query_entities(self.TABLES["comments"], query, select="PartitionKey")
         return comment_entities
+
+    def upload_image(self, upload):
+        filename = secure_filename(upload.filename)
+        blob_client = self.blob_service_client.get_blob_client(container="images", blob=filename)
+        if blob_client.exists():
+            filename, ext = filename.rsplit('.')
+            filename = f"{filename}_{uuid.uuid1().hex}.{ext}"
+            blob_client = self.blob_service_client.get_blob_client(container="images", blob=filename)
+        blob_client.upload_blob(upload.stream.read(), overwrite=False)
+        return filename
+
+    def get_image(self, filename):
+        blob_client = self.blob_service_client.get_blob_client(container="images", blob=filename)
+        data = blob_client.download_blob().readall()
+        return data

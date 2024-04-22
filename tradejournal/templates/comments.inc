@@ -8,7 +8,7 @@
     <li class="list-group-item">
         <div>
             {{ comment.add_time | formatdatetimedisplay }}
-            <div class="position-absolute top-0 end-0">
+            <div class="position-absolute top-0 end-0 d-print-none">
                 <button type="button" class="btn btn-light" id="editcommentbtn" onclick="initiateeditcomment('{{comment.key}}')">
                 <i class="bi-pen"></i>
                 </button>
@@ -31,20 +31,21 @@
             <div id="{{comment.key}}">
                 {{ comment.text | safe}}
             </div>
-            <button type="button" class="btn btn-light d-none" id="editcommentbtn" onclick="editcomment('{{comment.key}}') hidden>
+            <button type="button" class="btn btn-light d-none" id="editcommentbtn" onclick="editcomment('{{comment.key}}')" hidden>
                 <i class="bi-truck"></i>
             </button>
         </div>
     </li>
     {% endfor %}
-</table>
-{{ pagination.links }}
+</ul>
+<div class="d-print-none">
+    {{ pagination.links }}
+</div>
 {% else %}
 <p>No comments available.</p>
 <br />
 {% endif %}
 <h5 class="d-print-none"> 
-<br />
 Post a comment 
 </h5>
 <form class="d-print-none" action="" method="post" role="form" id="commentform">
@@ -60,12 +61,16 @@ Post a comment
     </div>
     <button type="submit" class="btn btn-success" id="postcommentbutton">Post Comment</button>
 </form>
-</div>
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
+    <script type="text/javascript" src="/static/scripts/ckeditor.js"></script>
     <script type="text/javascript">
         window.editor = null;
         ClassicEditor
-            .create( document.querySelector( '#commentbox' ) )
+            .create( document.querySelector( '#commentbox' ), { 
+                simpleUpload: {
+                    // The URL that the images are uploaded to.
+                    uploadUrl: '/images',
+                }}
+            )
             .then( newEditor => {
                 window.editor = newEditor;
             } )

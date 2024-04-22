@@ -4,7 +4,8 @@ Routes and views for the flask application.
 import json
 from datetime import datetime
 
-from flask import render_template, make_response, redirect, request, Response, session, url_for, jsonify
+from flask import render_template, make_response, redirect, request, Response, session, url_for, jsonify, send_file
+import io
 
 from tradejournal.models import JournalEntry, JournalEntryGroup, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
 from tradejournal.models.factory import create_repository
@@ -658,6 +659,33 @@ def format_datetime(value, format="%Y-%m-%dT%H:%M"):
     if value == toIST_fromtimestamp(0):
         return ""
     return value.strftime(format)
+
+@app.route('/images', methods=['POST'])
+def upload_image():
+    if 'upload' in request.files:
+        upload = request.files['upload']
+        if upload.filename != '':
+            filename = repository.upload_image(upload)
+            return jsonify(success=True, url=url_for("get_image", filename=filename))
+    
+    return jsonify(success=False, error="No file uploaded")
+
+@app.route('/images/<filename>', methods=['GET'])
+def get_image(filename):
+    image_binary = repository.get_image(filename)
+    return send_file(
+        io.BytesIO(image_binary),
+        mimetype='image/jpeg'
+        )
+
+@app.route('/images/<filename>', methods=['DELETE'])
+def delete_image(filename):
+    blob_client = container_client.get_blob_client(filename)
+    if blob_client.exists():
+        blob_client.delete_blob()
+        return jsonify(success=True, message="Image deleted successfully")
+    else:
+        return jsonify(success=False, error="Image not found")
 
 
 @app.template_filter('formatdatetimedisplay')
