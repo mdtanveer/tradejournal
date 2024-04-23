@@ -32,7 +32,7 @@
             </tr>
             <tr>
                 <td>Profit Probability</td> 
-                <td>{{ optionlab_result.probability_of_profit*100.0 | formatfloat }}%</td> 
+                <td>{{ (optionlab_result.probability_of_profit*100.0) | formatfloat }}%</td> 
             </tr>
             <tr>
                 <td>Profit Ranges</td> 
@@ -42,6 +42,28 @@
                 <td>Extrema profits</td> 
                 <td>{{ extrema_profits }}</td> 
             </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-responsive-sm">
+        <thead>
+        <tr>
+            <td>Trade</td>
+            <td>Delta</td>
+            <td>Theta</td>
+            <td>Gamma</td>
+            <td>Vega</td>
+        </tr>
+        </thead>
+        <tbody>
+            {% for t in journalentrygroup.deserialized_items %}
+            <tr>
+                <td>{{t.get_tradingsymbol_forview() | safe}}</td> 
+                <td>{{ optionlab_result.delta[loop.index0] | formatfloat}}</td> 
+                <td>{{ optionlab_result.theta[loop.index0] | formatfloat}}</td> 
+                <td>{{ optionlab_result.gamma[loop.index0] | formatfloat}}</td> 
+                <td>{{ optionlab_result.vega[loop.index0] | formatfloat}}</td> 
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
     {% else %}

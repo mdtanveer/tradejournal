@@ -81,6 +81,10 @@ async def get_quote(name):
     except:
         return 0
 
+@cached(ttl=12*3600)
+def get_india_vix():
+    return nsepython.indiavix()
+
 def get_quote_future(symbol, expiry, optiontype):
     derivative_data = get_nse_quote(symbol)
     query_string = f'stocks[?metadata.expiryDate == `{expiry}` && metadata.optionType==`-`].metadata.lastPrice'

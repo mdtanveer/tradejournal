@@ -19,45 +19,48 @@
     {% endfor %}
 </ul>
 {% if journalentries %}
-    <ul class="list-group checked-list-box">
+    <ul class="list-group list-group-flush">
         {% for journalentry in journalentries %}
             {% if journalentry.is_group() %}
             <li class="list-group-item">
                     <span>
-                        <input class="form-check-input" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
-                        <i class="bi-basket" style="font-size: 1rem;"></i>
-                        <a href="/journalentrygroup/{{journalentry.key}}/view">{{journalentry.name}}</a>
-                        <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
+                        <div class="d-flex w-100 justify-content-between">
+                            <div>
+                                <i class="bi-basket" style="font-size: 1em;"></i>
+                                <a href="/journalentrygroup/{{journalentry.key}}/view" class="h4" style="text-decoration:none;color:black">{{journalentry.name}}</a>
+                            </div>
+                                <input class="form-check-input" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
+                        </div>
                     </span>
-                    <div class="text-muted panel-text ms-4" oncopy="clearLocalStorage()">
+                    <div class="text-muted panel-text ms-4">
                         <div><i>entered {{journalentry.get_entry_time()}}</i></div>
-                        <div><i>{{ journalentry.strategy.lower()}}</i></div>
                     </div>
                     <div class="ms-4">
-                        <a href="/journalentrygroup/{{journalentry.key}}/edit"><i>{{ journalentry.get_comment_count()}} comments,</i></a>
-                        <i>{{ journalentry.get_item_count() }} trades </i>
+                        <a href="/journalentrygroup/{{journalentry.key}}/edit" class="text-muted" style="text-decoration:none"><i>{{ journalentry.get_item_count() }} trades,</i></a>
+                        <span class="text-muted"><i>{{ journalentry.get_comment_count()}} comments</i></span>
                     </div>
             </li>
              {% else %}
              <li class="list-group-item">
-                 <input class="form-check-input" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
-                <span class="">
-                    {%if not not journalentry.is_idea%}
-                        <i class="bi-lightbulb text-warning" style="font-size: 1rem;"></i>
-                    {%else%}
-                        {%if journalentry.is_open()%}
-                            <i class="bi-play-circle" style="font-size: 1rem;"></i>
+                <div class="d-flex w-100 justify-content-between">
+                    <div class="">
+                        {%if not not journalentry.is_idea%}
+                            <i class="bi-lightbulb text-warning" style="font-size: 1rem;"></i>
                         {%else%}
-                            {%if journalentry.is_profitable()%}
-                                <i class="bi-arrow-up-circle text-success" style="font-size: 1rem;"></i>
+                            {%if journalentry.is_open()%}
+                                <i class="bi-play-circle" style="font-size: 1rem;"></i>
                             {%else%}
-                                <i class="bi-arrow-down-circle text-danger" style="font-size: 1rem;"></i>
+                                {%if journalentry.is_profitable()%}
+                                    <i class="bi-arrow-up-circle text-success" style="font-size: 1rem;"></i>
+                                {%else%}
+                                    <i class="bi-arrow-down-circle text-danger" style="font-size: 1rem;"></i>
+                                {%endif%}
                             {%endif%}
                         {%endif%}
-                    {%endif%}
-                    <a href="/journalentry/{{journalentry.key}}/charts">{{journalentry.symbol}}</a>
-                    <button class="btn-light" onclick="appendToClipboard(event, '{{journalentry.key}}')"><i class="bi-clipboard"></i></button>
-                </span>
+                        <a href="/journalentry/{{journalentry.key}}/charts" class="h4" style="text-decoration:none;color:black">{{journalentry.symbol}}</a>
+                    </div>
+                     <input class="form-check-input" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
+                </div>
                 <div class="text-muted panel-text ms-4" oncopy="clearLocalStorage()">
                     <div><i>entered {{journalentry.get_entry_time()}}</i></div>
                     <div><i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i></div>
@@ -71,15 +74,6 @@
         {{ pagination.links }}
 </div>
     <script>
-        function appendToClipboard(event, text){
-            groupItems = localStorage.getItem("groupItems");
-            if (!event.shiftKey && groupItems != "") {
-                localStorage.setItem("groupItems", groupItems+ ',' + text);
-            } else {
-                localStorage.setItem("groupItems", text);
-            }
-        }
-        
         function clearLocalStorage(){
             localStorage.setItem("groupItems", "");
         }
@@ -98,6 +92,21 @@
 
             // Navigate to the URL with the checked items as parameters
             window.location.href = "creategroup?createwith=" + queryString;
+        }
+        
+        function copyCheckedItems() {
+            var checkedItems = [];
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            
+            checkboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    checkedItems.push(checkbox.id);
+                }
+            });
+            
+            // Convert the checkedItems array to a URL query string
+            var copyText = checkedItems.join(',');
+            localStorage.setItem("groupItems", copyText);
         }
 
         function clearCheckboxes() {
@@ -118,6 +127,7 @@
     <div>
         <button class="btn btn-light btn-secondary" onclick="postCheckedItems()">Create Group</button>
         <button class="btn btn-light btn-secondary" onclick="clearCheckboxes()">Clear</button>
+        <button class="btn btn-light btn-secondary" onclick="copyCheckedItems()">Copy</button>
     </div>
 </div>
 {% endblock %}

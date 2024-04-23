@@ -189,7 +189,7 @@ class JournalEntryGroup(object):
             "stock_price": spot_price, 
             "start_date": model['entry_date'],
             "target_date": model['expiry'],
-            "volatility": 0.272,
+            "volatility": stockutils.get_india_vix()/100,
             "interest_rate": 0.0002,
             "min_stock": spot_price * 0.95,
             "max_stock": spot_price * 1.05,
