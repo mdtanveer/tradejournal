@@ -57,7 +57,7 @@
         <tbody>
             {% for t in journalentrygroup.deserialized_items %}
             <tr>
-                <td>{{t.get_tradingsymbol_forview() | safe}}</td> 
+                <td>{{t.get_tradingsymbol_forview(False) | safe}}</td> 
                 <td>{{ optionlab_result.delta[loop.index0] | formatfloat}}</td> 
                 <td>{{ optionlab_result.theta[loop.index0] | formatfloat}}</td> 
                 <td>{{ optionlab_result.gamma[loop.index0] | formatfloat}}</td> 

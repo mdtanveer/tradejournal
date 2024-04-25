@@ -334,7 +334,13 @@ class JournalEntry(object):
         return category
 
     def get_tradingsymbol_forview(self, expiry_fetch=True):
-        attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol, expiry_fetch)
+        try:
+            attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol, expiry_fetch)
+        except:
+            if expiry_fetch == True:
+                expiry_fetch = False
+                attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol, expiry_fetch)
+
         if len(attrib) > 1:
             if attrib[2] == "Fut":
                 if expiry_fetch:
@@ -351,7 +357,7 @@ class JournalEntry(object):
         return html
 
     def is_option(self):
-        attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
+        attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol, False)
         return len(attrib) == 4
 
     def option_premium(self):
