@@ -1,6 +1,11 @@
 /* styles for validation helpers */
 body,html{margin:0}
 
+.font-details {
+    font-weight: 300;
+    font-size: 13px
+}
+
 .field-validation-error {
     color: #b94a48;
 }
