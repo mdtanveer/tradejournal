@@ -333,13 +333,19 @@ class JournalEntry(object):
             category.add('idea')
         return category
 
-    def get_tradingsymbol_forview(self):
-        attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
+    def get_tradingsymbol_forview(self, expiry_fetch=True):
+        attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol, expiry_fetch)
         if len(attrib) > 1:
             if attrib[2] == "Fut":
-                html = "%s %s %s" % (attrib[0], attrib[1].split('-')[1].upper(), attrib[2].upper())
+                if expiry_fetch:
+                    html = "%s %s %s" % (attrib[0], attrib[1].split('-')[1].upper(), attrib[2].upper())
+                else:
+                    html = "%s %s %s" % (attrib[0], attrib[1].upper(), attrib[2].upper())
             else:
-                html = "%s %s<br/><small>%s</small>" % (attrib[0], str(attrib[3])+attrib[2], attrib[1]) 
+                if expiry_fetch:
+                    html = "%s %s<br/><small>%s</small>" % (attrib[0], str(attrib[3])+attrib[2], attrib[1]) 
+                else:
+                    html = "%s %s %s %s" % (attrib[0], attrib[1].upper(), str(attrib[3]), attrib[2]) 
         else:
             html = self.tradingsymbol
         return html

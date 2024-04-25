@@ -64,7 +64,7 @@
                 <div class="text-muted panel-text ms-4" oncopy="clearLocalStorage()">
                     <div><i>entered {{journalentry.get_entry_time()}}</i></div>
                     <div><i>{{ journalentry.direction.lower()}},&nbsp;{{ journalentry.strategy.lower()}},&nbsp;{{ journalentry.timeframe.lower()}}</i></div>
-                    <div><small> <i>{{ journalentry.tradingsymbol}}</i></small></div>
+                    <a href="/journalentry/{{journalentry.key}}/edit" class="text-muted" style="text-decoration:none"><i>{{ journalentry.get_tradingsymbol_forview(False) }}</i></a>
                 </div>
              </li>
              {% endif %}

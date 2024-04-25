@@ -20,9 +20,10 @@ def get_expiry_day(symbol, year, month_abbr):
                 return expiry_day
     raise Exception(f"Couldn't find a valid expiry day for {year}-{month_abbr}, {symbol}")
         
-def convert_from_zerodha_convention(name):
+def convert_from_zerodha_convention(name, expiry_fetch=True):
     name = str(name)
     try:
+        # monthly expiry e.g. BANKNIFTY21SEP37500PE
         res = re.match(r"([A-Z\-&]+)(\d{2})([A-Z]{3})(\d+)([CP]E)", name)
         if res:
             symbol = res.group(1)
@@ -30,10 +31,14 @@ def convert_from_zerodha_convention(name):
             month_abbr = res.group(3).title()
             strike = res.group(4)
             optionytype = res.group(5)
-            expiry_day = get_expiry_day(symbol, int("20"+year), month_abbr)
-            expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
+            if expiry_fetch:
+                expiry_day = get_expiry_day(symbol, int("20"+year), month_abbr)
+                expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
+            else:
+                expiry = month_abbr
             return (symbol, expiry, optionytype, int(strike))
         
+        # weekly expiry PE BANKNIFTY2192336700PE BANKNIFTY24D2336700PE
         res = re.match(r"([A-Z\-&]+)(\d{2})([\dOND])(\d{2})(\d+)([CP]E)", name)
         if res:
             symbol = res.group(1)
@@ -50,13 +55,17 @@ def convert_from_zerodha_convention(name):
             expiry = weekdate + '-' + month_abbr + '-20' + year
             return (symbol, expiry, optionytype, int(strike))
 
+        # future KOTAKBANK21SEPFUT
         res = re.match(r"([A-Z\-&]+)(\d{2})([A-Z]{3})FUT", name)
         if res:
             symbol = res.group(1)
             year = res.group(2)
             month_abbr = res.group(3).title()
-            expiry_day = get_expiry_day(symbol, int("20"+year), month_abbr)
-            expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
+            if expiry_fetch:
+                expiry_day = get_expiry_day(symbol, int("20"+year), month_abbr)
+                expiry = str(expiry_day)+'-'+month_abbr+'-20'+year
+            else:
+                expiry = month_abbr
             return (symbol, expiry, "Fut")
         return (name,)
     except:
