@@ -610,7 +610,8 @@ def tradesignals(date, timeframe, strategy):
     charts = [{'key':'', 
                 'title': t.symbol,
                 'data': t.symbol,
-                'relativeUrl':t.relativeUrl
+                'relativeUrl':t.relativeUrl,
+                'tf': tf
                 } for t in tradesignals]
     return render_template(
         'tradesignals.html',

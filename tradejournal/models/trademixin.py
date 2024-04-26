@@ -16,6 +16,7 @@ class TradeMixin:
                 query += " and RowKey le '%s'"%(str(upper_timestamp.timestamp()))
             trade_entities = self.svc.query_entities(self.TABLES["trades"], query)
         trades = [tju.trade_from_entity(entity) for entity in trade_entities]
+        trades = list(filter(lambda x: x.tradingsymbol == journalentry.tradingsymbol, trades))
         return trades
 
     def get_all_trades(self):

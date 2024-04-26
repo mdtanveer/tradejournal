@@ -297,11 +297,13 @@ class TJChart
             }
             else {
                 var chartTrades = this.trades;
-                var supstanceData = [
-                    { start: this.trades[0].date, end: this.trades[1].date, value: this.trades[0].price },
-                    { start: this.trades[0].date, end: this.trades[1].date, value: this.trades[1].price },
-                ];
-                //this.svg.select("g.supstances").datum(supstanceData).call(this.supstance)
+                if (this.trades.length == 2) {
+                     var supstanceData = [
+                         { start: this.trades[0].date, end: this.trades[1].date, value: this.trades[0].price },
+                         { start: this.trades[0].date, end: this.trades[1].date, value: this.trades[1].price },
+                     ];
+                    this.svg.select("g.supstances").datum(supstanceData).call(this.supstance)
+                }
             }
             this.svg.selectAll("g.tradearrow").selectAll("*").remove();
             this.svg.selectAll("g.tradearrow").datum(chartTrades).call(this.tradearrow);
@@ -342,7 +344,9 @@ class TJChart
                 selfInstance.draw(data);
                 if(selfInstance.symbol == null)
                 {
-                    document.getElementById('charttitle').innerHTML = selfInstance.charts[i].data + ' (' + selfInstance.timeFrame + ')';
+                    var tf = selfInstance.timeFrame == null?selfInstance.charts[i].tf:selfInstance.timeFrame;
+                    var charttitle = selfInstance.charts[i].data + ' (' + tf + ')';
+                    document.getElementById('charttitle').innerHTML = charttitle;
                 }
                 else
                 {
@@ -384,18 +388,18 @@ class TJChart
 
         RenderNextChart() {
             this.currentChartIndex++;
-            this.DispatchCurrentIndexChanged();
             if (this.currentChartIndex >= this.charts.length)
                 this.currentChartIndex = 0;
+            this.DispatchCurrentIndexChanged();
             if (this.charts.length > 0)
                this.RenderChart();
         }
 
         RenderPreviousChart() {
             this.currentChartIndex--;
-            this.DispatchCurrentIndexChanged();
             if (this.currentChartIndex < 0)
                 this.currentChartIndex = this.charts.length-1;
+            this.DispatchCurrentIndexChanged();
             if (this.charts.length > 0)
                 this.RenderChart();
             }
