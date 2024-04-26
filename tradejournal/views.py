@@ -658,6 +658,11 @@ def crawl():
                     urls.append(url_for('charts', key=je.key))
     return render_template("crawlurls.html", urls=urls)
 
+@app.route('/tradecalc', methods=['GET'])
+@login_required
+def trade_calc():
+    return render_template('tradecalc.html')
+
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):
     if value is None:

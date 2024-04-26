@@ -1,0 +1,319 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#stock">Stock</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#options">Options</a>
+        </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content mt-3">
+        <!-- Stock tab -->
+        <div id="stock" class="tab-pane fade show active">
+            <div class="container">
+                <h1 class="mb-4">Stock Risk and Quantity Calculator</h1>
+                <form id="stock-calculator-form">
+                <div class="form-group row mb-3">
+                    <label for="ltp" class="col-md-4 col-form-label">LTP (Last Traded Price):</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="ltp" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label for="sl" class="col-md-4 col-form-label">SL (Stop Loss):</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="sl" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label for="lot_size" class="col-md-4 col-form-label">Lot Size:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="lot_size" min="1" step="1" required>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label for="option_strike" class="col-md-4 col-form-label">Option Strike:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="option_strike" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label for="option_price" class="col-md-4 col-form-label">Option Price:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="option_price" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label for="capital" class="col-md-4 col-form-label">Capital:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="capital" min="0" step="0.01" value="90000" required>
+                    </div>
+                </div>
+               
+                <div class="form-group row mb-3">
+                    <label for="future_price" class="col-md-4 col-form-label">Future Price:</label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" id="future_price" min="0" step="0.01" required>
+                    </div>
+                </div>
+                
+                <div class="form-group row mb-3">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-8">
+                        <button type="submit" class="btn btn-primary btn-block">Reset</button>
+                    </div>
+                </div>
+
+                </form>
+                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Stoploss</th>
+                            <th>Option Hedge</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        <tr>
+                            <td>Quantity:</td>
+                            <td id="quantity">0</td>
+                            <td id="quantityo">0</td>
+                        </tr>
+                
+                        <tr>
+                            <td>Risk:</td>
+                            <td id="risk">0.00</p>
+                            <td id="risko">0.00</p>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+        <!-- Options tab -->
+        <div id="options" class="tab-pane fade">
+            <div class="container">
+                <h1 class="mb-4">Options Risk and Reward Calculator</h1>
+                <form id="options-calculator-form">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="call_quantity" class="col-form-label">Call quantity</label>
+                            <input type="number" class="form-control" id="call_quantity" min="1" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="long_call_strike" class="col-form-label">Long call strike:</label>
+                            <input type="number" class="form-control" id="long_call_strike" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="long_call_price" class="col-form-label">Long call price:</label>
+                            <input type="number" class="form-control" id="long_call_price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="short_call_strike" class="col-form-label">Short Call Strike:</label>
+                            <input type="number" class="form-control" id="short_call_strike" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="short_call_price" class="col-form-label">Short Call Price:</label>
+                            <input type="number" class="form-control" id="short_call_price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="put_quantity" class="col-form-label">Put quantity</label>
+                            <input type="number" class="form-control" id="put_quantity" min="1" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="short_put_strike" class="col-form-label">Short Put Strike:</label>
+                            <input type="number" class="form-control" id="short_put_strike" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="short_put_price" class="col-form-label">Short Put Price:</label>
+                            <input type="number" class="form-control" id="short_put_price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="long_put_strike" class="col-form-label">Long Put Strike:</label>
+                            <input type="number" class="form-control" id="long_put_strike" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="long_put_price" class="col-form-label">Long Put Price:</label>
+                            <input type="number" class="form-control" id="long_put_price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label class="col-md-3 col-form-label">Risk:</label>
+                        <div class="col-md-8">
+                            <p id="options-risk" class="form-control-static">0.00</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label class="col-md-3 col-form-label">Reward:</label>
+                        <div class="col-md-8">
+                            <p id="options-reward" class="form-control-static">0.00</p>
+                        </div>
+                    </div>
+                   
+                    <div class="form-group row mb-3">
+                        <label class="col-md-3 col-form-label">Put Side Risk:</label>
+                        <div class="col-md-8">
+                            <p id="options-risk-put" class="form-control-static">0.00</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row mb-3">
+                        <label class="col-md-3 col-form-label">Call Side Risk:</label>
+                        <div class="col-md-8">
+                            <p id="options-risk-call" class="form-control-static">0.00</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS and jQuery (required for Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Stock Calculator
+        document.getElementById("stock-calculator-form").addEventListener("input", function () {
+            const ltp = parseFloat(document.getElementById("ltp").value);
+            const sl = parseFloat(document.getElementById("sl").value);
+            const capital = parseFloat(document.getElementById("capital").value);
+            const lot_size = parseInt(document.getElementById("lot_size").value);
+            const option_strike = parseFloat(document.getElementById("option_strike").value);
+            const option_price = parseFloat(document.getElementById("option_price").value);
+            const future_price = parseFloat(document.getElementById("future_price").value);
+
+            localStorage.setItem("ltp",  ltp);
+            localStorage.setItem("sl", sl);  
+            localStorage.setItem("capital", capital);  
+            localStorage.setItem("lot_size", lot_size);  
+            localStorage.setItem("option_strike", option_strike);  
+            localStorage.setItem("option_price", option_price);  
+            localStorage.setItem("future_price", future_price);  
+
+            var risk = 0;
+            var quantity = 0;
+
+            risk = Math.abs(ltp - sl);
+            lots = Math.round(capital / (risk * lot_size));
+            quantity = lots * lot_size;
+            document.getElementById("quantity").textContent = quantity.toString() + " (" + lots.toString() + " lots)" ;
+            document.getElementById("risk").textContent = risk.toFixed(2);
+
+            if (!isNaN(option_strike) && !isNaN(option_price))
+            {
+                risk = (Math.abs(ltp - option_strike) + option_price);
+                lots = Math.round(capital / (risk * lot_size));
+                quantity = lots * lot_size;
+                document.getElementById("quantityo").textContent = quantity.toString() + " (" + lots.toString() + " lots)";
+                document.getElementById("risko").textContent = risk.toFixed(2);
+            }
+
+        });
+
+        // Options Calculator
+        document.getElementById("options-calculator-form").addEventListener("input", function () {
+            // Calculate and update options risk and reward
+            const longCallStrike = parseFloat(document.getElementById("long_call_strike").value);
+            const longCallPrice = parseFloat(document.getElementById("long_call_price").value);
+            const callQuantity = parseFloat(document.getElementById("call_quantity").value);
+
+            const shortCallStrike = parseFloat(document.getElementById("short_call_strike").value);
+            const shortCallPrice = parseFloat(document.getElementById("short_call_price").value);
+
+            const shortPutStrike = parseFloat(document.getElementById("short_put_strike").value);
+            const shortPutPrice = parseFloat(document.getElementById("short_put_price").value);
+            const putQuantity = parseFloat(document.getElementById("put_quantity").value);
+
+            const longPutStrike = parseFloat(document.getElementById("long_put_strike").value);
+            const longPutPrice = parseFloat(document.getElementById("long_put_price").value);
+
+            localStorage.setItem("longCallStrike", longCallStrike);
+            localStorage.setItem("longCallPrice", longCallPrice);  
+            localStorage.setItem("callQuantity", callQuantity);
+
+            localStorage.setItem("shortCallStrike", shortCallStrike);
+            localStorage.setItem("shortCallPrice", shortCallPrice);
+
+            localStorage.setItem("shortPutStrike", shortPutStrike);
+            localStorage.setItem("shortPutPrice", shortPutPrice);
+            localStorage.setItem("putQuantity", putQuantity);
+
+            localStorage.setItem("longPutStrike", longPutStrike);
+            localStorage.setItem("longPutPrice", longPutPrice);
+
+            // Calculate risk and reward for short put (you can add similar calculations for other options)
+            var risk = 0;
+            var reward = 0;
+
+            callReward = (shortCallPrice - longCallPrice)*callQuantity;
+            putReward = (shortPutPrice - longPutPrice)*putQuantity;
+
+            callRisk = (longCallStrike - shortCallStrike)*callQuantity - callReward;
+            putRisk = -(longPutStrike - shortPutStrike)*putQuantity - putReward;
+
+            reward = callReward + putReward;
+            putSideRisk = putRisk - callReward;
+            callSideRisk = callRisk - putReward;
+            risk = Math.max(putSideRisk, callSideRisk);
+
+            document.getElementById("options-risk").textContent = risk.toFixed(2);
+            document.getElementById("options-reward").textContent = reward.toFixed(2);
+            document.getElementById("options-risk-put").textContent = putSideRisk.toFixed(2);
+            document.getElementById("options-risk-call").textContent = callSideRisk.toFixed(2);
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("ltp").value = new Number(localStorage.getItem("ltp"));
+            document.getElementById("sl").value = new Number(localStorage.getItem("sl"));  
+            document.getElementById("capital").value = new Number(localStorage.getItem("capital"));  
+            document.getElementById("lot_size").value = new Number(localStorage.getItem("lot_size"));  
+            document.getElementById("option_strike").value = new Number(localStorage.getItem("option_strike"));  
+            document.getElementById("option_price").value = new Number(localStorage.getItem("option_price"));  
+            document.getElementById("future_price").value = new Number(localStorage.getItem("future_price"));  
+            document.getElementById("long_call_strike").value = new Number(localStorage.getItem("longCallStrike"));
+            document.getElementById("long_call_price").value = new Number(localStorage.getItem("longCallPrice"));  
+            document.getElementById("call_quantity").value = new Number(localStorage.getItem("callQuantity"));
+
+            document.getElementById("short_call_strike").value = new Number(localStorage.getItem("shortCallStrike"));
+            document.getElementById("short_call_price").value = new Number(localStorage.getItem("shortCallPrice"));
+
+            document.getElementById("short_put_strike").value = new Number(localStorage.getItem("shortPutStrike"));
+            document.getElementById("short_put_price").value = new Number(localStorage.getItem("shortPutPrice"));
+            document.getElementById("put_quantity").value = new Number(localStorage.getItem("putQuantity"));
+
+            document.getElementById("long_put_strike").value = new Number(localStorage.getItem("longPutStrike"));
+            document.getElementById("long_put_price").value = new Number(localStorage.getItem("longPutPrice"));
+        });
+    </script>
+{% endblock %}
