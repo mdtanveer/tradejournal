@@ -344,14 +344,16 @@ class TJChart
                 selfInstance.draw(data);
                 if(selfInstance.symbol == null)
                 {
-                    var tf = selfInstance.timeFrame == null?selfInstance.charts[i].tf:selfInstance.timeFrame;
+                    var tf = selfInstance.charts[i].tf == null? selfInstance.timeFrame : selfInstance.charts[i].tf;
                     var charttitle = selfInstance.charts[i].data + ' (' + tf + ')';
                     document.getElementById('charttitle').innerHTML = charttitle;
                 }
                 else
                 {
-                    document.getElementById('charttitle').innerHTML = selfInstance.charts[i].title + " (" + (i+1) + " of " + selfInstance.charts.length + ") "
-                        + selfInstance.symbol + ' (' + selfInstance.timeFrame + ')';
+                    var tf = selfInstance.charts[i].tf == null? selfInstance.timeFrame : selfInstance.charts[i].tf;
+                    var charttitle = selfInstance.charts[i].title + " (" + (i+1) + " of " + selfInstance.charts.length + ") "
+                        + selfInstance.symbol + ' (' + tf + ')';
+                    document.getElementById('charttitle').innerHTML = charttitle;
                 }
             }
 
@@ -377,12 +379,21 @@ class TJChart
         RenderCurrentChartSwitchTF(timeFrame) {
             this.timeFrame = timeFrame;
             this.charts[this.currentChartIndex].raw_data = null;
+            this.charts[this.currentChartIndex]["tf"] = timeFrame;
             this.RenderChart();
         }
 
         RenderCurrentChartResampleTF(resampleType) {
             this.resampleType = resampleType;
             this.charts[this.currentChartIndex].raw_data = null;
+            var timeframes = ['2h', '1d', '1wk', '1mo'];
+            var tf = this.timeFrame;
+            if (resampleType == "mother") {
+                var idx = timeframes.indexOf(this.timeFrame);
+                if (idx != -1 && idx+1 < timeframes.length -1)
+                    tf = timeframes[idx+1];
+            }
+            this.charts[this.currentChartIndex]["tf"] = tf;
             this.RenderChart();
         }
 
