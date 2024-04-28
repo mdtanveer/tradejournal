@@ -6,6 +6,7 @@ from datetime import datetime
 
 from flask import render_template, make_response, redirect, request, Response, session, url_for, jsonify, send_file
 import io
+from .models import stockutils
 
 from tradejournal.models import JournalEntry, JournalEntryGroup, JournalEntryNotFound, toIST_fromtimestamp, IST_now, yahooquotes, resample
 from tradejournal.models.factory import create_repository
@@ -661,7 +662,20 @@ def crawl():
 @app.route('/tradecalc', methods=['GET'])
 @login_required
 def trade_calc():
-    return render_template('tradecalc.html')
+    symbol = request.args.get('symbol', None)
+    expiry = request.args.get('expiry', None)
+    option_chain = None
+    spot_ltp = None
+    lot_size = None
+    if symbol:
+        spot_ltp = stockutils.get_quote_spot(symbol)
+        lot_size = stockutils.get_lot_size(symbol)
+        option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 5)
+
+    return render_template('tradecalc.html', 
+            option_chain=option_chain,
+            spot_ltp = spot_ltp,
+            lot_size = lot_size)
 
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):
@@ -734,4 +748,6 @@ def format_dateonly(value, format="%d-%m-%Y"):
 
 @app.template_filter('formatfloat')
 def format_float(value):
-    return round(value, 2)
+    if not value:
+        value = 0.0;
+    return "%0.2f"%value

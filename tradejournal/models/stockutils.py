@@ -118,6 +118,28 @@ def get_quote_old(name):
         print("Error fetching:", args)
         return 0
 
+@cached(ttl=3600)
+def get_option_chain(symbol, expiry, ltp=None, count=0):
+    if not symbol:
+        return None
+    option_chain = nsepython.option_chain(symbol)
+    results = jmespath.search('records.data[*].{"expiry":expiryDate, "strike":strikePrice, "pe_ltp":PE.lastPrice, "ce_ltp":CE.lastPrice}', option_chain)
+    if expiry:
+        results = list(filter(lambda r: r["expiry"] == expiry, results))
+    if ltp and count > 0:
+        atm_index = 0
+        for i, r in enumerate(results):
+            if ltp-float(r["strike"]) < 0:
+                atm_index = i
+                break
+        if atm_index-count >= 0 and atm_index+count < len(results):
+            results = results[atm_index-count:atm_index+count]
+    return results
+
+@cached(ttl=30*24*3600)
+def get_lot_size(symbol):
+    return nsepython.nse_get_fno_lot_sizes(symbol)
+
 def test():
     me = "BANKNIFTY21SEP37500PE"
     we = "BANKNIFTY21O0736700PE"
