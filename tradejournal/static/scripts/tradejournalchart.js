@@ -21,6 +21,9 @@ class TJChart
         var windowW = document.getElementById("main").clientWidth;
         //var windowW = Math.round(window.innerWidth*0.81);
         var windowH = Math.round(window.innerHeight*0.60);
+        if (windowW > windowH) {
+            windowW = Math.min(1.618*windowH, windowW);
+        }
         var currentScrip = "";
 
         var dim = {

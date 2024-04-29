@@ -24,7 +24,7 @@
         </span>
     </h6>
     <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
-    <div id="main">
+    <div class="text-center" id="main">
         <div id="chart"></div>
     </div>
     <div class="d-print-none text-center mb-1" role="toolbar" aria-label="Toolbar with button groups">
@@ -35,10 +35,12 @@
             <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
                 <i class="bi-chevron-right"></i>
             </button>
-            <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();">
+            <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();" hidden>
                 <i class="bi-bar-chart-line"></i>
             </button>
-            <button type="button" id="charttypetogglebtn" class="btn btn-secondary btn-success">O</button>
+            <button type="button" class="btn btn-secondary btn-warning" id="charttypeObtn">O</button>
+            <button type="button" id="charttypeLbtn" class="btn btn-secondary btn-success">L</button>
+            <button type="button" id="charttypeMbtn" class="btn btn-secondary btn-success">M</button>
             <button id="chartcapturebutton" type="submit" class="btn btn-success">
                 <i class="bi-camera"></i>
             </button>
@@ -101,20 +103,20 @@
     <script type="text/javascript" src="/static/scripts/tradejournalchart.js"></script>
     <script type="text/javascript" src="/static/scripts/jquery-1.10.2.js"></script>
     <script type="text/javascript">
-            $("#chartcapturebutton").click(function(event){        
-                $.post("/journalentry/{{journalentry.key}}/charts", {}, function(data) {
-                    window.location.reload();
-                });
-                });   
-            var charttypes = ["original", "mother", "latest_{{journalentry.symbol}}"]
-            var charttypescounter = 0;
-            $("#charttypetogglebtn").click(function(event){
-                charttypescounter++;
-                charttypescounter = charttypescounter%3;
-                g_chartInstance.RenderCurrentChartResampleTF(charttypes[charttypescounter]);
-                $("#charttypetogglebtn").text(charttypes[charttypescounter][0].toUpperCase());
+            $( document ).ready(function() {
+                $("#chartcapturebutton").click(function(event){        
+                    $.post("/journalentry/{{journalentry.key}}/charts", {}, function(data) {
+                        window.location.reload();
+                    });
+                    });   
+                function switchChartType(event){
+                    var charttypes = {'O':"original", 'M':"mother", 'L':"latest_{{journalentry.symbol}}"};
+                    g_chartInstance.RenderCurrentChartResampleTF(charttypes[$(this).text()]);
+                }
+                $("#charttypeObtn").click(switchChartType);
+                $("#charttypeLbtn").click(switchChartType);
+                $("#charttypeMbtn").click(switchChartType);
             });
-            
 
             window.onbeforeunload = function() {
                 if($("#commenttitlebox").val() || $("#commentbox").val()) {

@@ -54,6 +54,8 @@ def home():
         entries = list(filter(lambda x: x.is_open() and not x.isidea(), journalentries))
     elif subpage == 'closed':
         entries = list(filter(lambda x: not x.is_open() and not x.isidea(), journalentries))
+    elif subpage == 'idea':
+        entries = list(filter(lambda x: x.isidea(), journalentries))
     elif subpage in categories.keys():
         entries = categories[subpage]
     elif subpage == 'all':

@@ -285,7 +285,7 @@
             var quantity = 0;
 
             risk = Math.abs(ltp - sl);
-            lots = Math.round(capital / (risk * lot_size));
+            lots = Math.floor(capital / (risk * lot_size));
             quantity = lots * lot_size;
             document.getElementById("quantity").textContent = quantity.toString() + " (" + lots.toString() + " lots)" ;
             document.getElementById("risk_pips").textContent = risk.toFixed(2);
@@ -295,7 +295,7 @@
             if (!isNaN(option_strike) && !isNaN(option_price))
             {
                 risk = (Math.abs(ltp - option_strike) + option_price);
-                lots = Math.round(capital / (risk * lot_size));
+                lots = Math.floor(capital / (risk * lot_size));
                 quantity = lots * lot_size;
                 hedge_cost = option_price*quantity;
                 document.getElementById("quantityo").textContent = quantity.toString() + " (" + lots.toString() + " lots)";

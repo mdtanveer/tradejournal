@@ -2,21 +2,30 @@ from . import tradejournalutils as tju
 from datetime import datetime, timedelta
 import pytz
 import pandas as pd
+from . import Trade
 
 class TradeMixin:
     def get_trades(self, journalentry_key):
         partition, row = tju.key_to_partition_and_row(journalentry_key)
         journalentry = self.get_journalentry(journalentry_key)
-        trade_entities = []
-        if journalentry.has_valid_entry_time():
-            lower_timestamp = journalentry.entry_time - timedelta(minutes=15)
-            query = "PartitionKey eq '%s' and RowKey ge '%s'"%(partition, str(lower_timestamp.timestamp()))
-            if journalentry.has_valid_exit_time():
-                upper_timestamp = journalentry.exit_time + timedelta(minutes=15)
-                query += " and RowKey le '%s'"%(str(upper_timestamp.timestamp()))
-            trade_entities = self.svc.query_entities(self.TABLES["trades"], query)
-        trades = [tju.trade_from_entity(entity) for entity in trade_entities]
-        trades = list(filter(lambda x: x.tradingsymbol == journalentry.tradingsymbol, trades))
+        trades = []
+        if not journalentry.isidea():
+            trade_entities = []
+            if journalentry.has_valid_entry_time():
+                lower_timestamp = journalentry.entry_time - timedelta(minutes=15)
+                query = "PartitionKey eq '%s' and RowKey ge '%s'"%(partition, str(lower_timestamp.timestamp()))
+                if journalentry.has_valid_exit_time():
+                    upper_timestamp = journalentry.exit_time + timedelta(minutes=15)
+                    query += " and RowKey le '%s'"%(str(upper_timestamp.timestamp()))
+                trade_entities = self.svc.query_entities(self.TABLES["trades"], query)
+            trades = [tju.trade_from_entity(entity) for entity in trade_entities]
+            trades = list(filter(lambda x: x.tradingsymbol == journalentry.tradingsymbol, trades))
+        else:
+            trades = [Trade(journalentry_key, { 'price': journalentry.entry_price,
+                                        'RowKey': row,
+                                        'trade_type': "buy" if journalentry.direction == "LONG" else "sell",
+                                        'tradingsymbol': journalentry.tradingsymbol,
+                                        'quantity': 1})]
         return trades
 
     def get_all_trades(self):

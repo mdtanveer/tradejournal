@@ -9,6 +9,12 @@
     <li id="open" class="nav-item">
         <a class="nav-link {{"active" if subpage=="open" else ""}}" href="home?subpage=open">Open</a>
     </li>
+    <li id="open" class="nav-item">
+        <a class="nav-link {{"active" if subpage=="closed" else ""}}" href="home?subpage=closed">Closed</a>
+    </li>
+    <li id="open" class="nav-item">
+        <a class="nav-link {{"active" if subpage=="ideas" else ""}}" href="home?subpage=ideas">Ideas</a>
+    </li>
     {% for cat in categories %}
     <li id="{{ cat }}" class="nav-item">
         <a class="nav-link {{"active" if subpage==cat else ""}}" href="home?subpage={{ cat }}">{{ cat.title() }}</a>

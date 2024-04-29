@@ -224,7 +224,7 @@ class JournalEntry(object):
         self.direction = entity['direction'] if 'direction' in entity.keys() else ''
         self.rating = entity['rating'] if 'rating' in entity.keys() else ''
         self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'default'
-        self.timeframe = entity['timeframe'] if 'timeframe' in entity.keys() and not not entity['timeframe'] else '1d'
+        self.timeframe = entity['timeframe'] if 'timeframe' in entity.keys() and not not entity['timeframe'] else '2h'
         self.is_idea = entity['is_idea'] if 'is_idea' in entity.keys() else ''
         self.tradingsymbol = entity['tradingsymbol'] if 'tradingsymbol' in entity.keys() and not not entity['tradingsymbol'] else ''
         self.position_changes = []
