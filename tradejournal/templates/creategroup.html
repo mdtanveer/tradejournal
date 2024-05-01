@@ -20,7 +20,11 @@
         </div>
         <div class="form-group">
             <label class="control-label" for="timeframe">Timeframe:</label>
-            <input class="form-control" id="timeframe" name="timeframe" type="text" value="{{journalentrygroup.timeframe}}">
+            <select class="form-control" id="timeframe" name="timeframe">
+                <option value="2h" {{"selected" if journalentrygroup.timeframe == "2h"}}>Intraday</option>
+                <option value="1d" {{"selected" if journalentrygroup.timeframe == "1d"}}>Daily</option>
+                <option value="1wk" {{"selected" if journalentrygroup.timeframe == "1wk"}}>Weekly</option>
+            </select>
         </div>
         <div class="form-group">
             <label class="control-label" for="exit_time">Exit Time:</label>
