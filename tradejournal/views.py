@@ -671,7 +671,10 @@ def trade_calc():
     lot_size = None
     if symbol:
         spot_ltp = stockutils.get_quote_spot(symbol)
-        lot_size = stockutils.get_lot_size(symbol)
+        try:
+            lot_size = stockutils.get_lot_size(symbol)
+        except:
+            pass
         option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 5)
 
     return render_template('tradecalc.html', 

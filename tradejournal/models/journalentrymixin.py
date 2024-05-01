@@ -130,6 +130,11 @@ class JournalEntryMixin:
         for key in [tju.KEY_ENTRY_TIME, tju.KEY_EXIT_TIME]:
             if key in entity.keys():
                 entity[key] = tju.strtime_to_timestamp(entity[key])
+        try:
+            if not entity['tradingsymbol']:
+                entity['tradingsymbol'] = entity['symbol']
+        except:
+            pass
         self.svc.insert_entity(self.TABLES["journalentry"], entity)
         self.add_chart(tju.partition_and_row_to_key(entity['symbol'], entry_time), {'title':'Auto entry chart'}, entity['timeframe'])
         journalentry = tju.journalentry_from_entity(entity)
