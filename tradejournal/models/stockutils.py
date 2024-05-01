@@ -86,6 +86,7 @@ def get_nse_quote(symbol):
 
 def cache_clear():
     get_nse_quote.cache_clear()
+    get_expiries_helper.cache_clear()
 
 async def get_quote(name):
     try:

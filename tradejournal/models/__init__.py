@@ -12,6 +12,7 @@ import itertools, functools
 import re
 from optionlab import Inputs, StrategyEngine
 from memoization import cached
+import asyncio
 
 def IST_now():
     return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
@@ -98,8 +99,9 @@ class JournalEntryGroup(object):
         return sum
 
     async def fetch_exit_price_as_ltp(self, force_refresh):
-        for je in self.deserialized_items:
-            await je.fetch_exit_price_as_ltp(force_refresh)
+        async with asyncio.TaskGroup() as tg:
+            for je in self.deserialized_items:
+                tg.create_task(je.fetch_exit_price_as_ltp(force_refresh))
 
     def get_category(self):
         category = set()
