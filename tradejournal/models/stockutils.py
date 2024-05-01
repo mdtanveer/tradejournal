@@ -11,9 +11,18 @@ import jmespath
 # future KOTAKBANK21SEPFUT
 
 @cached(ttl=7*24*3600)
-def get_expiry_day(symbol, year, month_abbr):
+def get_expiries_helper(symbol):
     payload = get_nse_quote(symbol)
-    monthly_expiries = jmespath.search('stocks[?ends_with(metadata.instrumentType, `Futures`)].metadata.expiryDate', payload)
+    expiries = jmespath.search('stocks[?ends_with(metadata.instrumentType, `Futures`)].metadata.expiryDate', payload)
+    return expiries
+
+def get_expiries(symbol):
+    if not symbol in ["BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "NIFTY"]:
+        symbol = "RELIANCE"
+    return get_expiries_helper(symbol)
+
+def get_expiry_day(symbol, year, month_abbr):
+    expiries = get_expiries(symbol)
     for exp in monthly_expiries:
             if exp.endswith(f"{month_abbr}-{year}"):
                 expiry_day = exp.split('-')[0]

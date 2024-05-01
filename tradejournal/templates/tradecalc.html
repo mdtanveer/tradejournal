@@ -129,7 +129,12 @@
                 <div class="form-group row mb-3">
                     <label for="sl" class="col-md-4 col-form-label">Expiry</label>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" id="expiry"></input>
+                        <input type="text" class="form-control" id="expiry" list="expiries"></input>
+                        <datalist id="expiries">
+                            {% for expiry in expiry_dates %}
+                            <option value="{{expiry}}" {{"selected" if loop.index == 1}}>{{expiry}}</option>
+                            {% endfor %}
+                        </datalist>
                     </div>
                 </div>
                 <div class="dropdown">

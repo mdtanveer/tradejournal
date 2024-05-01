@@ -16,7 +16,12 @@
         </div>
         <div class="form-group">
             <label class="control-label" for="strategy">Strategy:</label>
-            <input class="form-control" id="strategy" name="strategy" type="text" value="{{journalentrygroup.strategy}}">
+            <input class="form-control" id="strategy" name="strategy" type="text" value="{{journalentrygroup.strategy}}" list="strategies"/>
+            <datalist id="strategies">
+                {% for strategy in strategies %}
+                <option value="{{strategy}}">{{strategy}}</option>
+                {% endfor %}
+            </datalist>
         </div>
         <div class="form-group">
             <label class="control-label" for="timeframe">Timeframe:</label>

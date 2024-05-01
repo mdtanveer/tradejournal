@@ -139,7 +139,8 @@ def create():
         'create.html',
         journalentry = journalentry,
         pagetitle = "Create New",
-        subtitle = "Create New Journal Entry"
+        subtitle = "Create New Journal Entry",
+        strategies = repository.get_strategies()
     )
 
 @app.route('/creategroup', methods=['GET', 'POST'])
@@ -676,11 +677,14 @@ def trade_calc():
         except:
             pass
         option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 5)
+    expiry_dates = []
+    expiry_dates = stockutils.get_expiries("RELIANCE" if not symbol else symbol)
 
     return render_template('tradecalc.html', 
             option_chain=option_chain,
             spot_ltp = spot_ltp,
-            lot_size = lot_size)
+            lot_size = lot_size,
+            expiry_dates=expiry_dates)
 
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):

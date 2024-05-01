@@ -68,3 +68,6 @@ class Repository(JournalEntryMixin, ChartMixin,
         self.ENTRY_CACHE = {}
         self.last_cache_time = None
 
+    def get_strategies(self):
+        strategies = set(map(lambda x:x.strategy, self.ENTRY_CACHE.values()))
+        return strategies
