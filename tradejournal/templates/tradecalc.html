@@ -29,7 +29,7 @@
                 <div class="form-group row mb-3">
                     <label for="sl" class="col-md-4 col-form-label">SL (Stop Loss):</label>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" id="sl" min="0" step="0.01">
+                        <input type="number" class="form-control" id="sl" min="0" step="0.01" value={{stoploss}}>
                     </div>
                 </div>
 
@@ -129,10 +129,10 @@
                 <div class="form-group row mb-3">
                     <label for="sl" class="col-md-4 col-form-label">Expiry</label>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" id="expiry" list="expiries"></input>
+                        <input type="text" class="form-control" id="expiry" list="expiries" value="{{expiry}}"></input>
                         <datalist id="expiries">
-                            {% for expiry in expiry_dates %}
-                            <option value="{{expiry}}" {{"selected" if loop.index == 1}}>{{expiry}}</option>
+                            {% for exp in expiry_dates %}
+                            <option value="{{exp}}"></option>
                             {% endfor %}
                         </datalist>
                     </div>
@@ -144,7 +144,6 @@
                 <table class="table text-end" id="option_chain">
                     <thead>
                         <tr>
-                            <th>Expiry</th>
                             <th>CE Ltp</th>
                             <th>Strike</th>
                             <th>PE Ltp</th>
@@ -154,8 +153,7 @@
                     
                     <tbody>
                         {% for row in option_chain %}
-                        <tr>
-                            <td>{{ row["expiry"] }}</td>
+                        <tr {{('class="table-warning"' if row["strike"] == atm_strike) | safe}}>
                             <td><a href="#stock_results">{{ row["ce_ltp"] | formatfloat }}</a></td>
                             <td class="strike">{{ row["strike"] }}</td>
                             <td><a href="#stock_results">{{ row["pe_ltp"] | formatfloat }}</a></td>
@@ -389,7 +387,6 @@
            document.getElementById("long_put_price").value = new Number(localStorage.getItem("longPutPrice"));
             var searchParams = new URLSearchParams(window.location.search);
             $("#symbol").val(searchParams.get("symbol"));
-            $("#expiry").val(searchParams.get("expiry"));
         });
 
         function reset_stock_calc(){

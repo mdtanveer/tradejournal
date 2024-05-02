@@ -4,6 +4,8 @@ import calendar
 from memoization import cached
 import urllib
 import jmespath
+import requests
+import json
 
 #examples
 # monthly expiry PE BANKNIFTY21SEP37500PE
@@ -148,7 +150,35 @@ def get_option_chain(symbol, expiry, ltp=None, count=0):
 
 @cached(ttl=30*24*3600)
 def get_lot_size(symbol):
-    return nsepython.nse_get_fno_lot_sizes(symbol)
+    #return nsepython.nse_get_fno_lot_sizes(symbol)
+    lot_sizes = get_lot_sizes_dhan()
+    return lot_sizes[symbol]
+
+@cached(ttl=30*24*3600)
+def get_lot_sizes_dhan():
+    res = requests.post("https://open-web-scanx.dhan.co/scanx/allfut",
+        json=json.loads('{"Data":{"Seg":2,"Instrument":"FUT","Count":200,"Page_no":1,"ExpCode":-1}}'),
+        headers={
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Connection": "keep-alive",
+            "Origin": "https://dhan.co",
+            "Referer": "https://dhan.co/",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-site",
+            "TE": "trailers",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
+            "content-type": "application/json; charset=UTF-8"
+        },
+        cookies={},
+        auth=(),
+    )
+    lots = jmespath.search("data.list[*].[sym, fo_dt[0].lot_type]", res.json())
+    result = {x[0]:int(x[1].split()[0]) for x in lots}
+    return result
+
 
 def test():
     me = "BANKNIFTY21SEP37500PE"

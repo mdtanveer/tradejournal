@@ -11,8 +11,11 @@
                 <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
                     <i class="bi-chevron-right"></i>
                 </button>
-                <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();">
+                <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();" hidden>
                     <i class="bi-bar-chart-line"></i>
+                </button>
+                <button type="button" class="btn btn-secondary btn-warning" onclick="navigateToTradecalc();">
+                    <i class="bi-calculator"></i>
                 </button>
             </div>
             <div class="text-center mx-auto">
@@ -82,6 +85,10 @@
             }
         </script>
         <script>
+            function navigateToTradecalc(){
+                window.location.href = "/tradecalc?symbol="+$("#title").html()+"&sl="+$("#entry_sl").html();
+            }
+
             function SetTradeSignalDetails(e){
                 var i = e.originalEvent.detail;
                 if (i >= tradesignals.length)
@@ -92,7 +99,6 @@
             }
 
             function SetTradeSignalDetailsHelper(i){
-                $("#symbol").html(tradesignals[i].symbol);
                 $("#title").html(tradesignals[i].symbol);
                 $("#count").html(' (' + (i+1) + ' of ' + tradesignals.length + ')');
                 $("#signaldate").html(tradesignals[i].signaldate);

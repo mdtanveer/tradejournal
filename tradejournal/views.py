@@ -666,10 +666,13 @@ def crawl():
 @login_required
 def trade_calc():
     symbol = request.args.get('symbol', None)
-    expiry = request.args.get('expiry', None)
     option_chain = None
     spot_ltp = None
     lot_size = None
+    expiry_dates = []
+    expiry_dates = stockutils.get_expiries("RELIANCE" if not symbol else symbol)
+    expiry = request.args.get('expiry', expiry_dates[0])
+    sl = request.args.get('sl', None)
     if symbol:
         spot_ltp = stockutils.get_quote_spot(symbol)
         try:
@@ -677,14 +680,17 @@ def trade_calc():
         except:
             pass
         option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 5)
-    expiry_dates = []
-    expiry_dates = stockutils.get_expiries("RELIANCE" if not symbol else symbol)
+        strikes = map(lambda x: x['strike'], option_chain)
+        atm_strike = min(strikes, key=lambda x:abs(x-spot_ltp))
 
     return render_template('tradecalc.html', 
             option_chain=option_chain,
             spot_ltp = spot_ltp,
             lot_size = lot_size,
-            expiry_dates=expiry_dates)
+            expiry_dates=expiry_dates,
+            expiry=expiry, 
+            atm_strike=atm_strike,
+            stoploss=sl)
 
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):
