@@ -23,7 +23,7 @@ def get_expiries(symbol):
 
 def get_expiry_day(symbol, year, month_abbr):
     expiries = get_expiries(symbol)
-    for exp in monthly_expiries:
+    for exp in expiries:
             if exp.endswith(f"{month_abbr}-{year}"):
                 expiry_day = exp.split('-')[0]
                 return expiry_day
@@ -86,7 +86,6 @@ def get_nse_quote(symbol):
 
 def cache_clear():
     get_nse_quote.cache_clear()
-    get_expiries_helper.cache_clear()
 
 async def get_quote(name):
     try:
@@ -97,7 +96,8 @@ async def get_quote(name):
             return get_quote_option(*args)
         elif len(args) == 1:
             return get_quote_spot(*args)
-    except:
+    except Exception as e:
+        print("Error fetching quote", name, e)
         return 0
 
 @cached(ttl=12*3600)
