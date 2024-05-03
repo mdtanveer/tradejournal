@@ -51,6 +51,7 @@
                 <li>
                     <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/edit">Edit</a>
                     <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/duplicate">Duplicate</a>
+                    <a class="dropdown-item" onclick="navigateToTradingview()"><i class="bi bi-box-arrow-up-right"></i> &nbsp;Tradingview</a>
                     <a class="dropdown-item" href="/journalentry/monthlyreview/{{journalentry.entry_time.year}}/{{journalentry.entry_time.month}}/1">Monthly Review</a>
                     <a class="dropdown-item" href="javascript:g_chartInstance.DeleteCurrentChart();"> Delete Chart</a>
                     <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/delete">Delete Entry</a>
@@ -103,6 +104,10 @@
     <script type="text/javascript" src="/static/scripts/tradejournalchart.js"></script>
     <script type="text/javascript" src="/static/scripts/jquery-1.10.2.js"></script>
     <script type="text/javascript">
+            function navigateToTradingview(){
+                window.open("https://www.tradingview.com/chart?symbol={{journalentry.symbol}}");
+            }
+            
             $( document ).ready(function() {
                 $("#chartcapturebutton").click(function(event){        
                     $.post("/journalentry/{{journalentry.key}}/charts", {}, function(data) {

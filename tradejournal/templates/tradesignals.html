@@ -33,6 +33,7 @@
                 <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartSwitchTF('2h');">I</button>
                 <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartSwitchTF('1d');">D</button>
                 <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartSwitchTF('1wk');">W</button>
+                <button type="button" class="btn btn-secondary btn-success" onclick="navigateToTradingview()"><i class="bi bi-box-arrow-up-right"></i></button>
             </div>
         </div>
         <h5> 
@@ -86,9 +87,13 @@
         </script>
         <script>
             function navigateToTradecalc(){
-                window.location.href = "/tradecalc?symbol="+$("#title").html()+"&sl="+$("#entry_sl").html();
+                window.open("/tradecalc?symbol="+$("#title").html()+"&sl="+$("#entry_sl").html());
             }
 
+            function navigateToTradingview(){
+                window.open("https://www.tradingview.com/chart?symbol="+$("#title").html());
+            }
+            
             function SetTradeSignalDetails(e){
                 var i = e.originalEvent.detail;
                 if (i >= tradesignals.length)

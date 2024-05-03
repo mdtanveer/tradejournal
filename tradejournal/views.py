@@ -669,19 +669,23 @@ def trade_calc():
     option_chain = None
     spot_ltp = None
     lot_size = None
+    atm_strike = None
     expiry_dates = []
-    expiry_dates = stockutils.get_expiries("RELIANCE" if not symbol else symbol)
-    expiry = request.args.get('expiry', expiry_dates[0])
+    expiry = request.args.get('expiry', None)
     sl = request.args.get('sl', None)
     if symbol:
-        spot_ltp = stockutils.get_quote_spot(symbol)
         try:
+            expiry_dates = stockutils.get_expiries("RELIANCE" if not symbol else symbol)
+            if not expiry and len(expiry_dates) > 0:
+                expiry = expiry_dates[0]
+            spot_ltp = stockutils.get_quote_spot(symbol)
+            option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 8)
+            strikes = map(lambda x: x['strike'], option_chain)
+            atm_strike = min(strikes, key=lambda x:abs(x-spot_ltp))
             lot_size = stockutils.get_lot_size(symbol)
-        except:
+        except Exception as e:
+            print("Unable to fetch option chain details", e)
             pass
-        option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 5)
-        strikes = map(lambda x: x['strike'], option_chain)
-        atm_strike = min(strikes, key=lambda x:abs(x-spot_ltp))
 
     return render_template('tradecalc.html', 
             option_chain=option_chain,
