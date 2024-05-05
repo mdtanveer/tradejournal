@@ -4,6 +4,7 @@ import arrow
 from datetime import datetime, timedelta
 import os
 import yfinance as yf
+from memoization import cached
 
 YAHOO_SYMBOL_MAPPINGS={
     'NIFTY': '^NSEI',
@@ -18,6 +19,15 @@ YAHOO_SYMBOL_MAPPINGS={
     'GBPINR' : 'GBPINR=X',
     'JPYINR' : 'JPYINR=X',
     'EURINR' : 'EURINR=X',
+    "CNXIT": "^CNXIT",
+    "MIDCPNIFTY": "^NSEMDCP50", 
+    "CNXFINANCE": "NIFTY_FIN_SERVICE.NS", 
+    "CNXAUTO": "^CNXAUTO", 
+    "CNXREALTY": "^CNXREALTY", 
+    "CNXINFRA": "^CNXINFRA", 
+    "CNXFMCG": "^CNXFMCG", 
+    "CNXENERGY": "^CNXENERGY", 
+    "CNXPHARMA": "^CNXPHARMA",
 }
 
 def get_yahoo_symbol(symbol, preferred_exc):
@@ -25,6 +35,7 @@ def get_yahoo_symbol(symbol, preferred_exc):
         return YAHOO_SYMBOL_MAPPINGS[symbol]
     return symbol+preferred_exc
  
+@cached(ttl=30*60)
 def get_quote_data(symbol='RELIANCE', data_range='1d', data_interval='1h', preferred_exc='.BO', end_date=None):
     ysymbol = get_yahoo_symbol(symbol, preferred_exc)
     if not end_date:

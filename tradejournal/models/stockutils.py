@@ -13,6 +13,13 @@ import json
 # future KOTAKBANK21SEPFUT
 
 @cached(ttl=7*24*3600)
+def get_fnolist():
+    return nsepython.fnolist()
+
+def get_indices():
+    return ["NIFTY", "BANKNIFTY", "CNXFINANCE", "MIDCPNIFTY", "CNXIT", "CNXAUTO", "CNXREALTY", "CNXINFRA", "CNXFMCG", "CNXENERGY", "CNXPHARMA" ]
+
+@cached(ttl=7*24*3600)
 def get_expiries_helper(symbol):
     payload = get_nse_quote(symbol)
     expiries = jmespath.search('stocks[?ends_with(metadata.instrumentType, `Futures`)].metadata.expiryDate', payload)

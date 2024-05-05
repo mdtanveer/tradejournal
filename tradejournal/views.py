@@ -627,6 +627,35 @@ def tradesignals(date, timeframe, strategy):
         charts=jsonpickle.encode(charts, unpicklable=False),
     )
 
+@app.route('/watchlist/<listname>', methods=['GET'])
+def viewfno(listname):
+    """Renders the charts page."""
+    error_message = ''
+    tf = request.args.get('tf', '2h')
+    indicator = request.args.get('ind', 'stochastic')
+    overlay_indicator = request.args.get('oind', 'ichimoku')
+    if listname == "fno":
+        targetlist = stockutils.get_fnolist()
+    elif listname == "indices":
+        targetlist = stockutils.get_indices()
+
+    tradesignals = [{'symbol': symbol} for symbol in targetlist]
+    charts = [{'key':'', 
+                'title': symbol,
+                'data': symbol,
+                'relativeUrl':f"/charts/{symbol}?tf={tf}",
+                'tf': tf
+                } for symbol in targetlist]
+    return render_template(
+        'tradesignals.html',
+        tradesignals = jsonpickle.encode(tradesignals, unpicklable=False),
+        error_message=error_message,
+        timeframe=tf,
+        indicator=indicator,
+        overlay_indicator=overlay_indicator,
+        charts=jsonpickle.encode(charts, unpicklable=False),
+    )
+
 @app.route('/tradesignals/<date>/<timeframe>', methods=['POST'])
 def post_tradesignals(date, timeframe):
     try:
@@ -673,19 +702,19 @@ def trade_calc():
     expiry_dates = []
     expiry = request.args.get('expiry', None)
     sl = request.args.get('sl', None)
-    if symbol:
-        try:
-            expiry_dates = stockutils.get_expiries("RELIANCE" if not symbol else symbol)
-            if not expiry and len(expiry_dates) > 0:
-                expiry = expiry_dates[0]
+    try:
+        expiry_dates = stockutils.get_expiries("RELIANCE" if not symbol else symbol)
+        if not expiry and len(expiry_dates) > 0:
+            expiry = expiry_dates[0]
+        if symbol:
             spot_ltp = stockutils.get_quote_spot(symbol)
             option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 8)
             strikes = map(lambda x: x['strike'], option_chain)
             atm_strike = min(strikes, key=lambda x:abs(x-spot_ltp))
             lot_size = stockutils.get_lot_size(symbol)
-        except Exception as e:
-            print("Unable to fetch option chain details", e)
-            pass
+    except Exception as e:
+        print("Unable to fetch option chain details", e)
+        pass
 
     return render_template('tradecalc.html', 
             option_chain=option_chain,

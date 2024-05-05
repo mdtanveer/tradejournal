@@ -105,39 +105,41 @@
 
             function SetTradeSignalDetailsHelper(i){
                 $("#title").html(tradesignals[i].symbol);
-                $("#count").html(' (' + (i+1) + ' of ' + tradesignals.length + ')');
-                $("#signaldate").html(tradesignals[i].signaldate);
-                $("#score").html(tradesignals[i].score);
-                $("#direction").html(tradesignals[i].direction);
-                if (tradesignals[i].direction == "Buy")
-                {
-                     $("#symbolicon").removeClass().addClass("bi-arrow-up-circle text-success")
-                }
-                else
-                {
-                     $("#symbolicon").removeClass().addClass("bi-arrow-down-circle text-danger")
-                }
-                $("#entry_sl").html(tradesignals[i].entry_sl);
-                $("#lotsize").html(tradesignals[i].lotsize);
-                $("#entry_price").html(tradesignals[i].entry_price);
-                if(tradesignals[i].timeframe == "intraday") {
-                    var parseDate = d3.timeParse("%m/%d/%Y %I:%M %p"); 
-                }
-                else {
-                    var parseDate = d3.timeParse("%m/%d/%Y"); 
-                }
-                var tradearrowoffsetperc = 0.02;
-                var tradearrowoffsetentry = 1 + tradearrowoffsetperc;
-                if (tradesignals[i].direction == "Buy")
-                    var tradearrowoffsetentry = 1 - tradearrowoffsetperc;
+                if(tradesignals[i].direction){
+                    $("#count").html(' (' + (i+1) + ' of ' + tradesignals.length + ')');
+                    $("#signaldate").html(tradesignals[i].signaldate);
+                    $("#score").html(tradesignals[i].score);
+                    $("#direction").html(tradesignals[i].direction);
+                    if (tradesignals[i].direction == "Buy")
+                    {
+                         $("#symbolicon").removeClass().addClass("bi-arrow-up-circle text-success")
+                    }
+                    else
+                    {
+                         $("#symbolicon").removeClass().addClass("bi-arrow-down-circle text-danger")
+                    }
+                    $("#entry_sl").html(tradesignals[i].entry_sl);
+                    $("#lotsize").html(tradesignals[i].lotsize);
+                    $("#entry_price").html(tradesignals[i].entry_price);
+                    if(tradesignals[i].timeframe == "intraday") {
+                        var parseDate = d3.timeParse("%m/%d/%Y %I:%M %p"); 
+                    }
+                    else {
+                        var parseDate = d3.timeParse("%m/%d/%Y"); 
+                    }
+                    var tradearrowoffsetperc = 0.02;
+                    var tradearrowoffsetentry = 1 + tradearrowoffsetperc;
+                    if (tradesignals[i].direction == "Buy")
+                        var tradearrowoffsetentry = 1 - tradearrowoffsetperc;
 
-                g_chartInstance.SetTrades(
-                    [{
-                        date: parseDate(tradesignals[i].signaldate),
-                        type: tradesignals[i].direction.toLowerCase(),
-                        price: tradesignals[i].entry_price * tradearrowoffsetentry,
-                        quantity: 1
-                    }]);
+                    g_chartInstance.SetTrades(
+                        [{
+                            date: parseDate(tradesignals[i].signaldate),
+                            type: tradesignals[i].direction.toLowerCase(),
+                            price: tradesignals[i].entry_price * tradearrowoffsetentry,
+                            quantity: 1
+                        }]);
+                }
             }
 
             if(tradesignals.length > 0)

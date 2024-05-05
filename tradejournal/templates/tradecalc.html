@@ -80,7 +80,8 @@
                         <tr>
                             <th></th>
                             <th>Stoploss</th>
-                            <th>Option Hedge</th>
+                            <th>Fut+Option Hedge</th>
+                            <th>Itm Option</th>
                         </tr>
                     </thead>
                     
@@ -89,32 +90,38 @@
                             <td>Quantity:</td>
                             <td id="quantity">0</td>
                             <td id="quantityo">0</td>
+                            <td id="quantityitm">0</td>
                         </tr>
                 
                         <tr>
                             <td>Risk Pips:</td>
                             <td id="risk_pips">0.00</td>
                             <td id="risko_pips">0.00</td>
+                            <td id="riskitm_pips">0.00</td>
                         </tr>
                         <tr>
                             <td>Risk:</td>
                             <td id="risk">0.00</td>
                             <td id="risko">0.00</td>
+                            <td id="riskitm">0.00</td>
                         </tr>
                         <tr>
                             <td>Hedging cost:</td>
                             <td>-</td>
                             <td id="hedge_cost">0.00</td>
+                            <td id="hedgeitm_cost">0.00</td>
                         </tr>
                         <tr>
                             <td>Risk (per lot):</td>
                             <td id="risk_perlot">0.00</td>
                             <td id="risko_perlot">0.00</td>
+                            <td id="riskitm_perlot">0.00</td>
                         </tr>
                         <tr>
                             <td>Hedging cost (per lot):</td>
                             <td>-</td>
                             <td id="hedgeo_perlot">0.00</td>
+                            <td id="hedgeitm_perlot">0.00</td>
                         </tr>
                     </tbody>
                 </table>
@@ -154,9 +161,9 @@
                     <tbody>
                         {% for row in option_chain %}
                         <tr {{('class="table-warning"' if row["strike"] == atm_strike) | safe}}>
-                            <td><a href="#stock_results">{{ row["ce_ltp"] | formatfloat }}</a></td>
+                            <td><a class="ce" href="#stock_results">{{ row["ce_ltp"] | formatfloat }}</a></td>
                             <td class="strike">{{ row["strike"] }}</td>
-                            <td><a href="#stock_results">{{ row["pe_ltp"] | formatfloat }}</a></td>
+                            <td><a class="pe" href="#stock_results">{{ row["pe_ltp"] | formatfloat }}</a></td>
                             <td>{{ (-(spot_ltp - row["strike"])/spot_ltp*100) | formatfloat }}</td>
                         </tr>
                         {% endfor %}
@@ -267,6 +274,7 @@
 
     <script>
         // Stock Calculator
+        var flip_option_price = 0;
         function calculate() {
             const ltp = parseFloat(document.getElementById("ltp").value);
             const sl = parseFloat(document.getElementById("sl").value);
@@ -307,6 +315,20 @@
                 document.getElementById("risko_perlot").textContent = (risk*lot_size).toFixed(2);
                 document.getElementById("hedge_cost").textContent = hedge_cost.toFixed(2);
                 document.getElementById("hedgeo_perlot").textContent = (option_price*lot_size).toFixed(2);
+            }
+
+            if(!isNaN(option_strike))
+            {
+                risk = parseFloat(flip_option_price);
+                lots = Math.floor(capital / (risk * lot_size));
+                quantity = lots * lot_size;
+                hedge_cost_pips = risk - Math.abs(option_strike-ltp);
+                document.getElementById("quantityitm").textContent = quantity.toString() + " (" + lots.toString() + " lots)";
+                document.getElementById("riskitm_pips").textContent = risk.toFixed(2);
+                document.getElementById("riskitm").textContent = (risk*quantity).toFixed(2);
+                document.getElementById("riskitm_perlot").textContent = (risk*lot_size).toFixed(2);
+                document.getElementById("hedgeitm_cost").textContent = (hedge_cost_pips*quantity).toFixed(2);
+                document.getElementById("hedgeitm_perlot").textContent = (hedge_cost_pips*lot_size).toFixed(2);
             }
         }
         document.getElementById("stock-calculator-form").addEventListener("input", calculate);
@@ -415,9 +437,16 @@
                 var input = $('#option_price');
                 input.val(value);
                 
-                var value = $(this).parent().parent().children(".strike").html()
+                var value = $(this).parent().parent().children(".strike").html();
                 var input = $('#option_strike');
                 input.val(value);
+
+                var targetClass = ".pe";
+                if ($(this).hasClass("pe")){
+                            targetClass=".ce";
+                        }
+                flip_option_price = $(this).closest("tr").find(targetClass).html();
+                console.log(flip_option_price);
                 calculate();
             });
         });
