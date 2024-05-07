@@ -16,8 +16,6 @@ from flask_paginate import Pagination, get_per_page_parameter, get_page_args
 import jsonpickle
 from flask import current_app as app
 import sys, traceback
-import plotly
-import plotly.express as px
 
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
@@ -273,18 +271,21 @@ async def viewgroupanalysis(key):
     extrema_profits = ""
     optionlab_result = None
     graph = None
+    error = None
     try:
-        optionlab_result = await journalentrygroup.get_optionlab_result_async()
-        size = len(optionlab_result.data.stock_price_array)
-        k = int(size/500)
-        fig = px.line(x=optionlab_result.data.stock_price_array[:-k:k], y=optionlab_result.data.strategy_profit[:-k:k])
-        graph = fig.to_html(full_html = False, include_plotlyjs ='cdn')
+        (optionlab_result, graph) = await journalentrygroup.get_optionlab_result_async()
+        i = 0
         for low, high in optionlab_result.profit_ranges:
             profit_ranges += "%.1f-%.1f " % (low, high)
+            i += 1
+            if i >= 10:
+                profit_ranges += "..."
+                break
         extrema_profits = "%.2f / %.2f"%(optionlab_result.data.strategy_profit[0], optionlab_result.data.strategy_profit[-1]) 
         print(profit_ranges)
         print(extrema_profits)
     except Exception as err:
+        error = err
         print("Unable to do optionlab analysis:", err)
 
     return render_template(
@@ -295,7 +296,8 @@ async def viewgroupanalysis(key):
         optionlab_result = optionlab_result,
         graph = graph,
         profit_ranges = profit_ranges,
-        extrema_profits = extrema_profits
+        extrema_profits = extrema_profits,
+        error = error
     )
 
 @app.route('/journalentrygroup/<key>/delete', methods=['GET'])

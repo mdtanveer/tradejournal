@@ -13,6 +13,8 @@ import re
 from optionlab import Inputs, StrategyEngine
 from memoization import cached
 import asyncio
+import plotly
+import plotly.express as px
 
 def IST_now():
     return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
@@ -120,9 +122,9 @@ class JournalEntryGroup(object):
         elif grouptype == 'instrument':
             group_func = lambda x: x.tradingsymbol
         elif grouptype == 'strike':
-            group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol)[3]
+            group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[3]
         elif grouptype == 'expiry':
-            group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol)[1]
+            group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[1]
         else:
             return self
 
@@ -187,14 +189,18 @@ class JournalEntryGroup(object):
     def get_optionlab_result(self):
         model = self.get_optionlab_strategy()
         spot_price = stockutils.get_quote_spot(model['symbol'])
+        strikes = [stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[3] for x in self.deserialized_items]
+        strikes_avg = spot_price
+        if len(strikes) > 0:
+            strikes_avg = sum(strikes)/len(strikes)
         inputs_data = {
             "stock_price": spot_price, 
             "start_date": model['entry_date'],
             "target_date": model['expiry'],
             "volatility": stockutils.get_india_vix()/100,
             "interest_rate": 0.0002,
-            "min_stock": spot_price * 0.95,
-            "max_stock": spot_price * 1.05,
+            "min_stock": round(strikes_avg * 0.94, 2),
+            "max_stock": round(strikes_avg * 1.06, 2),
             "strategy": model['legs'],
             "mc_prices_number": 100
             }
@@ -202,7 +208,15 @@ class JournalEntryGroup(object):
         inputs = Inputs.model_validate(inputs_data)
         st = StrategyEngine(inputs)
         out = st.run()
-        return out
+
+        size = len(out.data.stock_price_array)
+        k = int(size/500)
+        fig = px.line(x=out.data.stock_price_array[:-k:k], y=out.data.strategy_profit[:-k:k])
+        fig.add_vline(spot_price, line_dash="dash", line_color="gray")
+        fig.add_hline(0)
+        graph = fig.to_html(full_html = False, include_plotlyjs ='cdn')
+
+        return out, graph
 
 
 class JournalEntry(object):
