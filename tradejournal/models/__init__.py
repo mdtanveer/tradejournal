@@ -28,11 +28,11 @@ class JournalEntryGroup(object):
         self.key = key
         try:
             self.entry_time = toIST_fromtimestamp(float(entity['entry_time']))
-        except:
+        except Exception as e:
             self.entry_time = toIST_fromtimestamp(0)
         try:
             self.exit_time = toIST_fromtimestamp(float(entity['exit_time']))
-        except:
+        except Exception as e:
             self.exit_time = toIST_fromtimestamp(0)
         self.rating = entity['rating'] if 'rating' in entity.keys() else ''
         self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'default'
@@ -55,8 +55,8 @@ class JournalEntryGroup(object):
                 self.entry_time = self.deserialized_items[-1].entry_time
                 if not self.is_open():
                     self.exit_time = max(self.deserialized_items, key = lambda x: x.exit_time).exit_time
-            except:
-                print("Error populating children:", key, "not found")
+            except Exception as e:
+                print("Error populating children:", key, "not found: ", e)
                 continue
     
     def is_open(self):
@@ -179,7 +179,6 @@ class JournalEntryGroup(object):
             raise Exception("Invalid symbol")
 
         model =  {'symbol': underlying, 'expiry': expiry, 'entry_date': entry_date, 'legs': legs}
-        print(model)
         return model
 
     async def get_optionlab_result_async(self):
@@ -226,11 +225,11 @@ class JournalEntry(object):
         self.symbol = entity['symbol'] if 'symbol' in entity.keys() else ''
         try:
             self.entry_time = toIST_fromtimestamp(float(entity['entry_time']))
-        except:
+        except Exception as e:
             self.entry_time = toIST_fromtimestamp(0)
         try:
             self.exit_time = toIST_fromtimestamp(float(entity['exit_time'])) 
-        except:
+        except Exception as e:
             self.exit_time = toIST_fromtimestamp(0)
         self.entry_price = entity['entry_price'] if 'entry_price' in entity.keys() else ''
         self.exit_price = entity['exit_price'] if 'exit_price' in entity.keys() else '' 
@@ -288,7 +287,8 @@ class JournalEntry(object):
                     return longprofitable
                 else:
                     return not longprofitable
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def directionalqty(self):
@@ -308,7 +308,9 @@ class JournalEntry(object):
                 gain = float(self.exit_price) - float(self.entry_price)
                 if self.direction == 'SHORT':
                     gain = -gain
-        except:
+        except Exception as e:
+            print(e)
+
             pass
         return gain
 
@@ -349,7 +351,9 @@ class JournalEntry(object):
     def get_tradingsymbol_forview(self, expiry_fetch=True):
         try:
             attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol, expiry_fetch)
-        except:
+        except Exception as e:
+            print(e)
+
             if expiry_fetch == True:
                 expiry_fetch = False
                 attrib = stockutils.convert_from_zerodha_convention(self.tradingsymbol, expiry_fetch)

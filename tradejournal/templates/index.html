@@ -29,7 +29,14 @@
                                 <i class="bi-basket" style="font-size: 1em;"></i>
                                 <a href="/journalentrygroup/{{journalentry.key}}/view" class="h4" style="text-decoration:none;color:black">{{journalentry.name}}</a>
                             </div>
-                                <input class="form-check-input" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
+                            <div>
+                                <div class="text-end">
+                                    <input class="form-check-input" type="checkbox" id="{{journalentry.key}}" aria-label="..."/>
+                                </div>
+                                {% if journalentry.profit() != 0 %}
+                                <div class='{{"text-success" if journalentry.profit() >= 0 else "text-danger"}}'> {{journalentry.profit() | formatfloat}} </div>
+                                {% endif %}
+                            </div>
                         </div>
                     </span>
                     <div class="d-flex w-100 justify-content-between">
@@ -122,6 +129,10 @@
 
             clearLocalStorage();
         }
+
+        $( document ).ready(function() {
+            fetch("/prefetch");
+        })
     </script>
 {% else %}
 <p>No journalentries available.</p>

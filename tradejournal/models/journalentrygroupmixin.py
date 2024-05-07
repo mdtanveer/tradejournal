@@ -5,6 +5,7 @@ from . import JournalEntryGroup, JournalEntryNotFound
 from azure.common import AzureMissingResourceHttpError
 import calendar
 import uuid
+import asyncio
 
 class JournalEntryGroupMixin:
     def get_journalentrygroups_helper(self, func, age):
@@ -126,4 +127,15 @@ class JournalEntryGroupMixin:
             else:
                 self.copyattributestochildren(je)
 
+    async def prefetch_currentgroupsdata(self):
+        await asyncio.create_task(self.prefetch_currentgroupsdata_helper())
+
+    async def prefetch_currentgroupsdata_helper(self):
+        current_month = datetime.today().month
+        month_abbr = calendar.month_abbr[current_month]
+        groups = filter(lambda x: x.name.find(month_abbr) != -1, self.GROUP_CACHE.values())
+
+        for group in groups:
+            print("Prefetching...", group.name, len(group.deserialized_items))
+            await group.fetch_exit_price_as_ltp(False)
 

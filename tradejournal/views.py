@@ -23,7 +23,7 @@ repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
 @app.route('/')
 @app.route('/home')
 @login_required
-def home():
+async def home():
     """Renders the home page, with a list of all journalentrys."""
     journalentries=repository.get_journalentries_forview()
     journalentrygroups=repository.get_journalentrygroups_forview(journalentries)
@@ -72,6 +72,12 @@ def home():
     response.set_cookie('subpage', subpage)
     response.set_cookie('page_'+subpage, str(page))
     return response
+
+@app.route('/prefetch')
+@login_required
+async def prefetch():
+    await repository.prefetch_currentgroupsdata()
+    return jsonify(success=True)
 
 @app.route('/js/<path:path>')
 @login_required
