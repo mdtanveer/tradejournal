@@ -318,10 +318,7 @@ class JournalEntry(object):
         return self.timeframe
 
     def get_indicator(self):
-        if not self.strategy or self.strategy == 'tkcross':
-            return 'stochastic'
-        else:
-            return 'macd'
+        return 'macd'
 
     def get_comment_count(self):
         return self.comment_count

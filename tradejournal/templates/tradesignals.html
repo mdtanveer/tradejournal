@@ -5,18 +5,6 @@
         <link rel="stylesheet" type="text/css" href="/static/content/chart.css">
         <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group mr-2" role="group" aria-label="First group">
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderPreviousChart();">
-                    <i class="bi-chevron-left"></i>
-                </button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
-                    <i class="bi-chevron-right"></i>
-                </button>
-                <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();" hidden>
-                    <i class="bi-bar-chart-line"></i>
-                </button>
-                <button type="button" class="btn btn-secondary btn-warning" onclick="navigateToTradecalc();">
-                    <i class="bi-calculator"></i>
-                </button>
             </div>
             <div class="text-center mx-auto">
                 <h5>
@@ -28,14 +16,40 @@
         <div class="text-center" id="main">
             <div id="chart"></div>
         </div>
-        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group mr-2" role="group" aria-label="First group">
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartSwitchTF('2h');">I</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartSwitchTF('1d');">D</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderCurrentChartSwitchTF('1wk');">W</button>
-                <button type="button" class="btn btn-secondary btn-success" onclick="navigateToTradingview()"><i class="bi bi-box-arrow-up-right"></i></button>
+        <div class="btn-toolbar mb-3 justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group" role="group" aria-label="First group">
+                <button type="button" class="btn btn-secondary btn-success btn-lg" onclick="g_chartInstance.RenderPreviousChart();">
+                    <i class="bi-chevron-left"></i>
+                </button>
+                <button type="button" class="btn btn-secondary btn-success btn-lg" onclick="g_chartInstance.RenderNextChart();">
+                    <i class="bi-chevron-right"></i>
+                </button>
+                <button type="button" class="btn btn-secondary btn-warning btn-lg" onclick="g_chartInstance.ToggleIndicator();" hidden>
+                    <i class="bi-bar-chart-line"></i>
+                </button>
+                <button type="button" class="btn btn-secondary btn-warning btn-lg" onclick="navigateToTradecalc();">
+                    <i class="bi-calculator"></i>
+                </button>
+                <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li>
+                        <a class="dropdown-item" onclick="g_chartInstance.RenderCurrentChartSwitchTF('2h');">Intraday</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" onclick="g_chartInstance.RenderCurrentChartSwitchTF('1d');">Daily</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" onclick="g_chartInstance.RenderCurrentChartSwitchTF('1wk');">Weekly</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" onclick="navigateToTradingview()"><i class="bi bi-box-arrow-up-right"></i> &nbsp;Tradingview</a>
+                    </li>
+                </ul>
             </div>
         </div>
+        {% if not is_watchlist %}
         <h5> 
             Details <span id="count"></span>
         </h5>
@@ -65,6 +79,7 @@
                 <td id="lotsize"></td>
             </tr>
         </table>
+    {% endif %}
     </div>
         <script type="text/javascript" src="/static/scripts/d3.v4.min.js"></script>
         <script type="text/javascript" src="/static/scripts/techan.min.js"></script>
@@ -76,7 +91,7 @@
             var secondaryIndicator = "{{ indicator }}";
             var primaryIndicator = "{{overlay_indicator if not not overlay_indicator else 'ichimoku'}}";
 
-            var g_chartInstance = new TJChart(null, null, charts, trades, null, primaryIndicator, secondaryIndicator, [$('#detailstable')[0]]);
+            var g_chartInstance = new TJChart(null, null, charts, trades, null, primaryIndicator, secondaryIndicator, [$('#title')[0]]);
             if (charts.length > 0) {
                 g_chartInstance.RenderChart();
             }
@@ -144,6 +159,6 @@
 
             if(tradesignals.length > 0)
                 SetTradeSignalDetailsHelper(0);
-            $('#detailstable').on('cidxchanged', SetTradeSignalDetails);
+            $('#title').on('cidxchanged', SetTradeSignalDetails);
         </script>
 {% endblock %}

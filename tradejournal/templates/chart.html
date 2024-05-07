@@ -29,19 +29,16 @@
     </div>
     <div class="d-print-none text-center mb-1" role="toolbar" aria-label="Toolbar with button groups">
         <div class="btn-group mr-2" role="group" aria-label="First group">
-            <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderPreviousChart();">
+            <button type="button" class="btn btn-secondary btn-success btn-lg" onclick="g_chartInstance.RenderPreviousChart();">
                 <i class="bi-chevron-left"></i>
             </button>
-            <button type="button" class="btn btn-secondary btn-success" onclick="g_chartInstance.RenderNextChart();">
+            <button type="button" class="btn btn-secondary btn-success btn-lg" onclick="g_chartInstance.RenderNextChart();">
                 <i class="bi-chevron-right"></i>
             </button>
-            <button type="button" class="btn btn-secondary btn-warning" onclick="g_chartInstance.ToggleIndicator();" hidden>
+            <button type="button" class="btn btn-secondary btn-warning btn-lg" onclick="g_chartInstance.ToggleIndicator();" hidden>
                 <i class="bi-bar-chart-line"></i>
             </button>
-            <button type="button" class="btn btn-secondary btn-warning" id="charttypeObtn">O</button>
-            <button type="button" id="charttypeLbtn" class="btn btn-secondary btn-success">L</button>
-            <button type="button" id="charttypeMbtn" class="btn btn-secondary btn-success">M</button>
-            <button id="chartcapturebutton" type="submit" class="btn btn-success">
+            <button id="chartcapturebutton" type="submit" class="btn btn-warning btn-lg">
                 <i class="bi-camera"></i>
             </button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -51,8 +48,10 @@
                 <li>
                     <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/edit">Edit</a>
                     <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/duplicate">Duplicate</a>
+                    <a class="dropdown-item" id="charttypeObtn">Original chart</a>
+                    <a id="charttypeLbtn" class="dropdown-item">Latest chart</a>
+                    <a id="charttypeMbtn" class="dropdown-item">Mother chart</a>
                     <a class="dropdown-item" onclick="navigateToTradingview()"><i class="bi bi-box-arrow-up-right"></i> &nbsp;Tradingview</a>
-                    <a class="dropdown-item" href="/journalentry/monthlyreview/{{journalentry.entry_time.year}}/{{journalentry.entry_time.month}}/1">Monthly Review</a>
                     <a class="dropdown-item" href="javascript:g_chartInstance.DeleteCurrentChart();"> Delete Chart</a>
                     <a class="dropdown-item" href="/journalentry/{{journalentry.key}}/delete">Delete Entry</a>
                 </li>

@@ -483,7 +483,7 @@ def quick_charts():
     if 'symbols' in request.args.keys():
         symbols = request.args['symbols'].split(',')
         tf = request.args.get('tf', '2h')
-        indicator = request.args.get('ind', 'stochastic')
+        indicator = request.args.get('ind', 'macd')
         overlay_indicator = request.args.get('oind', 'ichimoku')
 
         charts = [{'key':'', 'title': symbol, 'data': symbol, 'relativeUrl':'charts/%s?tf=%s'%(symbol, tf)} for symbol in symbols]
@@ -608,7 +608,7 @@ def tradesignals(date, timeframe, strategy):
     """Renders the charts page."""
     error_message = ''
     tf = request.args.get('tf', '2h')
-    indicator = request.args.get('ind', 'stochastic')
+    indicator = request.args.get('ind', 'macd')
     overlay_indicator = request.args.get('oind', 'ichimoku')
     tradesignals = repository.get_tradesignals(date, timeframe, strategy)
     charts = [{'key':'', 
@@ -625,6 +625,7 @@ def tradesignals(date, timeframe, strategy):
         indicator=indicator,
         overlay_indicator=overlay_indicator,
         charts=jsonpickle.encode(charts, unpicklable=False),
+        is_watchlist = False,
     )
 
 @app.route('/watchlist/<listname>', methods=['GET'])
@@ -632,7 +633,7 @@ def viewfno(listname):
     """Renders the charts page."""
     error_message = ''
     tf = request.args.get('tf', '2h')
-    indicator = request.args.get('ind', 'stochastic')
+    indicator = request.args.get('ind', 'macd')
     overlay_indicator = request.args.get('oind', 'ichimoku')
     if listname == "fno":
         targetlist = stockutils.get_fnolist()
@@ -654,6 +655,7 @@ def viewfno(listname):
         indicator=indicator,
         overlay_indicator=overlay_indicator,
         charts=jsonpickle.encode(charts, unpicklable=False),
+        is_watchlist = True,
     )
 
 @app.route('/tradesignals/<date>/<timeframe>', methods=['POST'])

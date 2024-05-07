@@ -20,9 +20,11 @@ class TJChart
         this.dataWindowSize = 250;
         var windowW = document.getElementById("main").clientWidth;
         //var windowW = Math.round(window.innerWidth*0.81);
-        var windowH = Math.round(window.innerHeight*0.60);
+        var windowH = window.innerHeight;
+        windowH *= windowW > windowH ? 0.8 : 0.6;
+        windowH = Math.round(windowH);
         if (windowW > windowH) {
-            windowW = Math.min(1.618*windowH, windowW);
+            windowW = Math.round(Math.min(1.618*windowH, windowW));
         }
         var currentScrip = "";
 
@@ -41,6 +43,7 @@ class TJChart
         dim.ohlc.height = Math.floor(dim.plot.height*0.80)
         dim.indicator.height = Math.floor(dim.plot.height*0.20)
 
+        
         dim.indicator.top = dim.ohlc.height+dim.indicator.padding;
         dim.indicator.bottom = dim.indicator.top+dim.indicator.height+dim.indicator.padding;
 
