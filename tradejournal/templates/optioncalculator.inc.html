@@ -1,10 +1,10 @@
             <div class="container">
                 <h1 class="mb-4">Options Risk and Reward Calculator</h1>
-                <form id="options-calculator-form">
+                <div id="options-calculator-form">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="call_quantity" class="col-form-label">Call quantity</label>
-                            <input type="number" class="form-control" id="call_quantity" min="1" step="1" required>
+                            <input type="number" class="form-control" id="call_quantity" min="1" step="1">
                         </div>
                     </div>
 
@@ -12,11 +12,11 @@
                         <div class="col-md-6">
                             <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
                             <label for="long_call_strike" class="col-form-label">Long call strike:</label>
-                            <input type="number" class="form-control" id="long_call_strike" min="0" step="1" required>
+                            <input type="number" class="form-control" id="long_call_strike" min="0" step="1">
                         </div>
                         <div class="col-md-6">
                             <label for="long_call_price" class="col-form-label">Long call price:</label>
-                            <input type="number" class="form-control" id="long_call_price" min="0" step="0.01" required>
+                            <input type="number" class="form-control" id="long_call_price" min="0" step="0.01">
                         </div>
                     </div>
                         
@@ -24,18 +24,18 @@
                         <div class="col-md-6">
                             <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
                             <label for="short_call_strike" class="col-form-label">Short Call Strike:</label>
-                            <input type="number" class="form-control" id="short_call_strike" min="0" step="1" required>
+                            <input type="number" class="form-control" id="short_call_strike" min="0" step="1">
                         </div>
                         <div class="col-md-6">
                             <label for="short_call_price" class="col-form-label">Short Call Price:</label>
-                            <input type="number" class="form-control" id="short_call_price" min="0" step="0.01" required>
+                            <input type="number" class="form-control" id="short_call_price" min="0" step="0.01">
                         </div>
                     </div>
                     
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="put_quantity" class="col-form-label">Put quantity</label>
-                            <input type="number" class="form-control" id="put_quantity" min="1" step="1" required>
+                            <input type="number" class="form-control" id="put_quantity" min="1" step="1">
                         </div>
                     </div>
 
@@ -43,11 +43,11 @@
                         <div class="col-md-6">
                             <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
                             <label for="short_put_strike" class="col-form-label">Short Put Strike:</label>
-                            <input type="number" class="form-control" id="short_put_strike" min="0" step="1" required>
+                            <input type="number" class="form-control" id="short_put_strike" min="0" step="1">
                         </div>
                         <div class="col-md-6">
                             <label for="short_put_price" class="col-form-label">Short Put Price:</label>
-                            <input type="number" class="form-control" id="short_put_price" min="0" step="0.01" required>
+                            <input type="number" class="form-control" id="short_put_price" min="0" step="0.01">
                         </div>
                     </div>
 
@@ -55,19 +55,19 @@
                         <div class="col-md-6">
                             <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault4">
                             <label for="long_put_strike" class="col-form-label">Long Put Strike:</label>
-                            <input type="number" class="form-control" id="long_put_strike" min="0" step="1" required>
+                            <input type="number" class="form-control" id="long_put_strike" min="0" step="1">
                         </div>
                         <div class="col-md-6">
                             <label for="long_put_price" class="col-form-label">Long Put Price:</label>
-                            <input type="number" class="form-control" id="long_put_price" min="0" step="0.01" required>
+                            <input type="number" class="form-control" id="long_put_price" min="0" step="0.01">
                         </div>
                     </div>
                     
                     <div class="dropdown mt-4">
-                        <button class="btn btn-primary btn-block" id="calculatebtn" onclick="calculateOption()">Calculate</button>
-                        <button class="btn btn-primary btn-block" id="resetbtn" onclick="reset_stock_calc()" >Reset</button>
+                        <button class="btn btn-primary btn-block" id="calculatebtno" onclick="calculateOption()">Calculate</button>
+                        <button class="btn btn-primary btn-block" id="resetbtno" onclick="reset_option_calc()" >Reset</button>
                     </div>
-
+            </div>
                     <h3 class="mt-4" >Results</h3>
                     <table class="table text-end" id="option_results">
                         <thead>
@@ -83,14 +83,14 @@
                             <tr>
                                 <td>Risk:</td>
                                 <td><p id="options-risk">0.00</p></td>
-                                <td><p id="options-risk-put">0.00</p></td>
                                 <td><p id="options-risk-call">0.00</p></td>
+                                <td><p id="options-risk-put">0.00</p></td>
                             </tr>
                             <tr>
                                 <td>Reward:</td>
                                 <td><p id="options-reward">0.00</p></td>
-                                <td><p id="options-reward-put">0.00</p></td>
                                 <td><p id="options-reward-call">0.00</p></td>
+                                <td><p id="options-reward-put">0.00</p></td>
                             </tr>
                         </tbody>
                     </table>
@@ -99,7 +99,7 @@
                 <div class="form-group row mb-3">
                     <label for="ltp" class="col-md-4 col-form-label">Symbol:</label>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" id="symbol"></input>
+                        <input type="text" class="form-control" id="symbol_option"></input>
                     </div>
                 </div>
 
@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 <div class="dropdown">
-                    <button class="btn btn-primary btn-block" id="fetchbtn" onclick="fetchurl()">Fetch</button>
+                    <button class="btn btn-primary btn-block" id="fetchbtn" onclick="fetchurlOption()">Fetch</button>
                 </div>
                 {% if option_chain %}
                 <table class="table text-end" id="option_chain_opt">
@@ -131,9 +131,9 @@
                     <tbody>
                         {% for row in option_chain %}
                         <tr {{('class="table-warning"' if row["strike"] == atm_strike) | safe}}>
-                            <td><a class="ce" href="#stock_results">{{ row["ce_ltp"] | formatfloat }}</a></td>
+                            <td><a class="ce" href="#option_chain_opt">{{ row["ce_ltp"] | formatfloat }}</a></td>
                             <td class="strike">{{ row["strike"] }}</td>
-                            <td><a class="pe" href="#stock_results">{{ row["pe_ltp"] | formatfloat }}</a></td>
+                            <td><a class="pe" href="#option_chain_opt">{{ row["pe_ltp"] | formatfloat }}</a></td>
                             <td>{{ (-(spot_ltp - row["strike"])/spot_ltp*100) | formatfloat }}</td>
                         </tr>
                         {% endfor %}
@@ -228,17 +228,18 @@
            document.getElementById("long_put_strike").value = new Number(localStorage.getItem("longPutStrike"));
            document.getElementById("long_put_price").value = new Number(localStorage.getItem("longPutPrice"));
             var searchParams = new URLSearchParams(window.location.search);
-            $("#symbol").val(searchParams.get("symbol"));
+            $("#symbol_option").val(searchParams.get("symbol"));
         });
 
-        function reset_stock_calc(){
+        function reset_option_calc(){
             $('#options-calculator-form').find('input[type=number]').val('');
         }
 
-        function fetchurl(){
+        function fetchurlOption(){
             var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set("symbol", $("#symbol").val());
+            searchParams.set("symbol", $("#symbol_option").val());
             searchParams.set("expiry", $("#expiry").val());
+            searchParams.set("tab", "option");
             window.location.search = searchParams;
         }
 
