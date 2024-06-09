@@ -10,6 +10,9 @@
         <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#options">Options</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#strategies">Strategies</a>
+        </li>
     </ul>
 
     <!-- Tab content -->
@@ -22,6 +25,11 @@
         <!-- Options tab -->
         <div id="options" class="tab-pane fade">
             {% include "optioncalculator.inc.html" %}
+        </div>
+        
+        <!-- Strategy tab -->
+        <div id="strategies" class="tab-pane fade">
+            {% include "strategycalculator.inc.html" %}
         </div>
     </div>
 </div>

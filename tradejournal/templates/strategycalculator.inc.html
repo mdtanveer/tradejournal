@@ -1,0 +1,21 @@
+<div class="container">
+    <div id="ltp_table"></div>
+    <button class="btn btn-primary btn-block" id="calculatebtn" onclick="fetch_ltp_table()">Fetch</button>
+    <script>
+        function fetch_ltp_table(){
+            fetch('/tradecalc/strategies')
+            .then(function(response) {
+                // When the page is loaded convert it to text
+                return response.text()
+            })
+            .then(function(html) {
+                    var doc = new DOMParser().parseFromString(html, 'text/html');
+                    var table = doc.getElementsByTagName('table')[0];
+                    document.getElementById("ltp_table").append(table);
+            })
+            .catch(function(err) {  
+                console.log('Failed to fetch page: ', err);  
+            });    
+        }
+    </script>
+</div>

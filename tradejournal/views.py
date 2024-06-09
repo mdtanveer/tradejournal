@@ -16,6 +16,7 @@ from flask_paginate import Pagination, get_per_page_parameter, get_page_args
 import jsonpickle
 from flask import current_app as app
 import sys, traceback
+import pandas as pd
 
 
 repository = create_repository(REPOSITORY_NAME, REPOSITORY_SETTINGS)
@@ -734,6 +735,22 @@ def trade_calc():
             expiry=expiry, 
             atm_strike=atm_strike,
             stoploss=sl)
+
+@app.route('/tradecalc/strategies', methods=['GET'])
+@login_required
+def trade_calc_strategies():
+    symbols = ["NIFTY", "BANKNIFTY", "HDFCBANK", "ICICIBANK", "AXISBANK", "SBIN", "LT", "TITAN", "RELIANCE"]
+    LTP = {}
+    for symbol in symbols:
+        LTP[symbol] = stockutils.get_quote_spot(symbol)
+    df = pd.DataFrame.from_dict(LTP, orient='index', columns=['ltp'])
+    df["2% up"] = df["ltp"]*1.02
+    df["4% up"] = df["ltp"]*1.04
+    df["2% down"] = df["ltp"]*0.98
+    df["4% down"] = df["ltp"]*0.96
+
+    return df.to_html(classes="table")
+
 
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):
