@@ -1,0 +1,276 @@
+            <div class="container">
+                <h1 class="mb-4">Options Risk and Reward Calculator</h1>
+                <form id="options-calculator-form">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="call_quantity" class="col-form-label">Call quantity</label>
+                            <input type="number" class="form-control" id="call_quantity" min="1" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                            <label for="long_call_strike" class="col-form-label">Long call strike:</label>
+                            <input type="number" class="form-control" id="long_call_strike" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="long_call_price" class="col-form-label">Long call price:</label>
+                            <input type="number" class="form-control" id="long_call_price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                            <label for="short_call_strike" class="col-form-label">Short Call Strike:</label>
+                            <input type="number" class="form-control" id="short_call_strike" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="short_call_price" class="col-form-label">Short Call Price:</label>
+                            <input type="number" class="form-control" id="short_call_price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="put_quantity" class="col-form-label">Put quantity</label>
+                            <input type="number" class="form-control" id="put_quantity" min="1" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+                            <label for="short_put_strike" class="col-form-label">Short Put Strike:</label>
+                            <input type="number" class="form-control" id="short_put_strike" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="short_put_price" class="col-form-label">Short Put Price:</label>
+                            <input type="number" class="form-control" id="short_put_price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault4">
+                            <label for="long_put_strike" class="col-form-label">Long Put Strike:</label>
+                            <input type="number" class="form-control" id="long_put_strike" min="0" step="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="long_put_price" class="col-form-label">Long Put Price:</label>
+                            <input type="number" class="form-control" id="long_put_price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown mt-4">
+                        <button class="btn btn-primary btn-block" id="calculatebtn" onclick="calculateOption()">Calculate</button>
+                        <button class="btn btn-primary btn-block" id="resetbtn" onclick="reset_stock_calc()" >Reset</button>
+                    </div>
+
+                    <h3 class="mt-4" >Results</h3>
+                    <table class="table text-end" id="option_results">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Total</th>
+                                <th>Call side</th>
+                                <th>Put side</th>
+                            </tr>
+                        </thead>
+                    
+                        <tbody>
+                            <tr>
+                                <td>Risk:</td>
+                                <td><p id="options-risk">0.00</p></td>
+                                <td><p id="options-risk-put">0.00</p></td>
+                                <td><p id="options-risk-call">0.00</p></td>
+                            </tr>
+                            <tr>
+                                <td>Reward:</td>
+                                <td><p id="options-reward">0.00</p></td>
+                                <td><p id="options-reward-put">0.00</p></td>
+                                <td><p id="options-reward-call">0.00</p></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                <h3>Option chain</h3>
+                <div class="form-group row mb-3">
+                    <label for="ltp" class="col-md-4 col-form-label">Symbol:</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="symbol"></input>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label for="sl" class="col-md-4 col-form-label">Expiry</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="expiry" list="expiries" value="{{expiry}}"></input>
+                        <datalist id="expiries">
+                            {% for exp in expiry_dates %}
+                            <option value="{{exp}}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-primary btn-block" id="fetchbtn" onclick="fetchurl()">Fetch</button>
+                </div>
+                {% if option_chain %}
+                <table class="table text-end" id="option_chain_opt">
+                    <thead>
+                        <tr>
+                            <th>CE Ltp</th>
+                            <th>Strike</th>
+                            <th>PE Ltp</th>
+                            <th>Spot %</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        {% for row in option_chain %}
+                        <tr {{('class="table-warning"' if row["strike"] == atm_strike) | safe}}>
+                            <td><a class="ce" href="#stock_results">{{ row["ce_ltp"] | formatfloat }}</a></td>
+                            <td class="strike">{{ row["strike"] }}</td>
+                            <td><a class="pe" href="#stock_results">{{ row["pe_ltp"] | formatfloat }}</a></td>
+                            <td>{{ (-(spot_ltp - row["strike"])/spot_ltp*100) | formatfloat }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+    <script>
+        // Options Calculator
+        document.getElementById("options-calculator-form").addEventListener("input", calculateOption); 
+
+        function calculateOption() {
+            // Calculate and update options risk and reward
+            const callQuantity = parseFloat(document.getElementById("call_quantity").value) || 0;
+            const longCallStrike = parseFloat(document.getElementById("long_call_strike").value) || 0;
+            const longCallPrice = parseFloat(document.getElementById("long_call_price").value) || 0;
+
+            const shortCallStrike = parseFloat(document.getElementById("short_call_strike").value) || 0;
+            const shortCallPrice = parseFloat(document.getElementById("short_call_price").value) || 0;
+
+            const shortPutStrike = parseFloat(document.getElementById("short_put_strike").value) || 0;
+            const shortPutPrice = parseFloat(document.getElementById("short_put_price").value) || 0;
+            const putQuantity = parseFloat(document.getElementById("put_quantity").value) || 0;
+
+            const longPutStrike = parseFloat(document.getElementById("long_put_strike").value) || 0;
+            const longPutPrice = parseFloat(document.getElementById("long_put_price").value) || 0;
+
+            localStorage.setItem("longCallStrike", longCallStrike);
+            localStorage.setItem("longCallPrice", longCallPrice);  
+            localStorage.setItem("callQuantity", callQuantity);
+
+            localStorage.setItem("shortCallStrike", shortCallStrike);
+            localStorage.setItem("shortCallPrice", shortCallPrice);
+
+            localStorage.setItem("shortPutStrike", shortPutStrike);
+            localStorage.setItem("shortPutPrice", shortPutPrice);
+            localStorage.setItem("putQuantity", putQuantity);
+
+            localStorage.setItem("longPutStrike", longPutStrike);
+            localStorage.setItem("longPutPrice", longPutPrice);
+
+            // Calculate risk and reward for short put (you can add similar calculations for other options)
+            var risk = 0;
+            var reward = 0;
+
+            callReward = (shortCallPrice - longCallPrice)*callQuantity;
+            putReward = (shortPutPrice - longPutPrice)*putQuantity;
+
+            var callRisk = undefined;
+            if (longCallStrike > 0 && shortCallStrike > 0) {
+                callRisk = (longCallStrike - shortCallStrike)*callQuantity - callReward;
+            }
+
+            var putRisk = undefined;
+            if (longPutStrike > 0 && shortPutStrike > 0) {
+                putRisk = -(longPutStrike - shortPutStrike)*putQuantity - putReward;
+            }
+
+            reward = (callReward || 0) + (putReward || 0);
+            putSideRisk = putRisk - callReward;
+            callSideRisk = callRisk - putReward;
+            risk = Math.max(putSideRisk || 0, callSideRisk || 0);
+
+            document.getElementById("options-risk").textContent = risk.toFixed(2);
+            document.getElementById("options-reward").textContent = reward.toFixed(2);
+            document.getElementById("options-risk-put").textContent = putSideRisk.toFixed(2);
+            document.getElementById("options-reward-put").textContent = putReward.toFixed(2);
+            document.getElementById("options-risk-call").textContent = callSideRisk.toFixed(2);
+            document.getElementById("options-reward-call").textContent = callReward.toFixed(2);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+           // document.getElementById("ltp").value = new Number(localStorage.getItem("ltp"));
+           // document.getElementById("sl").value = new Number(localStorage.getItem("sl"));  
+           // document.getElementById("capital").value = new Number(localStorage.getItem("capital"));  
+           // document.getElementById("lot_size").value = new Number(localStorage.getItem("lot_size"));  
+           // document.getElementById("option_strike").value = new Number(localStorage.getItem("option_strike"));  
+           // document.getElementById("option_price").value = new Number(localStorage.getItem("option_price"));  
+           // document.getElementById("future_price").value = new Number(localStorage.getItem("future_price"));  
+
+           document.getElementById("long_call_strike").value = new Number(localStorage.getItem("longCallStrike"));
+           document.getElementById("long_call_price").value = new Number(localStorage.getItem("longCallPrice"));  
+           document.getElementById("call_quantity").value = new Number(localStorage.getItem("callQuantity"));
+
+           document.getElementById("short_call_strike").value = new Number(localStorage.getItem("shortCallStrike"));
+           document.getElementById("short_call_price").value = new Number(localStorage.getItem("shortCallPrice"));
+
+           document.getElementById("short_put_strike").value = new Number(localStorage.getItem("shortPutStrike"));
+           document.getElementById("short_put_price").value = new Number(localStorage.getItem("shortPutPrice"));
+           document.getElementById("put_quantity").value = new Number(localStorage.getItem("putQuantity"));
+
+           document.getElementById("long_put_strike").value = new Number(localStorage.getItem("longPutStrike"));
+           document.getElementById("long_put_price").value = new Number(localStorage.getItem("longPutPrice"));
+            var searchParams = new URLSearchParams(window.location.search);
+            $("#symbol").val(searchParams.get("symbol"));
+        });
+
+        function reset_stock_calc(){
+            $('#options-calculator-form').find('input[type=number]').val('');
+        }
+
+        function fetchurl(){
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set("symbol", $("#symbol").val());
+            searchParams.set("expiry", $("#expiry").val());
+            window.location.search = searchParams;
+        }
+
+    </script>
+    {% if option_chain %}
+    <script>
+            $('#option_chain_opt a').click(function() {
+                var radios = $("input[name=flexRadioDefault]");
+                var next_radio = null;
+                for(i=0; i<radios.length; i++) {
+                    if (radios[i].checked) {
+                        next_radio_index = i+1 < radios.length ? i+1 : 0;
+                        next_radio = radios[next_radio_index];
+                        break;
+                    }
+                }
+                var price = $(this).html();
+                var input_strike = $("input[name=flexRadioDefault]:checked").nextAll(':input:first');
+                var input_price = input_strike.parent().next().children('input');
+                var strike = $(this).parent().parent().children(".strike").html();
+                
+                input_price.val(price);
+                input_strike.val(strike);
+
+                var targetClass = ".pe";
+                if ($(this).hasClass("pe")){
+                            targetClass=".ce";
+                        }
+                flip_option_price = $(this).closest("tr").find(targetClass).html();
+                console.log(flip_option_price);
+                calculate();
+                next_radio.click();
+            });
+    </script>
+    {% endif %}
