@@ -152,7 +152,7 @@ def get_option_chain(symbol, expiry, ltp=None, count=0):
                 atm_index = i
                 break
         if atm_index-count >= 0 and atm_index+count < len(results):
-            results = results[atm_index-count:atm_index+count]
+            results = results[atm_index-count+1:atm_index+count]
     return results
 
 @cached(ttl=30*24*3600)

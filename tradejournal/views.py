@@ -706,6 +706,7 @@ def crawl():
 @login_required
 def trade_calc():
     symbol = request.args.get('symbol', None)
+    active_tab = request.args.get('tab', 'stock')
     option_chain = None
     spot_ltp = None
     lot_size = None
@@ -719,7 +720,7 @@ def trade_calc():
             expiry = expiry_dates[0]
         if symbol:
             spot_ltp = stockutils.get_quote_spot(symbol)
-            option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 8)
+            option_chain = stockutils.get_option_chain(symbol, expiry, spot_ltp, 17)
             strikes = map(lambda x: x['strike'], option_chain)
             atm_strike = min(strikes, key=lambda x:abs(x-spot_ltp))
             lot_size = stockutils.get_lot_size(symbol)
@@ -734,7 +735,9 @@ def trade_calc():
             expiry_dates=expiry_dates,
             expiry=expiry, 
             atm_strike=atm_strike,
-            stoploss=sl)
+            stoploss=sl,
+            symbol=symbol,
+            active_tab = active_tab)
 
 @app.route('/tradecalc/strategies', methods=['GET'])
 @login_required

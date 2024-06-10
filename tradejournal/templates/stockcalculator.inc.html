@@ -111,7 +111,7 @@
                 <div class="form-group row mb-3">
                     <label for="ltp" class="col-md-4 col-form-label">Symbol:</label>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" id="symbol"></input>
+                        <input type="text" class="form-control" id="symbol" value="{{symbol if symbol else ''}}"></input>
                     </div>
                 </div>
 
@@ -154,6 +154,14 @@
                 {% endif %}
             </div>
     <script>
+        function fetchurl(){
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set("symbol", $("#symbol").val());
+            searchParams.set("expiry", $("#expiry").val());
+            searchParams.set("tab", "stock");
+            window.location.search = searchParams;
+        }
+
         // Stock Calculator
         var flip_option_price = 0;
         function calculate() {

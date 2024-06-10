@@ -5,30 +5,30 @@
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="myTabs">
         <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#stock">Stock</a>
+            <a class="nav-link {{ 'active' if active_tab == 'stock'}}" data-toggle="tab" href="#stock">Stock</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#options">Options</a>
+            <a class="nav-link {{ 'active' if active_tab == 'option'}}" data-toggle="tab" href="#options">Options</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#strategies">Strategies</a>
+            <a class="nav-link {{ 'active' if active_tab == 'strategy'}}" data-toggle="tab" href="#strategies">Strategies</a>
         </li>
     </ul>
 
     <!-- Tab content -->
     <div class="tab-content mt-3">
         <!-- Stock tab -->
-        <div id="stock" class="tab-pane fade show active">
+        <div id="stock" class="tab-pane fade {{ 'show active' if active_tab == 'stock'}}">
             {% include "stockcalculator.inc.html" %}
         </div>
 
         <!-- Options tab -->
-        <div id="options" class="tab-pane fade">
+        <div id="options" class="tab-pane fade {{'show active' if active_tab == 'option'}}">
             {% include "optioncalculator.inc.html" %}
         </div>
         
         <!-- Strategy tab -->
-        <div id="strategies" class="tab-pane fade">
+        <div id="strategies" class="tab-pane fade {{'show active' if active_tab == 'strategy'}}">
             {% include "strategycalculator.inc.html" %}
         </div>
     </div>

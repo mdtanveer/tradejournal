@@ -99,14 +99,14 @@
                 <div class="form-group row mb-3">
                     <label for="ltp" class="col-md-4 col-form-label">Symbol:</label>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" id="symbol_option"></input>
+                        <input type="text" class="form-control" id="symbol_option" value="{{symbol if symbol else ''}}"></input>
                     </div>
                 </div>
 
                 <div class="form-group row mb-3">
                     <label for="sl" class="col-md-4 col-form-label">Expiry</label>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" id="expiry" list="expiries" value="{{expiry}}"></input>
+                        <input type="text" class="form-control" id="expiry_option" list="expiries" value="{{expiry}}"></input>
                         <datalist id="expiries">
                             {% for exp in expiry_dates %}
                             <option value="{{exp}}"></option>
@@ -228,7 +228,6 @@
            document.getElementById("long_put_strike").value = new Number(localStorage.getItem("longPutStrike"));
            document.getElementById("long_put_price").value = new Number(localStorage.getItem("longPutPrice"));
             var searchParams = new URLSearchParams(window.location.search);
-            $("#symbol_option").val(searchParams.get("symbol"));
         });
 
         function reset_option_calc(){
@@ -238,7 +237,7 @@
         function fetchurlOption(){
             var searchParams = new URLSearchParams(window.location.search);
             searchParams.set("symbol", $("#symbol_option").val());
-            searchParams.set("expiry", $("#expiry").val());
+            searchParams.set("expiry", $("#expiry_option").val());
             searchParams.set("tab", "option");
             window.location.search = searchParams;
         }
