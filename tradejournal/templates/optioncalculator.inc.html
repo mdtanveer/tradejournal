@@ -81,6 +81,24 @@
                         </div>
                     </div>
                     
+                    <div class="row g-3">
+                        <div class="col-4 mb-2">
+                            <label for="capital_o" class="col-form-label">Capital</label>
+                        </div>
+                        <div class="col-4 mb-2">
+                            <input type="number" class="form-control" id="capital_o" min="1" step="1">
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-4 mb-2">
+                            <label for="lot_size_o" class="col-form-label">Lot size</label>
+                        </div>
+                        <div class="col-4 mb-2">
+                            <input type="number" class="form-control" id="lot_size_o" min="1" step="1">
+                        </div>
+                    </div>
+
                     <div class="dropdown mt-4">
                         <button class="btn btn-primary btn-block" id="calculatebtno" onclick="calculateOption()">Calculate</button>
                         <button class="btn btn-primary btn-block" id="resetbtno" onclick="reset_option_calc()" >Reset</button>
@@ -109,6 +127,12 @@
                                 <td><p id="options-reward">0.00</p></td>
                                 <td><p id="options-reward-call">0.00</p></td>
                                 <td><p id="options-reward-put">0.00</p></td>
+                            </tr>
+                            <tr>
+                                <td>Qty to trade:</td>
+                                <td></td>
+                                <td><p id="call_quantity_trade">0.00</p></td>
+                                <td><p id="put_quantity_trade">0.00</p></td>
                             </tr>
                         </tbody>
                     </table>
@@ -178,12 +202,9 @@
 
             const longPutStrike = parseFloat(document.getElementById("long_put_strike").value) || 0;
             const longPutPrice = parseFloat(document.getElementById("long_put_price").value) || 0;
+            const capital_o = parseFloat(document.getElementById("capital_o").value) || 0;
+            const lot_size_o = parseFloat(document.getElementById("lot_size_o").value) || 0;
 
-            localStorage.setItem("longCallStrike", longCallStrike);
-            localStorage.setItem("longCallPrice", longCallPrice);  
-            localStorage.setItem("callQuantity", callQuantity);
-
-            localStorage.setItem("shortCallStrike", shortCallStrike);
             localStorage.setItem("shortCallPrice", shortCallPrice);
 
             localStorage.setItem("shortPutStrike", shortPutStrike);
@@ -192,6 +213,9 @@
 
             localStorage.setItem("longPutStrike", longPutStrike);
             localStorage.setItem("longPutPrice", longPutPrice);
+            localStorage.setItem("longPutPrice", longPutPrice);
+            localStorage.setItem("capital_o", capital_o);
+            localStorage.setItem("lot_size_o", lot_size_o);
 
             // Calculate risk and reward for short put (you can add similar calculations for other options)
             var risk = 0;
@@ -214,6 +238,8 @@
             putSideRisk = putRisk - callReward;
             callSideRisk = callRisk - putReward;
             risk = Math.max(putSideRisk || 0, callSideRisk || 0);
+            putQtyTrade = Math.floor(putQuantity*capital_o/(risk*lot_size_o))*lot_size_o;
+            callQtyTrade = Math.floor(callQuantity*capital_o/(risk*lot_size_o))*lot_size_o;
 
             document.getElementById("options-risk").textContent = risk.toFixed(2);
             document.getElementById("options-reward").textContent = reward.toFixed(2);
@@ -221,17 +247,11 @@
             document.getElementById("options-reward-put").textContent = putReward.toFixed(2);
             document.getElementById("options-risk-call").textContent = callSideRisk.toFixed(2);
             document.getElementById("options-reward-call").textContent = callReward.toFixed(2);
+            document.getElementById("put_quantity_trade").textContent = putQtyTrade;
+            document.getElementById("call_quantity_trade").textContent = callQtyTrade;
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-           // document.getElementById("ltp").value = new Number(localStorage.getItem("ltp"));
-           // document.getElementById("sl").value = new Number(localStorage.getItem("sl"));  
-           // document.getElementById("capital").value = new Number(localStorage.getItem("capital"));  
-           // document.getElementById("lot_size").value = new Number(localStorage.getItem("lot_size"));  
-           // document.getElementById("option_strike").value = new Number(localStorage.getItem("option_strike"));  
-           // document.getElementById("option_price").value = new Number(localStorage.getItem("option_price"));  
-           // document.getElementById("future_price").value = new Number(localStorage.getItem("future_price"));  
-
            document.getElementById("long_call_strike").value = new Number(localStorage.getItem("longCallStrike"));
            document.getElementById("long_call_price").value = new Number(localStorage.getItem("longCallPrice"));  
            document.getElementById("call_quantity").value = new Number(localStorage.getItem("callQuantity"));
@@ -245,7 +265,9 @@
 
            document.getElementById("long_put_strike").value = new Number(localStorage.getItem("longPutStrike"));
            document.getElementById("long_put_price").value = new Number(localStorage.getItem("longPutPrice"));
-            var searchParams = new URLSearchParams(window.location.search);
+           document.getElementById("capital_o").value = new Number(localStorage.getItem("capital_o"));
+           document.getElementById("lot_size_o").value = new Number(localStorage.getItem("lot_size_o"));
+           var searchParams = new URLSearchParams(window.location.search);
         });
 
         function reset_option_calc(){
