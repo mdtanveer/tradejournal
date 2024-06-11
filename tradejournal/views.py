@@ -512,7 +512,7 @@ def quick_charts():
 def fetch_chart(symbol):
     tf = request.args.get('tf', '2h')
     if tf == '2h' or tf == '1h':
-        yahoo_params = (symbol, '90d', '1h', '.BO')
+        yahoo_params = (symbol, '6mo', '1h', '.BO')
     elif tf == '1d':
         yahoo_params = (symbol, '1y', '1d', '.NS')
     elif tf == '1wk':

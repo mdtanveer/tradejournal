@@ -49,7 +49,8 @@ def get_quote_data(symbol='RELIANCE', data_range='1d', data_interval='1h', prefe
             days = int(data_range[:-1])*365
         start_date = end_date - timedelta(days=days)
         df = yf.Ticker(ysymbol).history(interval=data_interval, start=start_date, end=end_date)
-
+    if df.empty:
+        raise Exception("Error fetching ticker history")
     df["Datetime"] = df.index.to_pydatetime()
     df["Datetime"] = df["Datetime"].apply(lambda x: x.replace(tzinfo=None))
     df = df.rename(columns = {'Open':'open', 'High':'high', 'Low':'low', 'Close':'close', 'Volume':'volume'})
