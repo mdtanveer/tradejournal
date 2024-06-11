@@ -2,64 +2,82 @@
                 <h1 class="mb-4">Options Risk and Reward Calculator</h1>
                 <div id="options-calculator-form">
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="call_quantity" class="col-form-label">Call quantity</label>
-                            <input type="number" class="form-control" id="call_quantity" min="1" step="1">
+                        <div class="col-4 mb-2">
+                        </div>
+                        <div class="col-4 mb-2">
+                            <span>Strike</span>
+                        </div>
+                        <div class="col-4 mb-2">
+                            <span>Price</span>
                         </div>
                     </div>
-
+                    
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-4 mb-2">
                             <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                            <label for="long_call_strike" class="col-form-label">Long call strike:</label>
+                            <label for="long_call_strike" class="col-form-label">Long call:</label>
+                        </div>
+                        <div class="col-4 mb-2">
                             <input type="number" class="form-control" id="long_call_strike" min="0" step="1">
                         </div>
-                        <div class="col-md-6">
-                            <label for="long_call_price" class="col-form-label">Long call price:</label>
+                        <div class="col-4 mb-2">
                             <input type="number" class="form-control" id="long_call_price" min="0" step="0.01">
                         </div>
                     </div>
                         
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-4 mb-2">
                             <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-                            <label for="short_call_strike" class="col-form-label">Short Call Strike:</label>
+                            <label for="short_call_strike" class="col-form-label">Short Call:</label>
+                        </div>
+                        <div class="col-4 mb-2">
                             <input type="number" class="form-control" id="short_call_strike" min="0" step="1">
                         </div>
-                        <div class="col-md-6">
-                            <label for="short_call_price" class="col-form-label">Short Call Price:</label>
+                        <div class="col-4 mb-2">
                             <input type="number" class="form-control" id="short_call_price" min="0" step="0.01">
                         </div>
                     </div>
                     
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="put_quantity" class="col-form-label">Put quantity</label>
-                            <input type="number" class="form-control" id="put_quantity" min="1" step="1">
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-4 mb-2">
                             <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
-                            <label for="short_put_strike" class="col-form-label">Short Put Strike:</label>
+                            <label for="short_put_strike" class="col-form-label">Short Put:</label>
+                        </div>
+                        <div class="col-4 mb-2">
                             <input type="number" class="form-control" id="short_put_strike" min="0" step="1">
                         </div>
-                        <div class="col-md-6">
-                            <label for="short_put_price" class="col-form-label">Short Put Price:</label>
+                        <div class="col-4 mb-2">
                             <input type="number" class="form-control" id="short_put_price" min="0" step="0.01">
                         </div>
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-4 mb-2">
                             <input class="" type="radio" name="flexRadioDefault" id="flexRadioDefault4">
-                            <label for="long_put_strike" class="col-form-label">Long Put Strike:</label>
+                            <label for="long_put_strike" class="col-form-label">Long Put:</label>
+                        </div>
+                        <div class="col-4 mb-2">
                             <input type="number" class="form-control" id="long_put_strike" min="0" step="1">
                         </div>
-                        <div class="col-md-6">
-                            <label for="long_put_price" class="col-form-label">Long Put Price:</label>
+                        <div class="col-4 mb-2">
                             <input type="number" class="form-control" id="long_put_price" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-4 mb-2">
+                            <label for="call_quantity" class="col-form-label">Call quantity</label>
+                        </div>
+                        <div class="col-4 mb-2">
+                            <input type="number" class="form-control" id="call_quantity" min="1" step="1">
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-4 mb-2">
+                            <label for="put_quantity" class="col-form-label">Put quantity</label>
+                        </div>
+                        <div class="col-4 mb-2">
+                            <input type="number" class="form-control" id="put_quantity" min="1" step="1">
                         </div>
                     </div>
                     
@@ -97,15 +115,15 @@
                     
                 <h3>Option chain</h3>
                 <div class="form-group row mb-3">
-                    <label for="ltp" class="col-md-4 col-form-label">Symbol:</label>
-                    <div class="col-md-8">
+                    <label for="ltp" class="col-4 col-form-label">Symbol:</label>
+                    <div class="col-8">
                         <input type="text" class="form-control" id="symbol_option" value="{{symbol if symbol else ''}}"></input>
                     </div>
                 </div>
 
                 <div class="form-group row mb-3">
-                    <label for="sl" class="col-md-4 col-form-label">Expiry</label>
-                    <div class="col-md-8">
+                    <label for="sl" class="col-4 col-form-label">Expiry</label>
+                    <div class="col-8">
                         <input type="text" class="form-control" id="expiry_option" list="expiries" value="{{expiry}}"></input>
                         <datalist id="expiries">
                             {% for exp in expiry_dates %}
@@ -256,8 +274,8 @@
                     }
                 }
                 var price = $(this).html();
-                var input_strike = $("input[name=flexRadioDefault]:checked").nextAll(':input:first');
-                var input_price = input_strike.parent().next().children('input');
+                var input_strike = $("input[name=flexRadioDefault]:checked").parent().next().find(':input:first');
+                var input_price = $("input[name=flexRadioDefault]:checked").parent().next().next().find(':input:first');
                 var strike = $(this).parent().parent().children(".strike").html();
                 
                 input_price.val(price);

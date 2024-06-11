@@ -2,53 +2,47 @@
                 <h1 class="mb-4">Stock Risk and Quantity Calculator</h1>
                 <form id="stock-calculator-form">
                 <div class="form-group row mb-3">
-                    <label for="ltp" class="col-md-4 col-form-label">LTP (Last Traded Price):</label>
-                    <div class="col-md-8">
+                    <label for="ltp" class="col-4 col-form-label">LTP:</label>
+                    <div class="col-8">
                         <input type="number" class="form-control" id="ltp" min="0" step="0.01" value="{{ spot_ltp }}" required ></input>
                     </div>
                 </div>
 
                 <div class="form-group row mb-3">
-                    <label for="sl" class="col-md-4 col-form-label">SL (Stop Loss):</label>
-                    <div class="col-md-8">
+                    <label for="sl" class="col-4 col-form-label">Stoploss:</label>
+                    <div class="col-8">
                         <input type="number" class="form-control" id="sl" min="0" step="0.01" value={{stoploss}}>
                     </div>
                 </div>
 
                 <div class="form-group row mb-3">
-                    <label for="lot_size" class="col-md-4 col-form-label">Lot Size:</label>
-                    <div class="col-md-8">
+                    <label for="lot_size" class="col-4 col-form-label">Lot Size:</label>
+                    <div class="col-8">
                         <input type="number" class="form-control" id="lot_size" min="1" step="1" value="{{ lot_size }}" required ></input>
                     </div>
                 </div>
 
                 <div class="form-group row mb-3">
-                    <label for="option_strike" class="col-md-4 col-form-label">Option Strike:</label>
-                    <div class="col-md-8">
+                    <label for="option_strike" class="col-4 col-form-label">Option Strike:</label>
+                    <div class="col-8">
                         <input type="number" class="form-control" id="option_strike" min="0" step="0.01" required>
                     </div>
                 </div>
 
                 <div class="form-group row mb-3">
-                    <label for="option_price" class="col-md-4 col-form-label">Option Price:</label>
-                    <div class="col-md-8">
+                    <label for="option_price" class="col-4 col-form-label">Option Price:</label>
+                    <div class="col-8">
                         <input type="number" class="form-control" id="option_price" min="0" step="0.01" required>
                     </div>
                 </div>
 
                 <div class="form-group row mb-3">
-                    <label for="capital" class="col-md-4 col-form-label">Capital:</label>
-                    <div class="col-md-8">
+                    <label for="capital" class="col-4 col-form-label">Capital:</label>
+                    <div class="col-8">
                         <input type="number" class="form-control" id="capital" min="0" step="0.01" value="150000" required>
                     </div>
                 </div>
                
-                <div class="form-group row mb-3">
-                    <label for="future_price" class="col-md-4 col-form-label">Future Price:</label>
-                    <div class="col-md-8">
-                        <input type="number" class="form-control" id="future_price" min="0" step="0.01" required>
-                    </div>
-                </div>
                 </form>
                 
                 <div class="dropdown">
@@ -68,6 +62,13 @@
                     </thead>
                     
                     <tbody>
+                        <tr>
+                            <td>Lots:</td>
+                            <td id="lots">0</td>
+                            <td id="lotso">0</td>
+                            <td id="lotsitm">0</td>
+                        </tr>
+                        
                         <tr>
                             <td>Quantity:</td>
                             <td id="quantity">0</td>
@@ -109,15 +110,15 @@
                 </table>
                 <h3>Option chain</h3>
                 <div class="form-group row mb-3">
-                    <label for="ltp" class="col-md-4 col-form-label">Symbol:</label>
-                    <div class="col-md-8">
+                    <label for="ltp" class="col-4 col-form-label">Symbol:</label>
+                    <div class="col-8">
                         <input type="text" class="form-control" id="symbol" value="{{symbol if symbol else ''}}"></input>
                     </div>
                 </div>
 
                 <div class="form-group row mb-3">
-                    <label for="sl" class="col-md-4 col-form-label">Expiry</label>
-                    <div class="col-md-8">
+                    <label for="sl" class="col-4 col-form-label">Expiry</label>
+                    <div class="col-8">
                         <input type="text" class="form-control" id="expiry" list="expiries" value="{{expiry}}"></input>
                         <datalist id="expiries">
                             {% for exp in expiry_dates %}
@@ -171,7 +172,6 @@
             const lot_size = parseInt(document.getElementById("lot_size").value);
             const option_strike = parseFloat(document.getElementById("option_strike").value);
             const option_price = parseFloat(document.getElementById("option_price").value);
-            const future_price = parseFloat(document.getElementById("future_price").value);
 
             localStorage.setItem("ltp",  ltp);
             localStorage.setItem("sl", sl);  
@@ -179,7 +179,6 @@
             localStorage.setItem("lot_size", lot_size);  
             localStorage.setItem("option_strike", option_strike);  
             localStorage.setItem("option_price", option_price);  
-            localStorage.setItem("future_price", future_price);  
 
             var risk = 0;
             var quantity = 0;
@@ -187,7 +186,8 @@
             risk = Math.abs(ltp - sl);
             lots = Math.floor(capital / (risk * lot_size));
             quantity = lots * lot_size;
-            document.getElementById("quantity").textContent = quantity.toString() + " (" + lots.toString() + " lots)" ;
+            document.getElementById("quantity").textContent = quantity.toString();
+            document.getElementById("lots").textContent = lots.toString();
             document.getElementById("risk_pips").textContent = risk.toFixed(2);
             document.getElementById("risk").textContent = (risk*quantity).toFixed(2);
             document.getElementById("risk_perlot").textContent = (risk*lot_size).toFixed(2);
@@ -198,7 +198,8 @@
                 lots = Math.floor(capital / (risk * lot_size));
                 quantity = lots * lot_size;
                 hedge_cost = option_price*quantity;
-                document.getElementById("quantityo").textContent = quantity.toString() + " (" + lots.toString() + " lots)";
+                document.getElementById("quantityo").textContent = quantity.toString();
+                document.getElementById("lotso").textContent = lots.toString();
                 document.getElementById("risko_pips").textContent = risk.toFixed(2);
                 document.getElementById("risko").textContent = (risk*quantity).toFixed(2);
                 document.getElementById("risko_perlot").textContent = (risk*lot_size).toFixed(2);
@@ -212,7 +213,8 @@
                 lots = Math.floor(capital / (risk * lot_size));
                 quantity = lots * lot_size;
                 hedge_cost_pips = risk - Math.abs(option_strike-ltp);
-                document.getElementById("quantityitm").textContent = quantity.toString() + " (" + lots.toString() + " lots)";
+                document.getElementById("quantityitm").textContent = quantity.toString();
+                document.getElementById("lotsitm").textContent = lots.toString();
                 document.getElementById("riskitm_pips").textContent = risk.toFixed(2);
                 document.getElementById("riskitm").textContent = (risk*quantity).toFixed(2);
                 document.getElementById("riskitm_perlot").textContent = (risk*lot_size).toFixed(2);
