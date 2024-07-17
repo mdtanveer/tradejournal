@@ -14,7 +14,7 @@ YAHOO_SYMBOL_MAPPINGS={
     'GOLD' : 'GC=F',
     'SILVER' : 'SI=F',
     'COPPER' : 'HG=F',
-    #'ALUMINIUM' : 'ALI=F',
+    'ALUMINIUM' : 'ALI=F',
     'USDINR' : 'INR=X',
     'GBPINR' : 'GBPINR=X',
     'JPYINR' : 'JPYINR=X',
@@ -28,6 +28,8 @@ YAHOO_SYMBOL_MAPPINGS={
     "CNXFMCG": "^CNXFMCG", 
     "CNXENERGY": "^CNXENERGY", 
     "CNXPHARMA": "^CNXPHARMA",
+    "BANKEX": "BSE-BANK.BO",
+    "SENSEX": "^BSESN",
 }
 
 def get_yahoo_symbol(symbol, preferred_exc):
