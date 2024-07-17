@@ -40,6 +40,7 @@ class JournalEntryGroup(object):
         self.name = entity['name'] if 'name' in entity.keys() else ''
         self.items = entity["items"] if 'items' in entity.keys() else ''
         self.deserialized_items = []
+        self.is_virtual = False
 
     def populate_children(self, indict, alljournalentries):
         if not self.items:
@@ -94,6 +95,24 @@ class JournalEntryGroup(object):
             sum += je.points_gain()
         return sum
 
+    def entry_cost(self):
+        sum = 0
+        for je in self.deserialized_items:
+            sum += je.entry_cost
+        return sum
+    
+    def exit_cost(self):
+        sum = 0
+        for je in self.deserialized_items:
+            sum += je.exit_cost
+        return sum
+
+    def profit_percent(self):
+        if self.entry_cost() != 0:
+            return self.profit()/self.entry_cost()*100
+        else:
+            return 0
+
     def profit(self):
         sum = 0
         for je in self.deserialized_items:
@@ -128,7 +147,7 @@ class JournalEntryGroup(object):
             group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[1]
         elif grouptype == 'status':
             group_func = lambda x: x.is_open()
-            groupview_translate_func = lambda n: "Realized" if n else "Unrealized"
+            groupview_translate_func = lambda n: "Realized" if not n else "Unrealized"
         else:
             return self
 
@@ -137,6 +156,7 @@ class JournalEntryGroup(object):
         jgnew = JournalEntryGroup(None, {})
         jgnew.name = self.name
         jgnew.deserialized_items.extend(group_items)
+        jgnew.is_virtual = True
         for k,group in itertools.groupby(sorted(entry_items, key=group_func), group_func):
             jenew = functools.reduce(lambda a,b: a.reduce(b), group, JournalEntry(None, {}))
             jenew.tradingsymbol = groupview_translate_func(k)
@@ -252,6 +272,8 @@ class JournalEntry(object):
         self.points_gain_prop = None
         self.profit_prop = None
         self.quantity_prop = None
+        self.entry_cost = 0
+        self.exit_cost = 0
     
     def reduce(self, other):
         jenew = JournalEntry(None, {})
@@ -260,6 +282,8 @@ class JournalEntry(object):
         jenew.points_gain_prop = self.points_gain() + other.points_gain()
         jenew.profit_prop = self.profit()+ other.profit()
         jenew.quantity_prop = float(self.directionalqty()) + float(other.directionalqty())
+        jenew.entry_cost = float(self.entry_cost)+float(other.entry_price)*float(other.directionalqty())
+        jenew.exit_cost = float(self.exit_cost)+float(other.exit_price)*float(other.directionalqty())
         return jenew
 
     async def fetch_exit_price_as_ltp(self, force_refresh):
@@ -406,6 +430,9 @@ class JournalEntry(object):
                     }
             return result
         raise TypeError("Not an option or trade is closed")
+
+    def profit_percent(self):
+        return self.profit()/self.entry_cost*100 if self.entry_cost != 0 else 0
 
 
 class JournalEntryNotFound(Exception):

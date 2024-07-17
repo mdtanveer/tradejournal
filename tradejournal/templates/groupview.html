@@ -35,10 +35,19 @@
             <td>Instrument</td>
             <td>Entry</td>
             <td>Exit</td>
+            {% if journalentrygroup.is_virtual %}
+            <td>Entry Cost</td>
+            <td>Exit Cost</td>
+            {% else %}
             <td>Entry Price</td>
             <td>Exit Price</td>
+            {% endif %}
             <td>Quantity</td>
-            <td style="text-align:right">Gain</td>
+            {% if journalentrygroup.is_virtual %}
+            <td style="text-align:right">Gain %</td>
+            {% else %}
+            <td style="text-align:right">Pips</td>
+            {% endif %}
             <td style="text-align:right">Profit</td>
         </tr>
         </thead>
@@ -52,16 +61,29 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td>{{'%0.2f' % journalentry.points_gain() | float}}</td>
+            {% if journalentrygroup.is_virtual %}
+                <td style="text-align:right">{{'%0.2f' % journalentry.profit_percent() | float}}</td>
+            {% else %}
+                <td style="text-align:right">{{'%0.2f' % journalentry.points_gain() | float}}</td>
+            {% endif %}
                 <td>{{'%0.2f' % journalentry.profit() | float}}</td>
             {% else %}
                 <td> <a href="/journalentry/{{journalentry.key}}/edit" style="text-decoration:none">{{journalentry.get_tradingsymbol_forview(False) | safe}}</a></td>
                 <td>{{journalentry.entry_time|formatdateonly}}</td>
                 <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
+            {% if journalentrygroup.is_virtual %}
+                <td>{{journalentry.entry_cost}}</td>
+                <td>{{journalentry.exit_cost}}</td>
+            {% else %}
                 <td>{{journalentry.entry_price}}</td>
                 <td>{{journalentry.exit_price}}</td>
+            {% endif %}
                 <td>{{journalentry.directionalqty()}}</td>
+            {% if journalentrygroup.is_virtual %}
+                <td style="text-align:right">{{'%0.2f' % journalentry.profit_percent() | float}}</td>
+            {% else %}
                 <td style="text-align:right">{{'%0.2f' % journalentry.points_gain() | float}}</td>
+            {% endif %}
                 <td style="text-align:right">{{'%0.2f' % journalentry.profit() | float}}</td>
             {% endif %}
         </tr>
@@ -72,10 +94,19 @@
             <td>Total</td>
             <td></td>
             <td></td>
+            {% if journalentrygroup.is_virtual %}
+            <td>{{journalentrygroup.entry_cost()}}</td>
+            <td>{{journalentrygroup.exit_cost()}}</td>
+            {% else %}
             <td></td>
             <td></td>
+            {% endif %}
             <td></td>
+            {% if journalentrygroup.is_virtual %}
+            <td style="text-align:right">{{'%0.2f' % journalentrygroup.profit_percent() | float}}</td>
+            {% else %}
             <td style="text-align:right">{{'%0.2f' % journalentrygroup.points_gain() | float}}</td>
+            {% endif %}
             <td style="text-align:right">{{'%0.2f' % journalentrygroup.profit() | float}}</td>
         </tr>
         </tfoot>
