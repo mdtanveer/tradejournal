@@ -117,6 +117,7 @@ class JournalEntryGroup(object):
         return category
 
     def groupby(self, grouptype):
+        groupview_translate_func = lambda x: x
         if grouptype == 'symbol':
             group_func = lambda x: x.symbol
         elif grouptype == 'instrument':
@@ -125,6 +126,9 @@ class JournalEntryGroup(object):
             group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[3]
         elif grouptype == 'expiry':
             group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[1]
+        elif grouptype == 'status':
+            group_func = lambda x: x.is_open()
+            groupview_translate_func = lambda n: "Realized" if n else "Unrealized"
         else:
             return self
 
@@ -133,9 +137,9 @@ class JournalEntryGroup(object):
         jgnew = JournalEntryGroup(None, {})
         jgnew.name = self.name
         jgnew.deserialized_items.extend(group_items)
-        for k,group in itertools.groupby(entry_items, group_func):
-            jenew = functools.reduce(lambda a,b: a.reduce(b), group)
-            jenew.tradingsymbol = k
+        for k,group in itertools.groupby(sorted(entry_items, key=group_func), group_func):
+            jenew = functools.reduce(lambda a,b: a.reduce(b), group, JournalEntry(None, {}))
+            jenew.tradingsymbol = groupview_translate_func(k)
             jenew.key = ''
             jgnew.deserialized_items.append(jenew)
         return jgnew
@@ -231,11 +235,11 @@ class JournalEntry(object):
             self.exit_time = toIST_fromtimestamp(float(entity['exit_time'])) 
         except Exception as e:
             self.exit_time = toIST_fromtimestamp(0)
-        self.entry_price = entity['entry_price'] if 'entry_price' in entity.keys() else ''
-        self.exit_price = entity['exit_price'] if 'exit_price' in entity.keys() else '' 
-        self.quantity = entity['quantity'] if 'quantity' in entity.keys() else ''
-        self.entry_sl = entity['entry_sl'] if 'entry_sl' in entity.keys() else ''
-        self.entry_target = entity['entry_target'] if 'entry_target' in entity.keys() else ''
+        self.entry_price = entity['entry_price'] if 'entry_price' in entity.keys() else 0
+        self.exit_price = entity['exit_price'] if 'exit_price' in entity.keys() else 0
+        self.quantity = entity['quantity'] if 'quantity' in entity.keys() else 0
+        self.entry_sl = entity['entry_sl'] if 'entry_sl' in entity.keys() else 0
+        self.entry_target = entity['entry_target'] if 'entry_target' in entity.keys() else 0
         self.direction = entity['direction'] if 'direction' in entity.keys() else ''
         self.rating = entity['rating'] if 'rating' in entity.keys() else ''
         self.strategy = entity['strategy'] if 'strategy' in entity.keys() and not not entity['strategy'] else 'default'
