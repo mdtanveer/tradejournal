@@ -742,17 +742,25 @@ def trade_calc():
 @app.route('/tradecalc/strategies', methods=['GET'])
 @login_required
 def trade_calc_strategies():
-    symbols = ["NIFTY", "BANKNIFTY", "HDFCBANK", "ICICIBANK", "AXISBANK", "SBIN", "LT", "TITAN", "RELIANCE"]
+    mib = ["BANKNIFTY", "HDFCBANK", "ICICIBANK", "AXISBANK", "SBIN", "KOTAKBANK"]
+    cc = ["LT", "TITAN", "RELIANCE", "INFY", "HDFCBANK", "NIFTY"]
+    symbols = set(mib+cc)
+    
     LTP = {}
     for symbol in symbols:
         LTP[symbol] = stockutils.get_quote_spot(symbol)
-    df = pd.DataFrame.from_dict(LTP, orient='index', columns=['ltp'])
-    df["2% up"] = df["ltp"]*1.02
-    df["4% up"] = df["ltp"]*1.04
+    df = pd.DataFrame.from_dict({k:v for k,v in LTP.items() if k in mib}, orient='index', columns=['ltp'])
     df["2% down"] = df["ltp"]*0.98
+    df["3% down"] = df["ltp"]*0.97
     df["4% down"] = df["ltp"]*0.96
 
-    return df.to_html(classes="table")
+    mib_html = df.to_html(classes="table")
+
+    df = pd.DataFrame.from_dict({k:v for k,v in LTP.items() if k in cc}, orient='index', columns=['ltp'])
+    df["4% up"] = df["ltp"]*1.04
+    cc_html = df.to_html(classes="table")
+
+    return "<html><body>" + mib_html + cc_html + "</body></html>"
 
 
 @app.template_filter('formatdatetimeinput')

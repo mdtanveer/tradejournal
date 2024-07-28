@@ -1,5 +1,8 @@
 <div class="container">
-    <div id="ltp_table"></div>
+    <h3>Mib</h3>
+    <div id="mib_table"></div>
+    <h3>Cc</h3>
+    <div id="cc_table"></div>
     <button class="btn btn-primary btn-block" id="calculatebtn" onclick="fetch_ltp_table()">Fetch</button>
     <script>
         function fetch_ltp_table(){
@@ -10,8 +13,9 @@
             })
             .then(function(html) {
                     var doc = new DOMParser().parseFromString(html, 'text/html');
-                    var table = doc.getElementsByTagName('table')[0];
-                    document.getElementById("ltp_table").append(table);
+                    var tables = doc.getElementsByTagName('table');
+                    document.getElementById("mib_table").append(tables[0]);
+                    document.getElementById("cc_table").append(tables[0]);
             })
             .catch(function(err) {  
                 console.log('Failed to fetch page: ', err);  
