@@ -196,17 +196,12 @@ class JournalEntryGroup(object):
                 else:
                     if leg['expiry'] != expiry:
                         raise TypeError("Non-homogeneous expiry found")
-                if not entry_date:
-                    entry_date = leg['entry_date']
-                else:
-                    if leg['entry_date'] != entry_date:
-                        raise TypeError("Non-homogeneous entry found")
                 legs.append(leg['strategy'])
 
         if underlying == None:
             raise Exception("Invalid symbol")
 
-        model =  {'symbol': underlying, 'expiry': expiry, 'entry_date': entry_date, 'legs': legs}
+        model =  {'symbol': underlying, 'expiry': expiry, 'legs': legs}
         return model
 
     async def get_optionlab_result_async(self):
@@ -222,7 +217,7 @@ class JournalEntryGroup(object):
             strikes_avg = sum(strikes)/len(strikes)
         inputs_data = {
             "stock_price": spot_price, 
-            "start_date": model['entry_date'],
+            "start_date": datetime.now().date(),
             "target_date": model['expiry'],
             "volatility": stockutils.get_india_vix()/100,
             "interest_rate": 0.0002,
@@ -418,21 +413,34 @@ class JournalEntry(object):
         return premium
 
     def get_optionlab_strategy(self):
-        if self.is_open() and self.is_option():
+        if self.is_option():
             symbol, expiry, optionytype, strike = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
-            result =  {
-                    'expiry' : datetime.strptime(expiry, "%d-%b-%Y").date(),
-                    'symbol' : symbol,
-                    'entry_date' : self.entry_time.date(),
-                    'strategy': {
-                        "type": "put" if optionytype == "PE" else "call",
-                        "strike": strike,
-                        "premium": float(self.entry_price),
-                        "n": float(self.quantity),
-                        "action":"buy" if self.direction == 'LONG' else "sell"
+            if self.is_open():
+                result =  {
+                        'expiry' : datetime.strptime(expiry, "%d-%b-%Y").date(),
+                        'symbol' : symbol,
+                        'entry_date' : self.entry_time.date(),
+                        'strategy': {
+                            "type": "put" if optionytype == "PE" else "call",
+                            "strike": strike,
+                            "premium": float(self.entry_price),
+                            "n": float(self.quantity),
+                            "action":"buy" if self.direction == 'LONG' else "sell",
+                            "expiration": (datetime.strptime(expiry, "%d-%b-%Y") - datetime.now()).days
+                            }
                         }
-                    }
-            return result
+                return result
+            else:
+                result =  {
+                        'expiry' : datetime.strptime(expiry, "%d-%b-%Y").date(),
+                        'symbol' : symbol,
+                        'entry_date' : self.entry_time.date(),
+                        'strategy': {
+                            "type": "closed",
+                            "prev_pos": self.profit()
+                            }
+                        }
+                return result
         raise TypeError("Not an option or trade is closed")
 
     def profit_percent(self):
