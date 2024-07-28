@@ -183,7 +183,9 @@ class JournalEntryGroup(object):
         underlying = None
         expiry = None
         entry_date = None
-        for je in self.deserialized_items:
+        open_items = filter(lambda x: x.is_open(), self.deserialized_items)
+        closed_items = filter(lambda x: not x.is_open(), self.deserialized_items)
+        for je in open_items:
             if not je.is_group():
                 leg = je.get_optionlab_strategy()
                 if not underlying:
@@ -197,6 +199,13 @@ class JournalEntryGroup(object):
                     if leg['expiry'] != expiry:
                         raise TypeError("Non-homogeneous expiry found")
                 legs.append(leg['strategy'])
+
+        closed_leg = {'type': 'closed', 'prev_pos': 0}
+        for je in closed_items:
+            if not je.is_group():
+                closed_leg['prev_pos'] += je.profit()
+        
+        legs.append(closed_leg)
 
         if underlying == None:
             raise Exception("Invalid symbol")
