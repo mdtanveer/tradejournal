@@ -57,7 +57,9 @@
         {% for journalentry in journalentrygroup.deserialized_items %}
         <tr>
             {% if journalentry.is_group() %}
-                <td> <a href="/journalentrygroup/{{journalentry.key}}/view" style="text-decoration:none">{{journalentry.name}}</a></td>
+                <td> 
+                    <a href="/journalentrygroup/{{journalentry.key}}/view" style="text-decoration:none">{{journalentry.name}}</a>
+                </td>
                 <td>{{journalentry.entry_time|formatdateonly}}</td>
                 <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
                 <td></td>
@@ -70,7 +72,13 @@
             {% endif %}
                 <td>{{'%0.2f' % journalentry.profit() | float}}</td>
             {% else %}
-                <td> <a href="/journalentry/{{journalentry.key}}/edit" style="text-decoration:none">{{journalentry.get_tradingsymbol_forview(False) | safe}}</a></td>
+                <td> 
+                    {% if journalentry.key %}
+                    <a href="/journalentry/{{journalentry.key}}/edit" style="text-decoration:none">{{journalentry.get_tradingsymbol_forview(False) | safe}}</a>
+                    {% else %}
+                    {{journalentry.get_tradingsymbol_forview(False) | safe}}
+                    {% endif %}
+                </td>
                 <td>{{journalentry.entry_time|formatdateonly}}</td>
                 <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
             {% if journalentrygroup.is_virtual %}

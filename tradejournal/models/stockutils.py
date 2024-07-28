@@ -6,6 +6,7 @@ import urllib
 import jmespath
 import requests
 import json
+from .tradejournalexceptions import ExpiryNotFoundException
 
 #examples
 # monthly expiry PE BANKNIFTY21SEP37500PE
@@ -36,7 +37,7 @@ def get_expiry_day(symbol, year, month_abbr):
             if exp.endswith(f"{month_abbr}-{year}"):
                 expiry_day = exp.split('-')[0]
                 return expiry_day
-    raise Exception(f"Couldn't find a valid expiry day for {year}-{month_abbr}, {symbol}")
+    raise ExpiryNotFoundException(f"Couldn't find a valid expiry day for {year}-{month_abbr}, {symbol}")
         
 def convert_from_zerodha_convention(name, expiry_fetch=True):
     name = str(name)

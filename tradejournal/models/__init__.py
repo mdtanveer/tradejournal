@@ -15,6 +15,9 @@ from memoization import cached
 import asyncio
 import plotly
 import plotly.express as px
+from .tradejournalexceptions import ExpiryNotFoundException
+
+DAYSHIFT=5
 
 def IST_now():
     return pytz.UTC.localize(datetime.utcnow()).astimezone(pytz.timezone('Asia/Calcutta'))
@@ -149,9 +152,9 @@ class JournalEntryGroup(object):
             group_func = lambda x: x.is_open()
             groupview_translate_func = lambda n: "Realized" if not n else "Unrealized"
         elif grouptype == 'symbolandentry':
-            group_func = lambda x: x.symbol + ":" + str(x.entry_time.date())
+            group_func = lambda x: str(x.entry_time.date()) + ': ' + x.symbol 
         elif grouptype == 'symbolandexpiry':
-            group_func = lambda x: x.symbol + ":" + stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[1]
+            group_func = lambda x: stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[1] + ': ' + x.symbol 
         else:
             return self
 
@@ -183,11 +186,24 @@ class JournalEntryGroup(object):
         underlying = None
         expiry = None
         entry_date = None
-        open_items = filter(lambda x: x.is_open(), self.deserialized_items)
-        closed_items = filter(lambda x: not x.is_open(), self.deserialized_items)
+        open_items = list(filter(lambda x: x.is_open(), self.deserialized_items))
+        closed_items = list(filter(lambda x: not x.is_open(), self.deserialized_items))
+        
+        override_closed = False
+
+        if len(open_items) == 0 and len(closed_items) > 0:
+            print("Overriding closed items as open for analysis")
+            open_items = closed_items
+            closed_items = []
+            override_closed = True
+
+        if len(open_items) == 0:
+            raise Exception("No trades as input")
+
         for je in open_items:
             if not je.is_group():
-                leg = je.get_optionlab_strategy()
+                leg = je.get_optionlab_strategy(override_closed)
+                print(leg)
                 if not underlying:
                     underlying = leg['symbol']
                 else:
@@ -204,11 +220,12 @@ class JournalEntryGroup(object):
         for je in closed_items:
             if not je.is_group():
                 closed_leg['prev_pos'] += je.profit()
-        
-        legs.append(closed_leg)
+
+        if closed_leg['prev_pos'] > 0:
+            legs.append(closed_leg)
 
         if underlying == None:
-            raise Exception("Invalid symbol")
+            raise Exception("Invalid symbol1")
 
         model =  {'symbol': underlying, 'expiry': expiry, 'legs': legs}
         return model
@@ -222,12 +239,22 @@ class JournalEntryGroup(object):
         spot_price = stockutils.get_quote_spot(model['symbol'])
         strikes = [stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[3] for x in self.deserialized_items]
         strikes_avg = spot_price
+
         if len(strikes) > 0:
             strikes_avg = sum(strikes)/len(strikes)
+
+        start_date = (datetime.now() - timedelta(days=DAYSHIFT)).date()
+        target_date = datetime.now().date()
+        if model['expiry']:
+            start_date = datetime.now().date()
+            target_date = model['expiry']
+        else:
+            spot_price = strikes_avg
+
         inputs_data = {
             "stock_price": spot_price, 
-            "start_date": datetime.now().date(),
-            "target_date": model['expiry'],
+            "start_date": start_date,
+            "target_date": target_date,
             "volatility": stockutils.get_india_vix()/100,
             "interest_rate": 0.0002,
             "min_stock": round(strikes_avg * 0.94, 2),
@@ -235,6 +262,8 @@ class JournalEntryGroup(object):
             "strategy": model['legs'],
             "mc_prices_number": 100
             }
+
+        print(inputs_data)
 
         inputs = Inputs.model_validate(inputs_data)
         st = StrategyEngine(inputs)
@@ -421,13 +450,28 @@ class JournalEntry(object):
             premium = -premium
         return premium
 
-    def get_optionlab_strategy(self):
+    def get_optionlab_strategy(self, override_closed = False):
         if self.is_option():
-            symbol, expiry, optionytype, strike = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
-            if self.is_open():
+            expiry_valid = True
+            try:
+                symbol, expiry, optionytype, strike = stockutils.convert_from_zerodha_convention(self.tradingsymbol)
+                expiry = datetime.strptime(expiry, "%d-%b-%Y").date()
+                if datetime.now().date() >= expiry:
+                    expiry_valid = False
+            except ExpiryNotFoundException:
+                symbol, expiry, optionytype, strike = stockutils.convert_from_zerodha_convention(self.tradingsymbol, False)
+                expiry_valid = False
+
+            days_to_expiry = DAYSHIFT - 1
+            if expiry_valid:
+                days_to_expiry = (expiry - datetime.now().date()).days-1
+            else:
+                expiry = None
+
+            if override_closed or self.is_open():
                 result =  {
-                        'expiry' : datetime.strptime(expiry, "%d-%b-%Y").date(),
                         'symbol' : symbol,
+                        'expiry' : expiry,
                         'entry_date' : self.entry_time.date(),
                         'strategy': {
                             "type": "put" if optionytype == "PE" else "call",
@@ -435,14 +479,14 @@ class JournalEntry(object):
                             "premium": float(self.entry_price),
                             "n": float(self.quantity),
                             "action":"buy" if self.direction == 'LONG' else "sell",
-                            "expiration": (datetime.strptime(expiry, "%d-%b-%Y") - datetime.now()).days
+                            "expiration": days_to_expiry
                             }
                         }
                 return result
-            else:
+            elif not override_closed:
                 result =  {
-                        'expiry' : datetime.strptime(expiry, "%d-%b-%Y").date(),
                         'symbol' : symbol,
+                        'expiry' : expiry,
                         'entry_date' : self.entry_time.date(),
                         'strategy': {
                             "type": "closed",

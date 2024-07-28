@@ -1,0 +1,4 @@
+
+class ExpiryNotFoundException(Exception):
+    pass
+

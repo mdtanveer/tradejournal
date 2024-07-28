@@ -58,3 +58,4 @@ def get_inst_type(tradingsymbol):
         return 'future'
     else:
         return 'default'
+
