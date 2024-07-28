@@ -148,6 +148,10 @@ class JournalEntryGroup(object):
         elif grouptype == 'status':
             group_func = lambda x: x.is_open()
             groupview_translate_func = lambda n: "Realized" if not n else "Unrealized"
+        elif grouptype == 'symbolandentry':
+            group_func = lambda x: x.symbol + ":" + str(x.entry_time.date())
+        elif grouptype == 'symbolandexpiry':
+            group_func = lambda x: x.symbol + ":" + stockutils.convert_from_zerodha_convention(x.tradingsymbol, False)[1]
         else:
             return self
 
