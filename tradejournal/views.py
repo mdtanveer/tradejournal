@@ -746,9 +746,7 @@ def trade_calc_strategies():
     cc = ["LT", "TITAN", "RELIANCE", "INFY", "HDFCBANK", "NIFTY"]
     symbols = set(mib+cc)
     
-    LTP = {}
-    for symbol in symbols:
-        LTP[symbol] = stockutils.get_quote_spot(symbol)
+    LTP =stockutils.get_quote_multiple(symbols) 
     df = pd.DataFrame.from_dict({k:v for k,v in LTP.items() if k in mib}, orient='index', columns=['ltp'])
     df["2% down"] = df["ltp"]*0.98
     df["3% down"] = df["ltp"]*0.97

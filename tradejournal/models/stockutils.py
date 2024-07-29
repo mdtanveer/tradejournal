@@ -7,6 +7,7 @@ import jmespath
 import requests
 import json
 from .tradejournalexceptions import ExpiryNotFoundException
+import pandas as pd
 
 #examples
 # monthly expiry PE BANKNIFTY21SEP37500PE
@@ -187,6 +188,17 @@ def get_lot_sizes_dhan():
     result = {x[0]:int(x[1].split()[0]) for x in lots}
     return result
 
+def get_quote_multiple(symbols):
+    df = nsepython.nse_get_advances_declines()
+    sr = pd.Series(index=list(symbols), name="targetsymbol")
+    df2 = df[["symbol", "lastPrice"]].join(sr, on='symbol', how="inner")
+    df3 = df2.set_index("symbol")[['lastPrice']]
+    df3['lastPrice'] = df3['lastPrice'].astype(float)
+    res = df3.to_dict()['lastPrice']
+    left = set(symbols).difference(set(res.keys()))
+    for symbol in left:
+        res[symbol] = get_quote_spot(symbol)
+    return res
 
 def test():
     me = "BANKNIFTY21SEP37500PE"

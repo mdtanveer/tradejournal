@@ -464,7 +464,7 @@ class JournalEntry(object):
 
             days_to_expiry = DAYSHIFT - 1
             if expiry_valid:
-                days_to_expiry = (expiry - datetime.now().date()).days-1
+                days_to_expiry = (expiry - datetime.now().date()).days
             else:
                 expiry = None
 
