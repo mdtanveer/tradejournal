@@ -16,6 +16,7 @@ import asyncio
 import plotly
 import plotly.express as px
 from .tradejournalexceptions import ExpiryNotFoundException
+import numpy as np
 
 DAYSHIFT=5
 
@@ -243,10 +244,10 @@ class JournalEntryGroup(object):
         if len(strikes) > 0:
             strikes_avg = sum(strikes)/len(strikes)
 
-        start_date = (datetime.now() - timedelta(days=DAYSHIFT)).date()
-        target_date = datetime.now().date()
+        target_date = np.busday_offset(datetime.now().date(), 0, roll="backward").astype(datetime)
+        start_date = np.busday_offset(target_date, -DAYSHIFT, roll="forward").astype(datetime)
         if model['expiry']:
-            start_date = datetime.now().date()
+            start_date = np.busday_offset(datetime.now().date(), 0, roll="backward").astype(datetime)
             target_date = model['expiry']
         else:
             spot_price = strikes_avg
@@ -462,9 +463,10 @@ class JournalEntry(object):
                 symbol, expiry, optionytype, strike = stockutils.convert_from_zerodha_convention(self.tradingsymbol, False)
                 expiry_valid = False
 
-            days_to_expiry = DAYSHIFT - 1
+            days_to_expiry = DAYSHIFT
             if expiry_valid:
-                days_to_expiry = (expiry - datetime.now().date()).days
+                start_date = np.busday_offset(datetime.now().date(), 0, roll="backward").astype(datetime)
+                days_to_expiry = np.busday_count(start_date, expiry)
             else:
                 expiry = None
 

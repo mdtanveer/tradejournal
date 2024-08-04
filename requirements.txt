@@ -20,3 +20,4 @@ jugaad-trader
 gunicorn[gthread]
 memoization
 optionlab
+numpy
