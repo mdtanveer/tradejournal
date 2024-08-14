@@ -166,7 +166,10 @@ class JournalEntryGroup(object):
         jgnew.deserialized_items.extend(group_items)
         jgnew.is_virtual = True
         for k,group in itertools.groupby(sorted(entry_items, key=group_func), group_func):
-            jenew = functools.reduce(lambda a,b: a.reduce(b), group, JournalEntry(None, {}))
+            jeaccum = JournalEntry(None, {})
+            jeaccum.entry_time = None
+            jeaccum.exit_time = None
+            jenew = functools.reduce(lambda a,b: a.reduce(b), group, jeaccum)
             jenew.tradingsymbol = groupview_translate_func(k)
             jenew.key = ''
             jgnew.deserialized_items.append(jenew)
@@ -315,8 +318,14 @@ class JournalEntry(object):
     
     def reduce(self, other):
         jenew = JournalEntry(None, {})
-        jenew.entry_time = min(self.entry_time, other.entry_time)
-        jenew.exit_time = toIST_fromtimestamp(0) if self.is_open() or other.is_open() else max(self.exit_time, other.exit_time)
+        if self.entry_time == None:
+            jenew.entry_time = other.entry_time
+        else:
+            jenew.entry_time = min(self.entry_time, other.entry_time) if other.has_valid_entry_time() else self.entry_time
+        if self.exit_time == None:
+            jenew.exit_time = other.exit_time
+        else:
+            jenew.exit_time = toIST_fromtimestamp(0) if self.is_open() or other.is_open() else max(self.exit_time, other.exit_time)
         jenew.points_gain_prop = self.points_gain() + other.points_gain()
         jenew.profit_prop = self.profit()+ other.profit()
         jenew.quantity_prop = float(self.directionalqty()) + float(other.directionalqty())
@@ -343,7 +352,7 @@ class JournalEntry(object):
         return self.entry_time != toIST_fromtimestamp(0)
 
     def has_valid_exit_time(self):
-        return self.exit_time != toIST_fromtimestamp(0)
+        return self.exit_time != None and self.exit_time != toIST_fromtimestamp(0)
 
     def is_profitable(self):
         try:
