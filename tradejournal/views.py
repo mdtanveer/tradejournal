@@ -761,6 +761,16 @@ def trade_calc_strategies():
 
     return "<html><body>" + mib_html + cc_html + "</body></html>"
 
+@app.route('/tradecalc/standarddeviation', methods=['GET'])
+@login_required
+def trade_calc_sd():
+    symbol = request.args.get('symbol', None)
+    expiry = request.args.get('expiry', None)
+    expiryDate: datetime = datetime.strptime(expiry, "%d-%b-%Y")
+    if symbol and expiry:
+        result = stockutils.get_standard_deviation(symbol, expiryDate)
+        return jsonify(result)
+    return jsonify(success=False)
 
 @app.template_filter('formatdatetimeinput')
 def format_datetime(value, format="%Y-%m-%dT%H:%M"):

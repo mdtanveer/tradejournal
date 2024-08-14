@@ -13,6 +13,9 @@
         <li class="nav-item">
             <a class="nav-link {{ 'active' if active_tab == 'strategy'}}" data-toggle="tab" href="#strategies">Strategies</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {{ 'active' if active_tab == 'strategy'}}" data-toggle="tab" href="#standarddeviation">Standard Deviation</a>
+        </li>
     </ul>
 
     <!-- Tab content -->
@@ -30,6 +33,11 @@
         <!-- Strategy tab -->
         <div id="strategies" class="tab-pane fade {{'show active' if active_tab == 'strategy'}}">
             {% include "strategycalculator.inc.html" %}
+        </div>
+        
+        <!-- SD tab -->
+        <div id="standarddeviation" class="tab-pane fade {{'show active' if active_tab == 'strategy'}}">
+            {% include "standarddeviationcalculator.inc.html" %}
         </div>
     </div>
 </div>

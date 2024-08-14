@@ -1,0 +1,72 @@
+<div class="container">
+    <h1>Standard Deviation Calculator</h1>
+    <div class="form-group row mb-3">
+        <label for="ltp" class="col-4 col-form-label">Symbol:</label>
+        <div class="col-8">
+            <input type="text" class="form-control" id="sd_symbol" value="{{symbol if symbol else ''}}"></input>
+        </div>
+    </div>
+
+    <div class="form-group row mb-3">
+        <label for="sl" class="col-4 col-form-label">Expiry</label>
+        <div class="col-8">
+            <input type="text" class="form-control" id="sd_expiry" list="expiries" value="{{expiry}}"></input>
+            <datalist id="expiries">
+                {% for exp in expiry_dates %}
+                <option value="{{exp}}"></option>
+                {% endfor %}
+            </datalist>
+        </div>
+    </div>
+    <button class="btn btn-primary btn-block mb-3" id="calculatesdbtn" onclick="fetch_sd_table()">Calculate</button>
+    <h3>Standard Deviation</h3>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>Annualized IV</td>
+                <td id="sd_annual_iv"></td>
+            </tr>
+            <tr>
+                <td>Daily IV</td>
+                <td id="sd_daily_iv"></td>
+            </tr>
+            <tr>
+                <td>Expiry IV</td>
+                <td id="sd_expiry_iv"></td>
+            </tr>
+            <tr>
+                <td>LTP</td>
+                <td id="sd_ltp"></td>
+            </tr>
+            <tr>
+                <td>Pips</td>
+                <td id="sd_pips"></td>
+            </tr>
+            <tr>
+                <td>+1σ</td>
+                <td id="sd_psd"></td>
+            </tr>
+            <tr>
+                <td>-1σ</td>
+                <td id="sd_msd"></td>
+            </tr>
+        </tbody>
+    </table>
+    <script>
+        function fetch_sd_table(){
+            fetch('/tradecalc/standarddeviation?symbol=' + $("#sd_symbol").val() + '&expiry=' + $("#sd_expiry").val())
+            .then(function(response) {
+                // When the page is loaded convert it to text
+                return response.json()
+            })
+            .then(function(json) {
+                    for (const key in json) {
+                        $("#sd_"+key).text(json[key].toFixed(2));
+                    }
+            })
+            .catch(function(err) {  
+                console.log('Failed to fetch page: ', err);  
+            });    
+        }
+    </script>
+</div>

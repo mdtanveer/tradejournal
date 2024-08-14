@@ -8,6 +8,9 @@ import requests
 import json
 from .tradejournalexceptions import ExpiryNotFoundException
 import pandas as pd
+from dataclasses import dataclass
+from datetime import datetime
+import math
 
 #examples
 # monthly expiry PE BANKNIFTY21SEP37500PE
@@ -140,10 +143,13 @@ def get_quote_old(name):
         return 0
 
 @cached(ttl=3600)
+def get_option_chain_helper(symbol):
+    return nsepython.option_chain(symbol)
+
 def get_option_chain(symbol, expiry, ltp=None, count=0):
     if not symbol:
         return None
-    option_chain = nsepython.option_chain(symbol)
+    option_chain = get_option_chain_helper(symbol)
     results = jmespath.search('records.data[*].{"expiry":expiryDate, "strike":strikePrice, "pe_ltp":PE.lastPrice, "ce_ltp":CE.lastPrice}', option_chain)
     if expiry:
         results = list(filter(lambda r: r["expiry"] == expiry, results))
@@ -156,6 +162,43 @@ def get_option_chain(symbol, expiry, ltp=None, count=0):
         if atm_index-count >= 0 and atm_index+count < len(results):
             results = results[atm_index-count+1:atm_index+count]
     return results
+
+@dataclass
+class SDResult():
+    annual_iv: float
+    daily_iv: float
+    expiry_iv: float
+    ltp: float
+    psd: float
+    msd: float
+    pips: float
+
+def get_standard_deviation(symbol, expiry: datetime):
+    option_chain = get_option_chain_helper(symbol)
+    ltp = get_quote_spot(symbol) 
+    results = jmespath.search('records.data[*].{"expiry":expiryDate, "strike":strikePrice, "pe_iv":PE.impliedVolatility, "ce_iv":CE.impliedVolatility}', option_chain)
+    if expiry:
+        results = list(filter(lambda r: r["expiry"] == expiry.strftime("%d-%b-%Y"), results))
+        results.sort(key=lambda r: float(r["strike"]))
+    atm_index = 0
+    for i, r in enumerate(results):
+        if ltp <= float(r["strike"]):
+            atm_index = i
+            break
+    keys = ["pe_iv", "ce_iv"]
+    sum_iv = 0
+    for k in keys:
+        for l in range(0, 2):
+            sum_iv += results[atm_index+l][k]
+
+    tte = (expiry.date() - datetime.now().date()).days
+    avg_iv = sum_iv / 4
+    daily_iv = avg_iv/math.sqrt(365)
+    expiry_iv = daily_iv*math.sqrt(tte)
+    pips = ltp * expiry_iv/100
+    psd = ltp + pips
+    msd = ltp - pips
+    return SDResult(annual_iv=avg_iv, daily_iv=daily_iv, expiry_iv=expiry_iv, ltp=ltp, pips=pips, msd=msd, psd=psd)
 
 @cached(ttl=30*24*3600)
 def get_lot_size(symbol):
