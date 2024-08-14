@@ -62,6 +62,41 @@
         </ul>
         {% endif %}
     </div>
+    <table class="mt-3 mb-3" data-toggle="table" id="membertable">
+        <thead>
+        <tr>
+            <th data-field="id">Id</th>
+            <th data-field="instrument">Instrument</th>
+            <th data-field="entry">Entry</th>
+            <th data-field="exit">Exit</th>
+            <th data-field="delete" data-formatter="operateFormatter" data-events="window.operateEvents">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for journalentry in journalentrygroup.deserialized_items %}
+        <tr>
+            {% if journalentry.is_group() %}
+                <td> {{ journalentry.key}} </td>
+                <td> {{journalentry.name}} </td>
+                <td>{{journalentry.entry_time|formatdateonly}}</td>
+                <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
+            {% else %}
+                <td>{{ journalentry.key }}</td>
+                <td> 
+                    {% if journalentry.key %}
+                        {{journalentry.get_tradingsymbol_forview(False) | safe}}
+                    {% else %}
+                        {{journalentry.get_tradingsymbol_forview(False) | safe}}
+                    {% endif %}
+                </td>
+                <td>{{journalentry.entry_time|formatdateonly}}</td>
+                <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
+            {% endif %}
+            <td></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 <script>
    function on_paste(elem) {
@@ -85,5 +120,26 @@
             });
           });
       });
+      function operateFormatter(value, row, index) {
+        return [
+          '<a class="remove" href="javascript:void(0)" title="Remove">',
+          '<i class="bi bi-trash"></i>',
+          '</a>'
+        ].join('')
+      }
+    window.operateEvents = {
+            'click .remove': function (e, value, row, index) {
+                    $("#membertable").bootstrapTable('remove', {
+                            field: 'id',
+                            values: [row.id]
+                        })
+                    var items = $("#items").val().split(",");
+                    const idx = items.indexOf(row.id);
+                    if (idx > -1) { 
+                            items.splice(idx, 1); 
+                    }
+                    $("#items").val(items.join(","));
+                }
+        }
 </script>
 {% endblock %}

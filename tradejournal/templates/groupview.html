@@ -31,32 +31,34 @@
       <a class="btn btn-secondary btn-light" type="button" id="analysisBtn" href="analysis" aria-expanded="false">Analysis</a>
       <a class="btn btn-secondary btn-light" href="edit">Edit</a>
     </div>
-    <table class="table table-sm table-responsive-sm">
+    <table class="" data-toggle="table" data-show-footer="true" data-show-columns="true">
         <thead>
         <tr>
-            <td>Instrument</td>
-            <td>Entry</td>
-            <td>Exit</td>
+            <th data-checkbox="true"></th>
+            <th data-sortable="true" data-field="instrument">Instrument</th>
+            <th data-sortable="true" data-field="entry">Entry</th>
+            <th data-sortable="true" data-field="exit">Exit</th>
             {% if journalentrygroup.is_virtual %}
-            <td>Entry Cost</td>
-            <td>Exit Cost</td>
+            <th>Entry Cost</th>
+            <th>Exit Cost</th>
             {% else %}
-            <td>Entry Price</td>
-            <td>Exit Price</td>
+            <th>Entry Price</th>
+            <th>Exit Price</th>
             {% endif %}
-            <td>Quantity</td>
+            <th>Quantity</th>
             {% if journalentrygroup.is_virtual %}
-            <td style="text-align:right">Gain %</td>
+            <th data-sortable="true" data-field="gain" style="text-align:right" data-falign="right">Gain %</th>
             {% else %}
-            <td style="text-align:right">Pips</td>
+            <th data-sortable="true" data-field="pips" style="text-align:right" data-falign="right">Pips</th>
             {% endif %}
-            <td style="text-align:right">Profit</td>
+            <th data-sortable="true" data-field="profit" style="text-align:right" data-falign="right">Profit</th>
         </tr>
         </thead>
         <tbody>
         {% for journalentry in journalentrygroup.deserialized_items %}
         <tr>
             {% if journalentry.is_group() %}
+                <td></td>
                 <td> 
                     <a href="/journalentrygroup/{{journalentry.key}}/view" style="text-decoration:none">{{journalentry.name}}</a>
                 </td>
@@ -65,35 +67,36 @@
                 <td></td>
                 <td></td>
                 <td></td>
-            {% if journalentrygroup.is_virtual %}
-                <td style="text-align:right">{{'%0.2f' % journalentry.profit_percent() | float}}</td>
-            {% else %}
-                <td style="text-align:right">{{'%0.2f' % journalentry.points_gain() | float}}</td>
-            {% endif %}
+                {% if journalentrygroup.is_virtual %}
+                    <td style="text-align:right">{{'%0.2f' % journalentry.profit_percent() | float}}</td>
+                {% else %}
+                    <td style="text-align:right">{{'%0.2f' % journalentry.points_gain() | float}}</td>
+                {% endif %}
                 <td>{{'%0.2f' % journalentry.profit() | float}}</td>
             {% else %}
+                <td></td>
                 <td> 
                     {% if journalentry.key %}
-                    <a href="/journalentry/{{journalentry.key}}/edit" style="text-decoration:none">{{journalentry.get_tradingsymbol_forview(False) | safe}}</a>
+                        <a href="/journalentry/{{journalentry.key}}/edit" style="text-decoration:none">{{journalentry.get_tradingsymbol_forview(False) | safe}}</a>
                     {% else %}
-                    {{journalentry.get_tradingsymbol_forview(False) | safe}}
+                        {{journalentry.get_tradingsymbol_forview(False) | safe}}
                     {% endif %}
                 </td>
                 <td>{{journalentry.entry_time|formatdateonly}}</td>
                 <td>{{journalentry.exit_time | formatdateonly if not zero_exit else ''}}</td>
-            {% if journalentrygroup.is_virtual %}
-                <td>{{journalentry.entry_cost}}</td>
-                <td>{{journalentry.exit_cost}}</td>
-            {% else %}
-                <td>{{journalentry.entry_price}}</td>
-                <td>{{journalentry.exit_price}}</td>
-            {% endif %}
+                {% if journalentrygroup.is_virtual %}
+                    <td>{{journalentry.entry_cost}}</td>
+                    <td>{{journalentry.exit_cost}}</td>
+                {% else %}
+                    <td>{{journalentry.entry_price}}</td>
+                    <td>{{journalentry.exit_price}}</td>
+                {% endif %}
                 <td>{{journalentry.directionalqty()}}</td>
-            {% if journalentrygroup.is_virtual %}
-                <td style="text-align:right">{{'%0.2f' % journalentry.profit_percent() | float}}</td>
-            {% else %}
-                <td style="text-align:right">{{'%0.2f' % journalentry.points_gain() | float}}</td>
-            {% endif %}
+                {% if journalentrygroup.is_virtual %}
+                    <td style="text-align:right">{{'%0.2f' % journalentry.profit_percent() | float}}</td>
+                {% else %}
+                    <td style="text-align:right">{{'%0.2f' % journalentry.points_gain() | float}}</td>
+                {% endif %}
                 <td style="text-align:right">{{'%0.2f' % journalentry.profit() | float}}</td>
             {% endif %}
         </tr>
@@ -101,6 +104,7 @@
         </tbody>
         <tfoot>
         <tr>
+            <td></td>
             <td>Total</td>
             <td></td>
             <td></td>
