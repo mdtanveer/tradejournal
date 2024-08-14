@@ -752,6 +752,7 @@ def trade_calc_strategies():
     df["3% down"] = df["ltp"]*0.97
     df["4% down"] = df["ltp"]*0.96
 
+    pd.set_option('colheader_justify', 'left')
     mib_html = df.to_html(classes="table")
 
     df = pd.DataFrame.from_dict({k:v for k,v in LTP.items() if k in cc}, orient='index', columns=['ltp'])
