@@ -31,7 +31,12 @@
       <a class="btn btn-secondary btn-light" type="button" id="analysisBtn" href="analysis" aria-expanded="false">Analysis</a>
       <a class="btn btn-secondary btn-light" href="edit">Edit</a>
     </div>
-    <table class="" data-toggle="table" data-show-footer="true" data-show-columns="true">
+    <table class="" 
+        data-toggle="table"
+        data-show-footer="true"
+        data-show-columns="true"
+        data-show-columns-toggle-all = "true"
+        >
         <thead>
         <tr>
             <th data-checkbox="true"></th>
@@ -51,7 +56,7 @@
             {% else %}
             <th data-sortable="true" data-field="pips" style="text-align:right" data-falign="right">Pips</th>
             {% endif %}
-            <th data-sortable="true" data-field="profit" style="text-align:right" data-falign="right">Profit</th>
+            <th data-sortable="true" data-switchable="false" data-field="profit" style="text-align:right" data-falign="right">Profit</th>
         </tr>
         </thead>
         <tbody>
