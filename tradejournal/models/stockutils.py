@@ -172,33 +172,78 @@ class SDResult():
     psd: float
     msd: float
     pips: float
+    ce_ltp: float = 0
+    pe_ltp: float = 0
+    ce_strike: float = 0
+    pe_strike: float = 0
+    ce_price: float = 0
+    pe_price: float = 0
+
+def get_closest_strike(price, option_chain, lesser=False):
+    atm_index = 0
+    option_chain.sort(key=lambda r: float(r["strike"]))
+    for i, r in enumerate(option_chain):
+        if price <= float(r["strike"]): 
+            atm_index = i
+            if lesser:
+                atm_index -= 1
+            break
+    return atm_index
 
 def get_standard_deviation(symbol, expiry: datetime):
     option_chain = get_option_chain_helper(symbol)
     ltp = get_quote_spot(symbol) 
-    results = jmespath.search('records.data[*].{"expiry":expiryDate, "strike":strikePrice, "pe_iv":PE.impliedVolatility, "ce_iv":CE.impliedVolatility}', option_chain)
+    lot_size = get_lot_size(symbol)
+    results = jmespath.search(('records.data[*].{"expiry":expiryDate,'
+                            '"strike":strikePrice,'
+                            '"pe_iv":PE.impliedVolatility,'
+                            '"ce_iv":CE.impliedVolatility,'
+                            '"pe_ltp":PE.lastPrice,'
+                            '"ce_ltp":CE.lastPrice}'), option_chain)
     if expiry:
         results = list(filter(lambda r: r["expiry"] == expiry.strftime("%d-%b-%Y"), results))
         results.sort(key=lambda r: float(r["strike"]))
-    atm_index = 0
-    for i, r in enumerate(results):
-        if ltp <= float(r["strike"]):
-            atm_index = i
-            break
+    atm_index = get_closest_strike(ltp, results)
     keys = ["pe_iv", "ce_iv"]
     sum_iv = 0
+    count = 0
     for k in keys:
         for l in range(0, 2):
-            sum_iv += results[atm_index+l][k]
-
+            iv = results[atm_index+l][k]
+            if iv > 0:
+                sum_iv += iv
+                count += 1
     tte = (expiry.date() - datetime.now().date()).days
-    avg_iv = sum_iv / 4
+    avg_iv = sum_iv / count if count != 0 else 0
     daily_iv = avg_iv/math.sqrt(365)
     expiry_iv = daily_iv*math.sqrt(tte)
     pips = ltp * expiry_iv/100
     psd = ltp + pips
     msd = ltp - pips
-    return SDResult(annual_iv=avg_iv, daily_iv=daily_iv, expiry_iv=expiry_iv, ltp=ltp, pips=pips, msd=msd, psd=psd)
+
+    ce_strike_index = get_closest_strike(psd, results)
+    pe_strike_index = get_closest_strike(msd, results, lesser=True)
+    ce_ltp=results[ce_strike_index]["ce_ltp"]
+    pe_ltp=results[pe_strike_index]["pe_ltp"]
+    ce_strike=results[ce_strike_index]["strike"]
+    pe_strike=results[pe_strike_index]["strike"]
+    ce_price = ce_ltp*lot_size
+    pe_price = pe_ltp*lot_size
+
+    return SDResult(annual_iv=avg_iv,
+            daily_iv=daily_iv,
+            expiry_iv=expiry_iv, 
+            ltp=ltp,
+            pips=pips,
+            msd=msd, 
+            psd=psd,
+            ce_strike=ce_strike,
+            pe_strike=pe_strike,
+            ce_ltp=ce_ltp,
+            pe_ltp=pe_ltp,
+            ce_price = ce_price,
+            pe_price = pe_price
+        )
 
 @cached(ttl=30*24*3600)
 def get_lot_size(symbol):

@@ -39,7 +39,7 @@
                 <div class="form-group row mb-3">
                     <label for="capital" class="col-4 col-form-label">Capital:</label>
                     <div class="col-8">
-                        <input type="number" class="form-control" id="capital" min="0" step="0.01" value="150000" required>
+                        <input type="number" class="form-control" id="capital" min="0" step="0.01" required>
                     </div>
                 </div>
                
@@ -223,6 +223,11 @@
             }
         }
         document.getElementById("stock-calculator-form").addEventListener("input", calculate);
+        
+        $(document).ready(function(){
+            $("#capital").val(new Number(localStorage.getItem("capital")));
+        });
+
     </script>
     
     {% if option_chain %}

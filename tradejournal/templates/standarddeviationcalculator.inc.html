@@ -52,6 +52,31 @@
             </tr>
         </tbody>
     </table>
+    <h3>Premiums</h3>
+    <table class="table">
+        <thead>
+            <th></th>
+            <th>CE</th>
+            <th>PE</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Strike</td>
+                <td id="sd_ce_strike"></td>
+                <td id="sd_pe_strike"></td>
+            </tr>
+            <tr>
+                <td>Premium</td>
+                <td id="sd_ce_ltp"></td>
+                <td id="sd_pe_ltp"></td>
+            </tr>
+            <tr>
+                <td>Price</td>
+                <td id="sd_ce_price"></td>
+                <td id="sd_pe_price"></td>
+            </tr>
+        </tbody>
+    </table>
     <script>
         function fetch_sd_table(){
             fetch('/tradecalc/standarddeviation?symbol=' + $("#sd_symbol").val() + '&expiry=' + $("#sd_expiry").val())
@@ -61,7 +86,10 @@
             })
             .then(function(json) {
                     for (const key in json) {
-                        $("#sd_"+key).text(json[key].toFixed(2));
+                        value = json[key];
+                        if (!Number.isInteger(value))
+                                value = value.toFixed(2);
+                        $("#sd_"+key).text(value);
                     }
             })
             .catch(function(err) {  
