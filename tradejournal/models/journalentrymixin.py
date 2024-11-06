@@ -16,7 +16,7 @@ class JournalEntryMixin:
     def get_journalentries(self):
         """Returns all the journalentries from the repository."""
         journalentries = self.get_journalentries_helper(tju.journalentry_from_entity, tju.ROLLING_AGE)
-        journalentries.sort(key = lambda x: (x.is_open(), x.entry_time), reverse=True)
+        journalentries.sort(key = lambda x: (x.entry_time, x.is_open()), reverse=True)
         return journalentries
 
     def get_journalentries_forview(self):
