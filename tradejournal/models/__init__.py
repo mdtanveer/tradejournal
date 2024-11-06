@@ -10,7 +10,7 @@ import pytz
 from . import stockutils
 import itertools, functools
 import re
-from optionlab import Inputs, StrategyEngine
+from optionlab import Inputs, run_strategy
 from memoization import cached
 import asyncio
 import plotly
@@ -270,8 +270,7 @@ class JournalEntryGroup(object):
         print(inputs_data)
 
         inputs = Inputs.model_validate(inputs_data)
-        st = StrategyEngine(inputs)
-        out = st.run()
+        out = run_strategy(inputs)
 
         size = len(out.data.stock_price_array)
         k = int(size/500)
