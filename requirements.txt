@@ -12,7 +12,7 @@ dash
 azure-keyvault-secrets
 azure-identity
 yfinance
-nsepython
+nsepython>=2.94
 nsepy
 jmespath
 fiscalyear
